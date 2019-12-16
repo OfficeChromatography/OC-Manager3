@@ -9,4 +9,4 @@ services:
     volumes:
       - ./app:/app # Map ./app directory en docker app folder
     command: > # > nextline
-      sh -c "python manage.py runserver 0.0.0.0:8000" 
+      sh -c "python manage.py runserver 0.0.0.0:8000"
