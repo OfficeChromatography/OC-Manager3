@@ -5,6 +5,13 @@ from django.http import HttpResponse
 def home_view(request, *args, **kwargs):
     return render(request, "index.html",{})
 
+def connection_view(request, *args, **kwargs):
+    my_context = {
+        "My_text": "This is about me",
+        "My_number" : 123
+    }
+    return render(request, "connection.html", my_context)
+
 def axis_view(request, *args, **kwargs):
     return render(request, "axis.html",{})
 
@@ -19,6 +26,3 @@ def documentation_view(request, *args, **kwargs):
 
 def inkjet_view(request, *args, **kwargs):
     return render(request, "inkjet.html",{})
-
-def connection_view(request, *args, **kwargs):
-    return render(request, "connection.html",{})
