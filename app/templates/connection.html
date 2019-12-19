@@ -52,23 +52,29 @@
 
             <!-- Serial Port -->
             <div class="col-sm-12 col-md-10 col-lg-8 col-xl-5 mb-4">
-              <div class="card border-left-success shadow h-100 py-2">
+              <div class="card border-left-success shadow mh-25 pt-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-3">Serial Port</div>
                       <!-- Input Group -->
+                      <form action="connection" method="post"> {% csrf_token %}
                         <div class="input-group mb-3">
                           <div class="input-group-prepend">
-                              <button class="btn btn-outline-secondary" type="button">Connect</button>
+                            {% if object %}
+                              <button class="btn btn-outline-secondary" type="submit">Connect</button>
+                            {% else %}
+                              <button class="btn btn-outline-secondary" type="submit" disabled>Connect</button>
+                            {% endif %}
                           </div>
-                          <select class="custom-select" id="inputGroupSelect03">
+                          <select class="custom-select" id="inputGroupSelect03" name="port_selected">
                             <option selected>Choose...</option>
                             {% for my_sub_item in object %}
-                              <option value = {{forloop.counter}} >{{ my_sub_item.device }}</option>
+                            <option value = {{ my_sub_item.device }} >{{ my_sub_item.device }}</option>
                             {% endfor %}
                           </select>
                         </div>
+                      </form>
                     </div>
                     <!-- USB icon -->
                     <div class="col-auto mt-3">
@@ -79,32 +85,59 @@
                       {% endif %}
                     </div>
                   </div>
-
+                </div>
+                  <div class="card-footer text-muted">{{message}}</div>
+              </div>
+            </div>
+            <!-- Monitor Card -->
+            <div class="col-sm-12 col-md-10 col-lg-8 col-xl-5 mb-4">
+              <div class="card border-left-success shadow h-100 pt-2">
+                <div class="card-body">
                   <div class="row no-gutters align-items-center">
-                    <p>
-                      {{My_text}},{{My_number}},{{ objects.name }}
-                    </p>
-                    <ul>
-                      {% for my_sub_item in My_list %}
-                        {% if my_sub_item == 123 %}
-                          <li>{{ my_sub_item }}</li>
-                        {% elif my_sub_item == 1235 %}
-                          <li>Encontro algo mas</li>
-                        {% else %}
-                          <li>Encontro algo</li>
-                        {% endif %}
-                      {% endfor %}
-                    </ul>
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-3">Monitor</div>
+                    </div>
+                    <!-- USB icon -->
+                    <div class="col-auto">
+                      {% if connected %}
+                        <i class="fa fa-desktop fa-2x text-green-500" aria-hidden="true"></i>
+                      {% else %}
+                        <i class="fa fa-desktop fa-2x text-gray-300" aria-hidden="true"></i>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <!-- Text on Monitor -->
+                  <div class="form-group">
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" disabled>{{received}}</textarea>
+                  </div>
+
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button" name="_send">Send</button>
+                    </div>
                   </div>
 
                 </div>
+                  <div class="card-footer text-muted font-italic font-weight-bold">
+                    {% if connected %}
+                    <table class="table table-borderless table-sm m-0 p-0">
+                      <thead>
+                        <tr>
+                          <th scope="col">Dev:{{device}}</th>
+                          <th scope="col">Baudrate:{{baudrate}}</th>
+                        </tr>
+                      </thead>
+                    </table>
+                    {% endif %}
+                  </div>
               </div>
             </div>
+
           </div>
 
         </div>
         <!-- /.container-fluid -->
-
       </div>
       <!-- End of Main Content -->
 
@@ -112,7 +145,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
+            <span> &copy; Your Website 2019</span>
           </div>
         </div>
       </footer>
