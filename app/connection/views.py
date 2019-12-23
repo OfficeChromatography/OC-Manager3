@@ -4,9 +4,6 @@ from django.http import HttpResponse
 import serial
 import serial.tools.list_ports
 import time
-
-ser = serial.Serial(baudrate=115200, timeout=1)
-
 my_context = {
     'object': "",
     'message': "",
@@ -34,30 +31,15 @@ def connection_view(request):
     return render(request, "connection.html", my_context)
 
 def connectArduino(port):
-    closeArduino()
-    # Connect to selected port
-    ser.port=port;
-    ser.open()
+    ser = serial.Serial(port, baudrate=115200, timeout=1)
     my_context['baudrate']=ser.baudrate
-    readArduino()
-    return
 
-def closeArduino():
-    # Close any posible connection and clean the monitor
-    ser.close()
-    my_context['received'] = ""
-    return
-
-def readArduino(): # Read 1 sec mssg
     timeout = 1  # [seconds]
     timeout_start = time.time()
     while time.time() < timeout_start+timeout:
-        ser_bytes = ser.read_until() #(‘\n’ by default)
+        ser_bytes = ser.readline()
         decoded_bytes = ser_bytes[0:len(ser_bytes)-1].decode("utf-8")
         my_context['received']+=str(decoded_bytes)+str('\n')
-    return
 
-# def read(){
-#     if(ser.in_waiting != 0):
-#
-# }
+    ser.write(bytes(b'G0 Y100\r'))
+    return
