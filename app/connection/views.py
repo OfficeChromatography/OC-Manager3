@@ -25,6 +25,7 @@ def connection_view(request):
                 my_context['connected'] = False
             else:
                 connectArduino(selected)
+
         if "usermsg" in request.POST:
             writeArduino(request.POST.get("usermsg"))
     return render(request, "connection.html", my_context)
@@ -53,13 +54,13 @@ def readArduino(): # Read 1 sec mssg
         decoded_bytes = ser_bytes[:-1].decode("utf-8")
         my_context['received']+=str(decoded_bytes)+str('\n')
         if my_context['received'][-1]=='\n' and my_context['received'][-2]=='\n':
-            my_context['received']=my_context['received'][:-1]
+            # my_context['received']=my_context['received'][:-1]
             break
     return
 
 def writeArduino(menssage):
-    my_context['received']+=menssage+"\n"
-    menssage+='\n'
+    menssage+=2*'\n'
+    my_context['received']+=menssage
     ser.write(menssage.encode('utf-8'))
     readArduino()
     return
