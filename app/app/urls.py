@@ -22,7 +22,7 @@ from connection import views as connectionview
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pageviews.home_view, name='home'),
-    path('connection', connectionview.connection_view, name='connection'),
+    path('connection/', connectionview.connection_view, name='connection'),
     # path('connection/<str:my_state>/', connectionview.connection_request, name='connection')
     # path('connection/<str:my_state>/', connectionview.connection_view, name='connection'),
 

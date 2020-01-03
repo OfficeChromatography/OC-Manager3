@@ -16,21 +16,17 @@ my_context = {
     'received': "",
 }
 def connection_view(request):
-
-    ports = serial.tools.list_ports.comports()
-    my_context['object']=ports
+    my_context['object'] = serial.tools.list_ports.comports()
     if request.method == 'POST':
-        selected = request.POST.get('port_selected')
-        if selected == "Choose...":
-            my_context['message']="Please select port"
-            my_context['connected'] = False
-        else:
-            connectArduino(selected)
-            my_context['message'] = "Connected to " + selected
-            my_context['connected'] = True
-            my_context['device'] = selected
-        # if "_send" in request.POST:
-            # ser.write(bytes(b''+'))
+        if 'port_selected' in request.POST:
+            selected = request.POST.get('port_selected')
+            if selected == "Choose...":
+                my_context['message']="Please select port"
+                my_context['connected'] = False
+            else:
+                connectArduino(selected)
+        if "usermsg" in request.POST:
+            writeArduino(request.POST.get("usermsg"))
     return render(request, "connection.html", my_context)
 
 def connectArduino(port):
@@ -38,7 +34,10 @@ def connectArduino(port):
     # Connect to selected port
     ser.port=port;
     ser.open()
-    my_context['baudrate']=ser.baudrate
+    my_context['baudrate'] = ser.baudrate
+    my_context['message'] = "Connected to " + port
+    my_context['connected'] = True
+    my_context['device'] = port
     readArduino()
     return
 
@@ -49,15 +48,18 @@ def closeArduino():
     return
 
 def readArduino(): # Read 1 sec mssg
-    timeout = 1  # [seconds]
-    timeout_start = time.time()
-    while time.time() < timeout_start+timeout:
+    while True:
         ser_bytes = ser.read_until() #(‘\n’ by default)
-        decoded_bytes = ser_bytes[0:len(ser_bytes)-1].decode("utf-8")
+        decoded_bytes = ser_bytes[:-1].decode("utf-8")
         my_context['received']+=str(decoded_bytes)+str('\n')
+        if my_context['received'][-1]=='\n' and my_context['received'][-2]=='\n':
+            my_context['received']=my_context['received'][:-1]
+            break
     return
 
-# def read(){
-#     if(ser.in_waiting != 0):
-#
-# }
+def writeArduino(menssage):
+    my_context['received']+=menssage+"\n"
+    menssage+='\n'
+    ser.write(menssage.encode('utf-8'))
+    readArduino()
+    return

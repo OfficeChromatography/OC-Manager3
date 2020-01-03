@@ -40,7 +40,7 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid">
+        <div class="container-fluid" style="height:80%">
 
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -48,26 +48,26 @@
           </div>
 
           <!-- Content Row -->
-          <div class="row">
+          <div class="row h-100">
 
             <!-- Serial Port -->
-            <div class="col-sm-12 col-md-10 col-lg-8 col-xl-5 mb-4">
+            <div class="col-sm-12 col-md-10 col-lg-8 col-xl-5 h-25 ">
               <div class="card border-left-success shadow mh-25 pt-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-3">Serial Port</div>
                       <!-- Input Group -->
-                      <form action="connection" method="post"> {% csrf_token %}
+                      <form method="post" id="form1"> {% csrf_token %}
                         <div class="input-group mb-3">
                           <div class="input-group-prepend">
                             {% if object %}
-                              <button class="btn btn-outline-secondary" type="submit">Connect</button>
+                              <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
                             {% else %}
                               <button class="btn btn-outline-secondary" type="submit" disabled>Connect</button>
                             {% endif %}
                           </div>
-                          <select class="custom-select" id="inputGroupSelect03" name="port_selected">
+                          <select class="custom-select" id="selectionBox" name="port_selected">
                             <option selected>Choose...</option>
                             {% for my_sub_item in object %}
                             <option value = {{ my_sub_item.device }} >{{ my_sub_item.device }}</option>
@@ -90,12 +90,12 @@
               </div>
             </div>
             <!-- Monitor Card -->
-            <div class="col-sm-12 col-md-10 col-lg-8 col-xl-5 mb-4">
+            <div class="col-sm-12 col-md-10 col-lg-8 col-xl-7 mb-4">
               <div class="card border-left-success shadow h-100 pt-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-3">Monitor</div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-3 ">Monitor</div>
                     </div>
                     <!-- Monitor icon -->
                     <div class="col-auto">
@@ -107,14 +107,19 @@
                     </div>
                   </div>
                   <!-- Text on Monitor -->
-                  <div class="form-group ">
-                    <textarea class="form-control" id="exampleFormControlTextarea1" rows=10 disabled>{{received}}</textarea>
-                  </div>
-
-                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary" type="button" name="_send">Send</button>
+                  <div class="row no-gutters align-items-start h-100">
+                    <div class="col pb-5 mb-5 h-100">
+                      <div class="form-group noresize p-2" style="height:90%">
+                        <textarea class="form-control" disabled id="sendit" style="height:100%; resize: none;">{{received}}</textarea>
+                        <form method="post">{% csrf_token %}
+                        <div class="input-group mb-3 pt-2">
+                          <input type="text" class="form-control overflow-y:scroll" aria-describedby="basic-addon2" name="usermsg">
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">Send</button>
+                          </div>
+                        </div>
+                        </form>
+                      </div>
                     </div>
                   </div>
 
@@ -184,7 +189,9 @@
   <!-- Bootstrap core JavaScript-->
   <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
+  <script type="text/javascript">
+    document.getElementById("sendit").scrollTop = document.getElementById("sendit").scrollHeight
+  </script>
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 
@@ -192,5 +199,6 @@
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
 
 </body>
+
 
 </html>
