@@ -12,5 +12,6 @@ WORKDIR /app
 COPY ./app /app
 
 # -D is only to run the apps without root premision
-RUN adduser -D user
-USER user
+# RUN adduser user
+# RUN adduser -D user
+# USER user

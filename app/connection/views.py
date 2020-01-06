@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from .serialarduino import ArdComm
 
 import serial.tools.list_ports
-import time
+# import time
 
 Arduino_Port = ArdComm(baudrate=115200, timeout=1)
 
@@ -15,6 +15,8 @@ my_context = {
     'baudrate': "",
     'received': "",
 }
+
+
 def connection_view(request):
     my_context['object'] = serial.tools.list_ports.comports()
     if request.method == 'POST':

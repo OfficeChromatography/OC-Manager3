@@ -17,16 +17,13 @@ from django.contrib import admin
 from django.urls import path
 
 from pages import views as pageviews
-from connection import views as connectionview
+from connection import views as conn_view
 from users import views as usersview
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pageviews.home_view, name='home'),
-    path('connection/', connectionview.connection_view, name='connection'),
+    path('connection/', conn_view.connection_view, name='connection'),
     path('register/', usersview.register_view, name='register'),
-
-    # path('connection/<str:my_state>/', connectionview.connection_request, name='connection')
-    # path('connection/<str:my_state>/', connectionview.connection_view, name='connection'),
 
 ]

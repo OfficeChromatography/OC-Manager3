@@ -3,8 +3,15 @@ version: "3"
 services:
   app:
     build: .
+    environment:
+      - UDEV=1
     ports:
       - "8000:8000" # Map 8000 to 8000 of our docker image
     volumes:
       - ./app:/app # Map ./app directory en docker app folder
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - '/dev:/dev'
     command: python manage.py runserver 0.0.0.0:8000
