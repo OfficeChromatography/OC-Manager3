@@ -110,7 +110,7 @@
                   <div class="row no-gutters align-items-start h-100">
                     <div class="col pb-5 mb-5 h-100">
                       <div class="form-group noresize p-2" style="height:90%">
-                        <textarea class="form-control" disabled id="sendit" style="height:100%; resize: none;">{{received}}</textarea>
+                        <textarea class="form-control" disabled id="sendit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea>
                         <form method="post">{% csrf_token %}
                         <div class="input-group mb-3 pt-2">
                           <input type="text" class="form-control overflow-y:scroll" aria-describedby="basic-addon2" name="usermsg">
