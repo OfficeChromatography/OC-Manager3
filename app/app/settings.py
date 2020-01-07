@@ -125,3 +125,5 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'templates')
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'users.User'
