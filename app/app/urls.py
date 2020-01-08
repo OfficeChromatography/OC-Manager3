@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
 
 from pages import views as pageviews
 from connection import views as conn_view
@@ -25,5 +26,5 @@ urlpatterns = [
     path('', pageviews.home_view, name='home'),
     path('connection/', conn_view.connection_view, name='connection'),
     path('register/', usersview.register_view, name='register'),
-
+    path('api/user/', include('users_api.urls')),
 ]
