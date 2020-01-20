@@ -1,0 +1,27 @@
+<footer class="sticky-footer bg-warning" style="opacity:0.7" id="footer">
+  <div class="container my-auto">
+    <div class="copyright font-weight-bold text-center my-auto">
+      <span id="footerText">OC-Lab Disconnected</span>
+    </div>
+  </div>
+
+  <script>
+    var connectionStatus = "{{connected}}";
+    var device = "{{device}}"
+    var busy = "{{busy}}"
+
+    connectionVerify(connectionStatus)
+    function connectionVerify(connectionStatus){
+      foot = document.getElementById("footer")
+      footText = document.getElementById("footerText")
+      if (connectionStatus!='False'){
+        foot.classList.replace(foot.classList[1],'bg-success')
+        footText.innerHTML="OC-Lab Connected to "+device
+      } else{
+        foot.classList.replace(foot.classList[1],'bg-warning')
+        footText.innerHTML="OC-Lab Disconnected"
+      }
+    }
+
+  </script>
+</footer>

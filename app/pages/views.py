@@ -15,8 +15,8 @@ def method_view(request, *args, **kwargs):
     return render(request, "404.html", {})
 
 
-def motorcontrol_view(request, *args, **kwargs):
-    return render(request, "motorcontrol.html", {})
+# def motorcontrol_view(request, *args, **kwargs):
+#     return render(request, "motorcontrol.html", {})
 
 
 def documentation_view(request, *args, **kwargs):

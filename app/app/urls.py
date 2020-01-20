@@ -19,12 +19,17 @@ from django.conf.urls import include
 
 from pages import views as pageviews
 from connection import views as conn_view
+from finecontrol import views as fine_view
 from users import views as usersview
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pageviews.home_view, name='home'),
     path('connection/', conn_view.connection_view, name='connection'),
+    path('motorcontrol/', fine_view.motorcontrol_view, name='motorcontrol'),
+
+
+
     path('register/', usersview.register_view, name='register'),
     path('api/user/', include('users_api.urls')),
 ]
