@@ -5,12 +5,12 @@ services:
     build: .
     environment:
       - UDEV=1
-      - DB_HOST=db
-      - DB_NAME=app
-      - DB_USER=postgres
-      - DB_PASS=Hptlc123
-    depends_on:
-      - db
+    #   - DB_HOST=db
+    #   - DB_NAME=app
+    #   - DB_USER=postgres
+    #   - DB_PASS=Hptlc123
+    # depends_on:
+    #   - db
     ports:
       - "8000:8000" # Map 8000 to 8000 of our docker image
     volumes:
@@ -21,15 +21,14 @@ services:
     devices:
       - '/dev:/dev'
     command: >
-      sh -c "python manage.py wait_for_db &&
-              python manage.py migrate &&
+      sh -c " python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
 
 
 
-  db:
-    image: postgres:10-alpine
-    environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=Hptlc123
+  # db:
+  #   image: postgres:10-alpine
+  #   environment:
+  #     - POSTGRES_DB=app
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=Hptlc123
