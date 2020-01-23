@@ -62,7 +62,7 @@
                       <span class="align-middle">X</span>
                     </div>
                     <div class="col-10 d-flex justify-content-around">
-                      <a href="#" id="left_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">{% csrf_token %}
+                      <a href="#" onclick="move(this.id, event)" id="left_arrow" class="btn btn-secondary btn-icon-split mr-5">{% csrf_token %}
                         <span class="icon text-white-50">
                           <i class="fas fa-arrow-left"></i>
                         </span>
@@ -116,7 +116,7 @@
                   <div class="input-group">
                     <input type="text" class="form-control" id="Gcode" placeholder="Enter G-CODE" aria-label="Enter G-CODE" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                      <a href="#" class="btn btn-primary btn-icon-split" onclick="run(event)">
+                      <a href="#" class="btn btn-primary btn-icon-split" id="btt_play">
                         <span class="icon text-white-50">
                           <i class="fas fa-play"></i>
                         </span>
@@ -135,25 +135,86 @@
                 <div class="card-header py-3">
                   <h6 class="m-0 font-weight-bold text-primary">Upload G-Code</h6>
                 </div>
+                <div class="card-body" >
+                  <form class="form-inline" id='lenghtforupload' enctype="multipart/form-data" method="POST">{% csrf_token %}
+                    <div class="form-group" id='uploadform'>
+                        <input  type="file" id='uploadfile' class="form-control" style="height:auto" name="document"  aria-describedby="basic-addon2">
+                        <button type="submit" id='btt_upload_file' class="btn btn-primary btn-icon-split">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-play"></i>
+                          </span>
+                        </button>
+                        <a href="#" class="btn btn-primary btn-icon-split">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-trash-alt"></i>
+                          </span>
+                        </a>
+                    </div>
+                  </form>
+                </div>
+                {% if gcode_url %}
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">URL:{{gcode_url}}</th>
+                        <th scope="col">File:   {{gcode_filename}}</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                {% else %}
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Upload Something</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                {% endif %}
+              </div>
+
+            </div>
+            <div class="col-lg-6 mb-4">
+              <div class="card border-left-success shadow h-100 pt-2">
                 <div class="card-body">
-                  <div class="form-group">
-                    <div class="input-group-append">
-                      <input type="file" class="form-control" style="height:auto" placeholder="Load your G-CODE" aria-label="Load your G-CODE" aria-describedby="basic-addon2">
-                      <a href="#" class="btn btn-primary btn-icon-split">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-play"></i>
-                        </span>
-                      </a>
-                      <a href="#" class="btn btn-primary btn-icon-split">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-trash-alt"></i>
-                        </span>
-                      </a>
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-3 ">Monitor</div>
+                    </div>
+                    <!-- Monitor icon -->
+                    <div class="col-auto">
+                      {% if connected %}
+                        <i class="fa fa-desktop fa-2x text-green-500" aria-hidden="true" onClick="location.reload(true)"></i>
+                      {% else %}
+                        <i class="fa fa-desktop fa-2x text-gray-300" aria-hidden="true"></i>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <!-- Text on Monitor -->
+                  <div class="row no-gutters align-items-start h-100">
+                    <div class="col h-100">
+                      <div class="form-group noresize p-2" style="height:90%">
+                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  {% if connected %}
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Dev:{{device}}</th>
+                        <th scope="col">Baudrate:{{baudrate}}</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  {% endif %}
+                </div>
               </div>
-
             </div>
           </div>
 
@@ -209,7 +270,20 @@
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
   <script src="{% static 'motorcontrol.js' %}"></script>
-  scr
+  <script type="text/javascript">
+    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+    aux1=document.getElementById("uploadform")
+    aux2=document.getElementById("uploadfile")
+    function changeInputSize() {
+    len=document.getElementById("lenghtforupload").offsetWidth
+    bttLength=document.getElementById("btt_upload_file").offsetWidth
+    aux1.style.width = len.toString()+'px'
+    f=len-(2*bttLength)-15
+    aux2.style.width = f.toString()+'px'
+    }
+    window.onresize = changeInputSize;
+    window.onload = changeInputSize;
+  </script>
 </body>
 
 </html>

@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 from pages import views as pageviews
 from connection import views as conn_view
@@ -33,3 +36,6 @@ urlpatterns = [
     path('register/', usersview.register_view, name='register'),
     path('api/user/', include('users_api.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

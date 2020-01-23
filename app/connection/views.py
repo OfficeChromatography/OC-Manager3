@@ -13,7 +13,6 @@ my_context = {
     'baudrate': "",
     'received': "",
     'errormsg': "",
-    'busy': 'false'
 }
 blank = my_context
 
@@ -38,24 +37,15 @@ def connection_view(request):
             else:
                 my_context['received'] = ""
                 error = 0
-                while my_context['received'] == "" and error<19:
+                while my_context['received'] == "":
                     try:
-                        my_context['busy'] = 'true'
-                        Arduino_Port.closeArduino()
-                        Arduino_Port.connectArduino(selected)
+                        my_context['connected'] = str(Arduino_Port.connectArduino(selected))
                         my_context['received'] += Arduino_Port.readArduino()
                         my_context['baudrate'] = Arduino_Port.baudrate
                         my_context['device'] = Arduino_Port.name
                         my_context['message'] = "Connected to " + my_context['device']
-                        my_context['connected'] = "True"
-                        my_context['busy'] = 'false'
                     except:
                         my_context['errormsg'] = "Connection Error 1"
-                        error+=1
-                        print(error)
         if "usermsg" in request.POST:
-            my_context['busy'] = 'true'
             my_context['received'] += Arduino_Port.writeArduino(request.POST.get("usermsg"))
-            my_context['received'] += Arduino_Port.readArduino()
-            my_context['busy'] = 'false'
     return render(request, "connection.html", my_context)
