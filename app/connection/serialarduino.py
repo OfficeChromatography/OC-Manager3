@@ -1,7 +1,5 @@
 from serial import Serial
 import serial.tools.list_ports
-import time
-import sys
 
 
 class ArdComm(Serial):
@@ -15,11 +13,14 @@ class ArdComm(Serial):
                 list.append(devices)
         return list
 
-    def connectArduino(self, port):
+    def connectArduino(self, port, baudrate, timeout):
         # returns TRUE if connected if not, FALSE
         self.closeArduino()
         # Connect to selected port
         self.port = port
+        self.baudrate = baudrate
+        self.timeout = timeout
+        print("Este es mi timeout: "+str(self.timeout))
         self.queue = 0
         error=0
         while error<10:
@@ -30,8 +31,6 @@ class ArdComm(Serial):
             except:
                 success = False
                 error+=1
-        if success:
-            time.sleep(3)
         return success
 
     def closeArduino(self):
@@ -56,8 +55,6 @@ class ArdComm(Serial):
 
     def writeArduino(self, menssage):
         self.queue+=1
-        # sys.stdout.flush()
-
         print(self.queue)
         if self.queue==1:
             menssage += 2*'\n'
