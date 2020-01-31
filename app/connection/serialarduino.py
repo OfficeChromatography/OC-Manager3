@@ -20,7 +20,7 @@ class ArdComm(Serial):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
-        print("Este es mi timeout: "+str(self.timeout))
+
         self.queue = 0
         error=0
         while error<10:
@@ -55,7 +55,6 @@ class ArdComm(Serial):
 
     def writeArduino(self, menssage):
         self.queue+=1
-        print(self.queue)
         if self.queue==1:
             menssage += 2*'\n'
             self.write(menssage.encode('utf-8'))
@@ -64,7 +63,6 @@ class ArdComm(Serial):
             self.queue-=1
         else:
             menssage = "Error "+self.name+" busy, try "+ menssage +" later\n"
-            print("ERROR")
             self.queue-=1
         return menssage
 

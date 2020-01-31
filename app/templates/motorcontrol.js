@@ -17,6 +17,7 @@ btt_erase.addEventListener("click", function(event){
 
 btt_play.addEventListener("click", function(event){
   event.preventDefault();
+  console.log("HOLAAA");
   gcode = document.getElementById('Gcode').value
   $.post(url, gcode = {
     "Gcode":gcode

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>OC-Manager - Fine Control</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    {% include 'sidebar.html' %}
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        {% include 'topbar.html' %}
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Motor Control</h1>
+          </div>
+          <!-- Content Row -->
+          <div class="row">
+
+            <!-- Content Column -->
+            <div class="col-lg-6 mb-4">
+              <!-- Manual -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3" id="manualHeader">
+                  <h6 class="m-0 font-weight-bold text-primary" id='Manual'>Manual</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row d-flex align-items-center mb-3">
+                    <div class="col-2 d-flex justify-content-center">
+                      <span class="align-middle">X</span>
+                    </div>
+                    <div class="col-10 d-flex justify-content-around">
+                      <a href="#" onclick="move(this.id, event)" id="left_arrow" class="btn btn-secondary btn-icon-split mr-5">{% csrf_token %}
+                        <span class="icon text-white-50">
+                          <i class="fas fa-arrow-left"></i>
+                        </span>
+                      </a>
+
+                      <a href="#" id="x_homming" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-home"></i>
+                        </span>
+                      </a>
+
+                      <a href="#" id="right_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-arrow-right"></i>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="row d-flex align-items-center mb-3">
+                    <div class="col-2 d-flex justify-content-center">
+                    <span class="align-middle">Y</span>
+                    </div>
+                    <div class="col-10 d-flex justify-content-around">
+                      <a href="#" id="up_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-arrow-up"></i>
+                        </span>
+                      </a>
+
+                      <a href="#" id="y_homming" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-home"></i>
+                        </span>
+                      </a>
+
+                      <a href="#" id="down_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-arrow-down"></i>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Single G-Code -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">G-Code</h6>
+                </div>
+                <div class="card-body">
+                  <form method="post" id="Gcode_form"> {% csrf_token %}
+                    <div class="input-group">
+                      {{commandsend}}
+                      <div class="input-group-append">
+                        <button class="btn btn-primary btn-icon-split" type="submit" id="connButton">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-play"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-primary btn-icon-split" type="submit" id="btt_erase">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-trash-alt"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <!-- Upload G-Code -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Upload G-Code</h6>
+                </div>
+                <div class="card-body" >
+                  <form class="form-inline" id='lenghtforupload' enctype="multipart/form-data" method="POST">{% csrf_token %}
+                    <div class="form-group" id='uploadform'>
+                        <input  type="file" id='uploadfile' class="form-control" style="height:auto" name="document"  aria-describedby="basic-addon2">
+                        <button type="submit" id='btt_upload_file' class="btn btn-primary btn-icon-split">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-play"></i>
+                          </span>
+                        </button>
+                        <a href="#" class="btn btn-primary btn-icon-split">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-trash-alt"></i>
+                          </span>
+                        </a>
+                    </div>
+                  </form>
+                </div>
+                {% if gcode_url %}
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">URL:{{gcode_url}}</th>
+                        <th scope="col">File:   {{gcode_filename}}</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                {% else %}
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Upload Something</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                {% endif %}
+              </div>
+
+            </div>
+            <div class="col-lg-6 mb-4">
+              <div class="card border-left-success shadow h-100 pt-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-3 ">Monitor</div>
+                    </div>
+                    <!-- Monitor icon -->
+                    <div class="col-auto">
+                      {% if connected %}
+                        <i class="fa fa-desktop fa-2x text-green-500" aria-hidden="true" onClick="location.reload(true)"></i>
+                      {% else %}
+                        <i class="fa fa-desktop fa-2x text-gray-300" aria-hidden="true"></i>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <!-- Text on Monitor -->
+                  <div class="row no-gutters align-items-start h-100">
+                    <div class="col h-100">
+                      <div class="form-group noresize p-2" style="height:90%">
+                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{monitor}}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-muted font-italic font-weight-bold">
+                  {% if connected %}
+                  <table class="table table-borderless table-sm m-0 p-0">
+                    <thead>
+                      <tr>
+                        <th scope="col">Dev:{{device}}</th>
+                        <th scope="col">Baudrate:{{baudrate}}</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      {% include 'footer.html' %}
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+  <!-- <script src="{% static 'motorcontrol.js' %}"></script> -->
+  <script type="text/javascript">
+    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+    aux1=document.getElementById("uploadform")
+    aux2=document.getElementById("uploadfile")
+    function changeInputSize() {
+    len=document.getElementById("lenghtforupload").offsetWidth
+    bttLength=document.getElementById("btt_upload_file").offsetWidth
+    aux1.style.width = len.toString()+'px'
+    f=len-(2*bttLength)-15
+    aux2.style.width = f.toString()+'px'
+    }
+    window.onresize = changeInputSize;
+    window.onload = changeInputSize;
+  </script>
+  <script>
+    $("#id_chattext").change(function () {
+        console.log( $(this).val() );
+      });
+  </script>
+</body>
+
+</html>

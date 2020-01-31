@@ -41,7 +41,7 @@ class ConnectionForm(forms.ModelForm):
         'messages'  : "",
         'error'     : "",
     }
-    devices=[]
+    devices=[] #List of connected devices
 
     class Meta:
         model = Connection_Db
@@ -68,7 +68,9 @@ class ConnectionForm(forms.ModelForm):
                 self.state['info'] = "Connected to " + selected_port
             except:
                 self.state['messages'] = "Connection Error"
-        self.chattext = self.state['messages']
+        aux = self.save(commit=False)
+        aux.chattext = self.state['messages']
+        aux.save();
         return
 
     def update(self):
@@ -76,6 +78,15 @@ class ConnectionForm(forms.ModelForm):
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
+        return
+
+    def clean_oc_lab(self, *args, **kwargs):
+        oc_lab = self.cleaned_data.get('oc_lab')
+        choices = self.fields['oc_lab'].choices
+        if 'Plug an OC-Lab' in choices[0]:
+            raise forms.ValidationError('Please connect an OC-Lab')
+        return oc_lab
+
 
 # Formular to send the Arduino based on Connection_Db
 class ChatForm(forms.ModelForm):
@@ -101,4 +112,3 @@ class ChatForm(forms.ModelForm):
         aux.chattext += message
         aux.save()
         return message
-    
