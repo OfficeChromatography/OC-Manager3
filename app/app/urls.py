@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 
 from pages import views as pageviews
-from connection import views as conn_view
+# from connection import views as conn_view
 from connection.views import Connection_test
 from finecontrol.views import MotorControl_test
 from finecontrol import views as fine_view

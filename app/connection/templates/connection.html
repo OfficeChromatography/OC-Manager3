@@ -70,7 +70,7 @@
                 </div>
                 <div class="card-body">
                       <!-- Input Group -->
-                  <form method="post" id="form1"> {% csrf_token %}
+                  <form method="post" id="serialport"> {% csrf_token %}
                     {{ connectionset.as_p }}
                     <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
                     <!-- {% if object %}
@@ -108,13 +108,13 @@
                       <div class="form-group noresize" style="height:90%">
                         <!-- <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
                         <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'>{{monitor}}</textarea>
-                        <form method="post" id="send_area">{% csrf_token %}
-                        <div class="input-group mb-3 pt-2">
-                          {{commandsend}}
-                          <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit">Send</button>
+                        <form class="ajax-form" method="post" data-url='/monitor/' id="send_area"> {% csrf_token %}
+                          <div class="input-group mb-3 pt-2">
+                            {{commandsend}}
+                            <div class="input-group-append">
+                              <button class="btn btn-outline-secondary" type="submit">Send</button>
+                            </div>
                           </div>
-                        </div>
                         </form>
                       </div>
                     </div>
@@ -191,7 +191,39 @@
 
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+  <script>
+  // using jQuery
+  function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
 
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+  </script>
+  <script src="{% static 'connection.js' %}" charset="utf-8"></script>
 </body>
 
 

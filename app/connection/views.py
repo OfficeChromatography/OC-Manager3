@@ -3,7 +3,7 @@ from .serialarduino import ArdComm
 from .forms import ConnectionForm, ChatForm
 from .models import Connection_Db
 from django.views import View
-
+from django.http import JsonResponse, HttpResponse
 
 Arduino_Port = ArdComm(baudrate=115200, timeout=1)
 
@@ -26,7 +26,7 @@ context = {
     'baudrate': '',
 }
 
-
+data = {}
 def update_monitor(**kwargs):
     if context['connected'] == 'True':
         actual_text = Connection_Db.objects.last().chattext
@@ -51,19 +51,27 @@ class Connection_test(View):
         return render(request, "connection.html", context)
 
     def post(self, request):
-        if ('oc_lab' in request.POST):
+        if 'oc_lab' in request.POST:
             context['connectionset'] = ConnectionForm(request.POST)
             context['monitor'] = ""
             if context['connectionset'].is_valid():
                 context['connectionset'].connect()
                 self.update_parameters(connected='True')
-        else:
+
+        if 'chattext' in request.POST:
             context['commandsend'] = ChatForm(request.POST)
+
             if context['commandsend'].is_valid():
-                context['commandsend'].send()
-                self.update_parameters()
-                context['commandsend'] = ChatForm()
-        return render(request, "connection.html", context)
+                if request.POST.get('chattext')=='CLEAR':
+                    context['monitor']=""
+                else:
+                    context['commandsend'].send()
+                    self.update_parameters()
+                    context['commandsend'] = ChatForm()
+            data['monitor'] = context['monitor']
+            return JsonResponse(data)
+        else:
+            return render(request, "connection.html", context)
 
     def update_parameters(self, **kwargs):
         for key, value in kwargs.items():
