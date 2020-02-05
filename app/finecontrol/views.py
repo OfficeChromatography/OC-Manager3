@@ -6,36 +6,41 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from connection.views import data, state, form
 
-import os
 
 def update_monitor(**kwargs):
     return Connection_Db.objects.last().chattext
 
+
 def get_device():
     return Connection_Db.objects.last().oc_lab
 
+
 def get_baudrate():
     return Connection_Db.objects.last().baudrate
+
 
 class MotorControl(View):
 
     def get(self, request):
         data['monitor'] = update_monitor()
-        return render(request, "./motorcontrol.html", {**form,**data,**state})
+        return render(
+            request,
+            "./motorcontrol.html",
+            {**form, **data, **state})
 
     def post(self, request):
         print(request.POST)
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
-                if request.POST.get('chattext')=='CLEAR':
-                    data['monitor']=""
+                if request.POST.get('chattext') == 'CLEAR':
+                    data['monitor'] = ""
                 else:
                     form['commandsend'].send()
                     self.update_parameters()
                     form['commandsend'] = ChatForm()
             return JsonResponse(data)
-            
+
         if 'speedrange' in request.POST:
             gcode = simple_move_Gcode_gen(request)
             form['commandsend'] = ChatForm({'chattext': gcode})
@@ -45,7 +50,10 @@ class MotorControl(View):
                 form['commandsend'] = ChatForm()
                 return JsonResponse(data)
         else:
-            return render(request, "./motorcontrol.html", {**form,**data,**state})
+            return render(
+                    request,
+                    "./motorcontrol.html",
+                    {**form, **data, **state})
 
     def update_parameters(self, **kwargs):
         for key, value in kwargs.items():
@@ -53,11 +61,11 @@ class MotorControl(View):
         if state['connected'] == 'True':
             form['connectionset'].update()
             data['monitor'] = update_monitor()
-            data['device']  = get_device()
-            data['baudrate']  = get_baudrate()
+            data['device'] = get_device()
+            data['baudrate'] = get_baudrate()
         else:
             for i in data:
-                data[i]=''
+                data[i] = ''
 
 
 def simple_move_Gcode_gen(request):
@@ -65,21 +73,21 @@ def simple_move_Gcode_gen(request):
     speed = request.POST.get('speedrange')
     step = request.POST.get('steprange')
     if 'arrow' in direction:
-        gcode="G1 "
+        gcode = "G1 "
         if 'left' in direction:
-            gcode+="X-"
+            gcode += "X-"
         elif 'right' in direction:
-            gcode+="X+"
+            gcode += "X+"
         elif 'down' in direction:
-            gcode+="Y-"
+            gcode += "Y-"
         else:
-            gcode+="Y+"
-        gcode+=str(step)
+            gcode += "Y+"
+        gcode += str(step)
     if 'homming' in direction:
-        gcode="G28 "
+        gcode = "G28 "
         if 'x' in direction:
-            gcode+='X'
+            gcode += 'X'
         else:
-            gcode+='Y'
-    gcode+=' F'+str(speed)
+            gcode += 'Y'
+    gcode += ' F' + str(speed)
     return gcode

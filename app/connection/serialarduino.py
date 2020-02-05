@@ -1,13 +1,13 @@
 from serial import Serial
 import serial.tools.list_ports
-import time
+
 
 class ArdComm(Serial):
 
     @staticmethod
     def ArduinosConnected():
-        list=[]
-        a=serial.tools.list_ports.comports()
+        list = []
+        a = serial.tools.list_ports.comports()
         for devices in a:
             if str(devices.description) != 'n/a':
                 list.append(devices)
@@ -22,15 +22,15 @@ class ArdComm(Serial):
         self.timeout = timeout
 
         self.queue = 0
-        error=0
-        while error<10:
+        error = 0
+        while error < 10:
             try:
                 self.open()
                 success = True
                 break
             except:
                 success = False
-                error+=1
+                error += 1
         return success
 
     def closeArduino(self):
@@ -48,22 +48,22 @@ class ArdComm(Serial):
                 if (formated[-1] == '\n' and formated[-2] == '\n'):
                     break
             except:
-                formated="Error reading, command might be or not apply\n"
-                ser_bytes=""
+                formated = "Error reading, command might be or not apply\n"
+                ser_bytes = ""
                 break
         return formated
 
     def writeArduino(self, menssage):
-        self.queue+=1
-        if self.queue==1:
+        self.queue += 1
+        if self.queue == 1:
             menssage += 2*'\n'
             self.write(menssage.encode('utf-8'))
             menssage = menssage[0:-1]
             menssage += self.readArduino()
-            self.queue-=1
+            self.queue -= 1
         else:
-            menssage = "Error "+self.name+" busy, try "+ menssage +" later\n"
-            self.queue-=1
+            menssage = "Error "+self.name+" busy, try " + menssage + " later\n"
+            self.queue -= 1
         return menssage
 
     def isrunning(self):

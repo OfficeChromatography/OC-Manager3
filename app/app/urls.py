@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import include
+# from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -23,20 +23,14 @@ from pages import views
 from connection.views import Connection_test
 from finecontrol.views import MotorControl
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home_view, name='home'),
     path('connection/', Connection_test.as_view(), name='connection'),
     path('motorcontrol/',  MotorControl.as_view(), name='motorcontrol'),
-
-
-
-
-    # path('register/', usersview.register_view, name='register'),
-    # path('api/user/', include('users_api.urls')),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+            settings.MEDIA_URL,
+            document_root=settings.MEDIA_ROOT)
