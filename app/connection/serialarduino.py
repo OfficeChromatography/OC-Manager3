@@ -46,7 +46,6 @@ class ArdComm(Serial):
                 decoded_bytes = ser_bytes[:-1].decode("utf-8")
                 formated += str(decoded_bytes)+str('\n')
                 if (formated[-1] == '\n' and formated[-2] == '\n'):
-                    print("encontro algo")
                     break
             except:
                 formated="Error reading, command might be or not apply\n"

@@ -18,6 +18,7 @@
   <!-- Custom styles for this template-->
   <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
 
+
 </head>
 
 <body id="page-top">
@@ -50,61 +51,90 @@
           <div class="row">
 
             <!-- Content Column -->
-            <div class="col-lg-6 mb-4">
+            <div class="col-lg-6">
               <!-- Manual -->
               <div class="card shadow mb-4 ">
-                <div class="card-header py-3" id="manualHeader">
-                  <h6 class="m-0 font-weight-bold text-primary" id='Manual'>Manual</h6>
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Manual</h6>
                 </div>
                 <div class="card-body">
-                  <div class="row d-flex align-items-center mb-3">
-                    <div class="col-2 d-flex justify-content-center">
-                      <span class="align-middle">X</span>
+                  <form  class="move-form" id='ajax-form' data-url='/monitor/' method="post"> {% csrf_token %}
+                    <!-- Speed rangeBar -->
+                    <div class="form-row align-items-center">
+                      <div class="form-group col-4 col-md-2">
+                        <p class="text-center  m-0">Speed [mm/min]</p>
+                      </div>
+                      <div class="form-group col-6 col-md-8">
+                        <input class="custom-range" name="speedrange" value='0' type="range" min="0" max="3000" step="100" oninput="sliderChange(this.value,'speedtext')" id='speedrange'/>
+                      </div>
+                      <div class="form-group col-2 col-md-2">
+                        <input type="text" class='form-control' value="0" id='speedtext'>
+                      </div>
                     </div>
-                    <div class="col-10 d-flex justify-content-around">
-                      <a href="#" onclick="move(this.id, event)" id="left_arrow" class="btn btn-secondary btn-icon-split mr-5">{% csrf_token %}
-                        <span class="icon text-white-50">
-                          <i class="fas fa-arrow-left"></i>
-                        </span>
-                      </a>
-
-                      <a href="#" id="x_homming" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-home"></i>
-                        </span>
-                      </a>
-
-                      <a href="#" id="right_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-arrow-right"></i>
-                        </span>
-                      </a>
+                    <!-- Step rangeBar -->
+                    <div class="form-row align-items-center">
+                      <div class="form-group col-4 col-md-2">
+                        <p class="text-center m-0">Steps</p>
+                      </div>
+                      <div class="form-group col-6 col-md-8">
+                        <input class="custom-range" name='steprange' value='0' type="range" min="0" max="100" oninput="sliderChange(this.value,'steptext')" id='steprange'/>
+                      </div>
+                      <div class="form-group col-2 col-md-2">
+                        <input type="text" class='form-control' value="0" id='steptext'>
+                      </div>
                     </div>
-                  </div>
-                  <div class="row d-flex align-items-center mb-3">
-                    <div class="col-2 d-flex justify-content-center">
-                    <span class="align-middle">Y</span>
+                    <!-- X buttons -->
+                    <div class="form-row align-items-center">
+                      <div class="form-group col-2 d-flex justify-content-around">
+                        <span class="align-middle">X</span>
+                      </div>
+                      <div class="form-group col-8 d-flex justify-content-around">
+                        <button class="btn btn-secondary btn-icon-split" id='left_arrow' name='' value='leftie' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-arrow-left"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-secondary btn-icon-split" id='x_homming' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-home"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-secondary btn-icon-split" id='right_arrow' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-arrow-right"></i>
+                          </span>
+                        </button>
+                      </div>
+                      <div class="form-group col-2 d-flex justify-content-around">
+                      </div>
                     </div>
-                    <div class="col-10 d-flex justify-content-around">
-                      <a href="#" id="up_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-arrow-up"></i>
-                        </span>
-                      </a>
+                    <!-- Y buttons -->
+                    <div class="form-row align-items-center justify-content-center">
+                      <div class="form-group col-2 d-flex justify-content-around">
+                        <span class="align-middle">Y</span>
+                      </div>
+                      <div class="form-group col-8 d-flex justify-content-around">
+                        <button class="btn btn-secondary btn-icon-split" id='up_arrow' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-arrow-up"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-secondary btn-icon-split" id='y_homming' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-home"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-secondary btn-icon-split" id='down_arrow' type="submit">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-arrow-down"></i>
+                          </span>
+                        </button>
+                      </div>
+                      <div class="form-group col-2 d-flex justify-content-around">
 
-                      <a href="#" id="y_homming" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-home"></i>
-                        </span>
-                      </a>
-
-                      <a href="#" id="down_arrow" onclick="move(this.id, event)" class="btn btn-secondary btn-icon-split mr-5">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-arrow-down"></i>
-                        </span>
-                      </a>
+                      </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
               <!-- Single G-Code -->
@@ -113,21 +143,23 @@
                   <h6 class="m-0 font-weight-bold text-primary">G-Code</h6>
                 </div>
                 <div class="card-body">
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="Gcode" placeholder="Enter G-CODE" aria-label="Enter G-CODE" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <a href="#" class="btn btn-primary btn-icon-split" id="btt_play">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-play"></i>
-                        </span>
-                      </a>
-                      <a href="#" class="btn btn-primary btn-icon-split" id="btt_erase">
-                        <span class="icon text-white-50">
-                          <i class="fas fa-trash-alt"></i>
-                        </span>
-                      </a>
+                  <form method="post" id="Gcode_form"> {% csrf_token %}
+                    <div class="input-group">
+                      {{commandsend}}
+                      <div class="input-group-append">
+                        <button class="btn btn-primary btn-icon-split" type="submit" id="connButton">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-play"></i>
+                          </span>
+                        </button>
+                        <button class="btn btn-primary btn-icon-split" onclick="erase()" id="btt_erase">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-trash-alt"></i>
+                          </span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
               <!-- Upload G-Code -->
@@ -144,7 +176,6 @@
                             <i class="fas fa-play"></i>
                           </span>
                         </button>
-                        <a href="#" class="btn btn-primary btn-icon-split">
                           <span class="icon text-white-50">
                             <i class="fas fa-trash-alt"></i>
                           </span>
@@ -175,9 +206,8 @@
                 </div>
                 {% endif %}
               </div>
-
             </div>
-            <div class="col-lg-6 mb-4">
+            <div class="col-lg-6 mb-4" style="min-height:400px">
               <div class="card border-left-success shadow h-100 pt-2">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
@@ -197,7 +227,7 @@
                   <div class="row no-gutters align-items-start h-100">
                     <div class="col h-100">
                       <div class="form-group noresize p-2" style="height:90%">
-                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea>
+                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{monitor}}</textarea>
                       </div>
                     </div>
                   </div>
@@ -270,20 +300,7 @@
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
   <script src="{% static 'motorcontrol.js' %}"></script>
-  <script type="text/javascript">
-    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
-    aux1=document.getElementById("uploadform")
-    aux2=document.getElementById("uploadfile")
-    function changeInputSize() {
-    len=document.getElementById("lenghtforupload").offsetWidth
-    bttLength=document.getElementById("btt_upload_file").offsetWidth
-    aux1.style.width = len.toString()+'px'
-    f=len-(2*bttLength)-15
-    aux2.style.width = f.toString()+'px'
-    }
-    window.onresize = changeInputSize;
-    window.onload = changeInputSize;
-  </script>
+
 </body>
 
 </html>

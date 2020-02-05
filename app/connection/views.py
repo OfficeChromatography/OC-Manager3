@@ -5,34 +5,23 @@ from .models import Connection_Db
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 
-Arduino_Port = ArdComm(baudrate=115200, timeout=1)
-
-my_context = {
-    'object': [],
-    'message': "",
-    'connected': "False",
-    'device': "",
-    'baudrate': "",
-    'received': "",
-    'errormsg': "",
-}
-
-context = {
+form = {
     'connectionset': ConnectionForm(initial={'baudrate':'115200', 'timeout':'2'}),
     'commandsend'  : ChatForm(),
-    'monitor': "",
-    'device': '',
-    'connected': 'False',
-    'baudrate': '',
 }
 
-data = {}
+data = {
+    'monitor':"",
+    'device': '',
+    'baudrate': '',
+}
+state = {
+    'connected': 'False',
+}
+
+
 def update_monitor(**kwargs):
-    if context['connected'] == 'True':
-        actual_text = Connection_Db.objects.last().chattext
-    else:
-        actual_text = ''
-    return actual_text
+    return Connection_Db.objects.last().chattext
 
 def get_device():
     return Connection_Db.objects.last().oc_lab
@@ -40,43 +29,41 @@ def get_device():
 def get_baudrate():
     return Connection_Db.objects.last().baudrate
 
-# Really New Code
-
 
 class Connection_test(View):
 
     def get(self, request):
         self.update_parameters()
-        context['connectionset']    =  context['connectionset']
-        return render(request, "connection.html", context)
+        return render(request, "connection.html", {**state,**form,**data})
 
     def post(self, request):
         if 'oc_lab' in request.POST:
-            context['connectionset'] = ConnectionForm(request.POST)
-            context['monitor'] = ""
-            if context['connectionset'].is_valid():
-                context['connectionset'].connect()
+            form['connectionset'] = ConnectionForm(request.POST)
+            data['monitor'] = ""
+            if form['connectionset'].is_valid():
+                form['connectionset'].connect()
                 self.update_parameters(connected='True')
+            return render(request, "connection.html", {**state,**form, **data})
 
         if 'chattext' in request.POST:
-            context['commandsend'] = ChatForm(request.POST)
-
-            if context['commandsend'].is_valid():
+            form['commandsend'] = ChatForm(request.POST)
+            if form['commandsend'].is_valid():
                 if request.POST.get('chattext')=='CLEAR':
-                    context['monitor']=""
+                    data['monitor']=""
                 else:
-                    context['commandsend'].send()
+                    form['commandsend'].send()
                     self.update_parameters()
-                    context['commandsend'] = ChatForm()
-            data['monitor'] = context['monitor']
+                    form['commandsend'] = ChatForm()
             return JsonResponse(data)
-        else:
-            return render(request, "connection.html", context)
 
     def update_parameters(self, **kwargs):
         for key, value in kwargs.items():
-            context[key] = value
-        context['connectionset'].update()
-        context['monitor'] = update_monitor()
-        context['device']  = get_device()
-        context['baudrate']  = get_baudrate()
+            state[key] = value
+        if state['connected'] == 'True':
+            form['connectionset'].update()
+            data['monitor'] = update_monitor()
+            data['device']  = get_device()
+            data['baudrate']  = get_baudrate()
+        else:
+            for i in data:
+                data[i]=''

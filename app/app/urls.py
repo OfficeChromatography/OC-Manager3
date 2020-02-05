@@ -19,21 +19,17 @@ from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 
-
-from pages import views as pageviews
-# from connection import views as conn_view
+from pages import views
 from connection.views import Connection_test
-from finecontrol.views import MotorControl_test
-from finecontrol import views as fine_view
-# from users import views as usersview
+from finecontrol.views import MotorControl
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', pageviews.home_view, name='home'),
-    # path('', conn_view.connection_view, name='home'),
-    path('', MotorControl_test.as_view(), name='home'),
+    path('', views.home_view, name='home'),
     path('connection/', Connection_test.as_view(), name='connection'),
-    path('motorcontrol/', fine_view.motorcontrol_view, name='motorcontrol'),
+    path('motorcontrol/',  MotorControl.as_view(), name='motorcontrol'),
 
 
 

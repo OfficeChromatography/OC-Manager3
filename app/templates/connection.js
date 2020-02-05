@@ -4,6 +4,7 @@ $(document).ready(function(){
     event.preventDefault()
     var $formData = $(this).serialize()
     var $endpoint = window.location.href
+
     $.ajax({
       method: 'POST',
       url:    $endpoint,
@@ -15,6 +16,7 @@ $(document).ready(function(){
 
   function handleFormSuccess(data, textStatus, jqXHR){
       document.getElementById("sentit").value = data.monitor
+      scrollit()
       console.log(data);
       console.log(textStatus)
       console.log(jqXHR)
@@ -27,3 +29,8 @@ $(document).ready(function(){
       console.log(errorThrown)
   }
 })
+
+//Monitor Function
+function scrollit(){
+    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+}
