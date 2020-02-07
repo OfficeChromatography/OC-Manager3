@@ -1,5 +1,8 @@
 from serial import Serial
 import serial.tools.list_ports
+from contextlib import suppress
+from time import sleep
+
 
 
 class ArdComm(Serial):
@@ -20,7 +23,7 @@ class ArdComm(Serial):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
-
+        self.intial_timeout = timeout
         self.queue = 0
         error = 0
         while error < 10:
@@ -40,30 +43,25 @@ class ArdComm(Serial):
 
     def readArduino(self):
         formated = ""
-        while True:
+        while self.in_waiting == 0:
+            continue
+        while self.in_waiting>0:
             try:
                 ser_bytes = self.read_until()  # (‘\n’ by default)
                 decoded_bytes = ser_bytes[:-1].decode("utf-8")
                 formated += str(decoded_bytes)+str('\n')
-                if (formated[-1] == '\n' and formated[-2] == '\n'):
-                    break
-            except:
+            except serial.SerialException:
                 formated = "Error reading, command might be or not apply\n"
                 ser_bytes = ""
                 break
         return formated
 
     def writeArduino(self, menssage):
-        self.queue += 1
-        if self.queue == 1:
-            menssage += 2*'\n'
-            self.write(menssage.encode('utf-8'))
-            menssage = menssage[0:-1]
-            menssage += self.readArduino()
-            self.queue -= 1
-        else:
-            menssage = "Error "+self.name+" busy, try " + menssage + " later\n"
-            self.queue -= 1
+        menssage += 2*'\n'
+        self.write(menssage.encode('utf-8'))
+        menssage = menssage[0:-1]
+        menssage += self.readArduino()
+        self.queue -= 1
         return menssage
 
     def isrunning(self):
