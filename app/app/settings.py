@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'connection',
     'finecontrol',
-    'users',
-    'users_api',
-    'rest_framework',
-    'rest_framework.authtoken',
+    # 'users',
+    # 'users_api',
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
 
 ]
 
@@ -80,13 +80,20 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': os.environ.get('DB_HOST'),
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASS'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.environ.get('DB_HOST'),
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASS'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -134,7 +141,7 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'templates')
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = 'users.User'
+# AUTH_USER_MODEL = 'users.User'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'templates/media')
 

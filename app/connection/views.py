@@ -1,7 +1,9 @@
 from django.shortcuts import render
-# from django.http import HttpResponse
 from .serialarduino import ArdComm
-# import time
+from .forms import ConnectionForm, ChatForm
+from .models import Connection_Db
+from django.views import View
+from django.http import JsonResponse, HttpResponse
 
 Arduino_Port = ArdComm(baudrate=115200, timeout=1)
 
@@ -14,38 +16,67 @@ my_context = {
     'received': "",
     'errormsg': "",
 }
-blank = my_context
+
+context = {
+    'connectionset': ConnectionForm(initial={'baudrate':'115200', 'timeout':'2'}),
+    'commandsend'  : ChatForm(),
+    'monitor': "",
+    'device': '',
+    'connected': 'False',
+    'baudrate': '',
+}
+
+data = {}
+def update_monitor(**kwargs):
+    if context['connected'] == 'True':
+        actual_text = Connection_Db.objects.last().chattext
+    else:
+        actual_text = ''
+    return actual_text
+
+def get_device():
+    return Connection_Db.objects.last().oc_lab
+
+def get_baudrate():
+    return Connection_Db.objects.last().baudrate
+
+# Really New Code
 
 
-def connection_view(request):
-    if request.method == 'GET':
-        my_context['object'] = []
-        my_context['object'] = ArdComm.ArduinosConnected()
-        if not my_context['object']:
-            Arduino_Port.closeArduino()
-            for i in my_context:
-                my_context[i]=""
-            my_context['connected']= "False"
+class Connection_test(View):
 
-    if request.method == 'POST':
-        error=0
-        if 'port_selected' in request.POST:
-            selected = request.POST.get('port_selected')
-            if selected == "Choose...":
-                my_context['message'] = "Please select port"
-                my_context['connected'] = "False"
-            else:
-                my_context['received'] = ""
-                error = 0
-                while my_context['received'] == "":
-                    try:
-                        my_context['connected'] = str(Arduino_Port.connectArduino(selected))
-                        my_context['received'] += Arduino_Port.readArduino()
-                        my_context['baudrate'] = Arduino_Port.baudrate
-                        my_context['device'] = Arduino_Port.name
-                        my_context['message'] = "Connected to " + my_context['device']
-                    except:
-                        my_context['errormsg'] = "Connection Error 1"
-        if "usermsg" in request.POST:
-            my_context['received'] += Arduino_Port.writeArduino(request.POST.get("usermsg"))
-    return render(request, "connection.html", my_context)
+    def get(self, request):
+        self.update_parameters()
+        context['connectionset']    =  context['connectionset']
+        return render(request, "connection.html", context)
+
+    def post(self, request):
+        if 'oc_lab' in request.POST:
+            context['connectionset'] = ConnectionForm(request.POST)
+            context['monitor'] = ""
+            if context['connectionset'].is_valid():
+                context['connectionset'].connect()
+                self.update_parameters(connected='True')
+
+        if 'chattext' in request.POST:
+            context['commandsend'] = ChatForm(request.POST)
+
+            if context['commandsend'].is_valid():
+                if request.POST.get('chattext')=='CLEAR':
+                    context['monitor']=""
+                else:
+                    context['commandsend'].send()
+                    self.update_parameters()
+                    context['commandsend'] = ChatForm()
+            data['monitor'] = context['monitor']
+            return JsonResponse(data)
+        else:
+            return render(request, "connection.html", context)
+
+    def update_parameters(self, **kwargs):
+        for key, value in kwargs.items():
+            context[key] = value
+        context['connectionset'].update()
+        context['monitor'] = update_monitor()
+        context['device']  = get_device()
+        context['baudrate']  = get_baudrate()

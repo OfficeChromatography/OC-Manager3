@@ -21,20 +21,25 @@ from django.conf.urls.static import static
 
 
 from pages import views as pageviews
-from connection import views as conn_view
+# from connection import views as conn_view
+from connection.views import Connection_test
+from finecontrol.views import MotorControl_test
 from finecontrol import views as fine_view
-from users import views as usersview
+# from users import views as usersview
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', pageviews.home_view, name='home'),
-    path('connection/', conn_view.connection_view, name='connection'),
+    # path('', pageviews.home_view, name='home'),
+    # path('', conn_view.connection_view, name='home'),
+    path('', MotorControl_test.as_view(), name='home'),
+    path('connection/', Connection_test.as_view(), name='connection'),
     path('motorcontrol/', fine_view.motorcontrol_view, name='motorcontrol'),
 
 
 
-    path('register/', usersview.register_view, name='register'),
-    path('api/user/', include('users_api.urls')),
+
+    # path('register/', usersview.register_view, name='register'),
+    # path('api/user/', include('users_api.urls')),
 ]
 
 if settings.DEBUG:
