@@ -7,6 +7,10 @@ from django.contrib.auth import (
 )
 User = get_user_model()
 
+USER_INFO = {
+
+}
+
 from .forms import UserRegisterForm, UserLoginForm, ProfileForm
 
 def login_view(request):
@@ -47,12 +51,11 @@ def register_view(request):
     return render(request,'register.html',context)
 
 def profile_view(request):
-    form = ProfileForm(request.POST or None)
-    context = {
-        'form': form
-    }
-    user_info = {}
+    context = {    }
     if request.user.is_authenticated == True:
+        USER_INFO['username'] = request.user.get_username()
+        USER_INFO['email'] = request.user.email
+        form = ProfileForm(request.POST or None, initial=USER_INFO)
         context['username'] = request.user.get_username()
         if form.is_valid():
             username_qs = User.objects.get(username=context['username'])
@@ -61,4 +64,5 @@ def profile_view(request):
             return redirect("/")
     else:
         return redirect("/register/")
+    context['form'] = form
     return render(request,'profile.html',context)

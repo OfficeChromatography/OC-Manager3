@@ -75,6 +75,7 @@ class UserRegisterForm(forms.ModelForm):
 
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(
+        required=False,
         label=False,
         widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Username'})
     )
@@ -84,7 +85,6 @@ class ProfileForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Email'})
     )
     password = forms.CharField(
-        required=False,
         label=False,
         widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Password'}))
 
@@ -98,9 +98,15 @@ class ProfileForm(forms.ModelForm):
 
     def clean(self, *args, **kwargs):
         username = self.cleaned_data.get("username")
+        email = self.cleaned_data.get("email")
         password = self.cleaned_data.get("password")
+        if (not email) and (not username):
+            raise forms.ValidationError('Theres nothing to change!')
         if username:
             username_qs = User.objects.filter(username=username)
             if username_qs.exists():
                 raise forms.ValidationError('Error Username already exists!')
-            
+        if email:
+            email_qs = User.objects.filter(email=email)
+            if email_qs.exists():
+                raise forms.ValidationError('Error email already exists!')
