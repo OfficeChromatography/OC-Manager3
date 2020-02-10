@@ -26,12 +26,13 @@ from finecontrol.views import MotorControl
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', pages_views.home_view, name='home'),
+    path('', Connection_test.as_view(), name='connection'),
     path('connection/', Connection_test.as_view(), name='connection'),
     path('motorcontrol/',  MotorControl.as_view(), name='motorcontrol'),
     path('login/',  accounts_views.login_view, name='login'),
     path('logout/',  accounts_views.logout_view, name='logout'),
     path('register/',  accounts_views.register_view, name='register'),
+    path('profile/',  accounts_views.profile_view, name='profile'),
 ]
 
 if settings.DEBUG:

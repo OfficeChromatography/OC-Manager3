@@ -66,12 +66,41 @@ class UserRegisterForm(forms.ModelForm):
     def clean_email2(self):
         email = self.cleaned_data.get('email')
         email2 = self.cleaned_data.get('email2')
-        print(email)
-        print(email2)
-        print(self.cleaned_data)
         if email != email2:
             raise forms.ValidationError("The emails must match")
         email_qs = User.objects.filter(email=email)
         if email_qs.exists():
             raise forms.ValidationError("The emails has already been register")
         return email
+
+class ProfileForm(forms.ModelForm):
+    username = forms.CharField(
+        label=False,
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Username'})
+    )
+    email = forms.CharField(
+        required=False,
+        label=False,
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Email'})
+    )
+    password = forms.CharField(
+        required=False,
+        label=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Password'}))
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'password',
+        ]
+
+    def clean(self, *args, **kwargs):
+        username = self.cleaned_data.get("username")
+        password = self.cleaned_data.get("password")
+        if username:
+            username_qs = User.objects.filter(username=username)
+            if username_qs.exists():
+                raise forms.ValidationError('Error Username already exists!')
+            
