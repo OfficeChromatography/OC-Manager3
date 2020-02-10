@@ -19,15 +19,20 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from pages import views
+from pages import views as pages_views
+from accounts import views as accounts_views
 from connection.views import Connection_test
 from finecontrol.views import MotorControl
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home_view, name='home'),
+    path('', Connection_test.as_view(), name='connection'),
     path('connection/', Connection_test.as_view(), name='connection'),
     path('motorcontrol/',  MotorControl.as_view(), name='motorcontrol'),
+    path('login/',  accounts_views.login_view, name='login'),
+    path('logout/',  accounts_views.logout_view, name='logout'),
+    path('register/',  accounts_views.register_view, name='register'),
+    path('profile/',  accounts_views.profile_view, name='profile'),
 ]
 
 if settings.DEBUG:

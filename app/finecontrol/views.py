@@ -5,7 +5,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import render
 from connection.views import data, state, form
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def update_monitor(**kwargs):
     return Connection_Db.objects.last().chattext
@@ -19,6 +19,9 @@ def get_baudrate():
     return Connection_Db.objects.last().baudrate
 
 
+# class MotorControl(LoginRequiredMixin, View):
+#     login_url = '/login/'
+#     redirect_field_name = 'login'
 class MotorControl(View):
 
     def get(self, request):
@@ -29,7 +32,6 @@ class MotorControl(View):
             {**form, **data, **state})
 
     def post(self, request):
-        print(request.POST)
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
@@ -43,6 +45,8 @@ class MotorControl(View):
 
         if 'speedrange' in request.POST:
             gcode = simple_move_Gcode_gen(request)
+            print(gcode)
+            # print(type_of(gcode))
             form['commandsend'] = ChatForm({'chattext': gcode})
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
@@ -75,19 +79,18 @@ def simple_move_Gcode_gen(request):
     if 'arrow' in direction:
         gcode = "G1 "
         if 'left' in direction:
-            gcode += "X-"
+            gcode += "-X"
         elif 'right' in direction:
             gcode += "X+"
         elif 'down' in direction:
-            gcode += "Y-"
+            gcode += "-Y"
         else:
             gcode += "Y+"
         gcode += str(step)
     if 'homming' in direction:
-        gcode = "G28 "
+        gcode = "G0 G28 "
         if 'x' in direction:
             gcode += 'X'
         else:
             gcode += 'Y'
-    gcode += ' F' + str(speed)
-    return gcode
+    return gcode + ' F' + str(speed)

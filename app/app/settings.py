@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'connection',
     'finecontrol',
+    'accounts',
     # 'users',
     # 'users_api',
     # 'rest_framework',
