@@ -1,111 +1,93 @@
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from connection.views import my_context , Arduino_Port
-from connection.serialarduino import ArdComm
-from django.core.files.storage import FileSystemStorage
-from app.settings import STATIC_ROOT, BASE_DIR, MEDIA_ROOT
-
-from connection.forms import ConnectionForm, ChatForm
-
 # IMPORTS FOR CLASS BASED View
 from connection.forms import ChatForm
 from connection.models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
+from django.shortcuts import render
+from connection.views import data, state, form
 
 
-import os
-# Create your views here.
-@csrf_exempt
-def motorcontrol_view(request, *args, **kwargs):
-    error = "Please, go to Connection and connect the Arduino"
-    my_context['gcode_url'] = ""
-    if request.method == 'POST':
-        if 'left_arrow' in request.POST:
-            try:
-                move = 'G1 X10'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'right_arrow' in request.POST:
-            try:
-                move = 'G1 X-10'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'x_homming' in request.POST:
-            try:
-                move = 'M28 X'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'up_arrow' in request.POST:
-            try:
-                move = 'G1 Y10'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'down_arrow' in request.POST:
-            try:
-                move = 'G1 Y-10'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'y_homming' in request.POST:
-            try:
-                move = 'M28 Y'
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-
-        if 'Gcode' in request.POST:
-            try:
-                move = request.POST.get('Gcode')
-                my_context['received'] += Arduino_Port.writeArduino(move)
-            except:
-                my_context['errormsg'] = error
-        if 'document' in request.FILES:
-            uploaded_file = request.FILES['document']
-            fs = FileSystemStorage()
-            name = fs.save(uploaded_file.name, uploaded_file)
-            my_context['gcode_url'] = fs.url(name)
-            my_context['gcode_filename'] = uploaded_file
-    return render(request, "./motorcontrol.html", my_context)
+def update_monitor(**kwargs):
+    return Connection_Db.objects.last().chattext
 
 
-# Really New Code
-def update_monitor():
-    actual_text = Connection_Db.objects.last().chattext
-    return actual_text
+def get_device():
+    return Connection_Db.objects.last().oc_lab
 
-def validate_username(request):
-    username = request.GET.get('commandsend', None)
-    print()
-    return JsonResponse(data)
 
-class MotorControl_test(View, ):
+def get_baudrate():
+    return Connection_Db.objects.last().baudrate
 
-    context = {
-        'commandsend'  : ChatForm(),
-        'monitor': ""
-    }
+
+class MotorControl(View):
 
     def get(self, request):
-        self.context['monitor'] = update_monitor()
-        return render(request, "motor_test.html", self.context)
+        data['monitor'] = update_monitor()
+        return render(
+            request,
+            "./motorcontrol.html",
+            {**form, **data, **state})
 
     def post(self, request):
-        print("dasdsa")
+        print(request.POST)
         if 'chattext' in request.POST:
-            self.context['commandsend'] = ChatForm(request.POST)
-            if self.context['commandsend'].is_valid():
-                self.context['commandsend'].send()
-                self.context['monitor'] = update_monitor()
-                self.context['commandsend'] = ChatForm()
+            form['commandsend'] = ChatForm(request.POST)
+            if form['commandsend'].is_valid():
+                if request.POST.get('chattext') == 'CLEAR':
+                    data['monitor'] = ""
+                else:
+                    form['commandsend'].send()
+                    self.update_parameters()
+                    form['commandsend'] = ChatForm()
+            return JsonResponse(data)
 
-        return render(request, "motor_test.html", self.context)
+        if 'speedrange' in request.POST:
+            gcode = simple_move_Gcode_gen(request)
+            form['commandsend'] = ChatForm({'chattext': gcode})
+            if form['commandsend'].is_valid():
+                form['commandsend'].send()
+                self.update_parameters()
+                form['commandsend'] = ChatForm()
+                return JsonResponse(data)
+        else:
+            return render(
+                    request,
+                    "./motorcontrol.html",
+                    {**form, **data, **state})
+
+    def update_parameters(self, **kwargs):
+        for key, value in kwargs.items():
+            state[key] = value
+        if state['connected'] == 'True':
+            form['connectionset'].update()
+            data['monitor'] = update_monitor()
+            data['device'] = get_device()
+            data['baudrate'] = get_baudrate()
+        else:
+            for i in data:
+                data[i] = ''
+
+
+def simple_move_Gcode_gen(request):
+    direction = request.POST.get('button')
+    speed = request.POST.get('speedrange')
+    step = request.POST.get('steprange')
+    if 'arrow' in direction:
+        gcode = "G1 "
+        if 'left' in direction:
+            gcode += "X-"
+        elif 'right' in direction:
+            gcode += "X+"
+        elif 'down' in direction:
+            gcode += "Y-"
+        else:
+            gcode += "Y+"
+        gcode += str(step)
+    if 'homming' in direction:
+        gcode = "G28 "
+        if 'x' in direction:
+            gcode += 'X'
+        else:
+            gcode += 'Y'
+    gcode += ' F' + str(speed)
+    return gcode

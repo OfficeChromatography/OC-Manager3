@@ -2,46 +2,55 @@ from django import forms
 from .models import Connection_Db
 from .serialarduino import ArdComm
 
+
 def db_list_4_tuple(*args):
-    if len(args)==2:
-        merged_list = [(args[0][i], args[1][i]) for i in range(0, len(args[0]))]
+    merged_list = []
+    if len(args) == 2:
+            for i in range(0, len(args[0])):
+                merged_list.append((args[0][i], args[1][i]))
     else:
         try:
-            merged_list = [(args[0][i].device, args[0][i].name) for i in range(0, len(args[0]))]
+            for i in range(0, len(args[0])):
+                merged_list.append((args[0][i].device, args[0][i].name))
         except:
-            merged_list = [(list(range(len(args[0])))[i], args[0][i]) for i in range(0, len(args[0]))]
+            for i in range(0, len(args[0])):
+                merged_list.append((list(range(len(args[0])))[i], args[0][i]))
     return tuple(merged_list)
 
 
-LIST_OF_BAUDRATES = [300, 600, 1200, 2400, 4800, 9600, 14400,
-                    19200, 28800, 38400, 57600, 115200, 200000]
+LIST_OF_BAUDRATES = [
+                    300, 600, 1200, 2400, 4800, 9600, 14400,
+                    19200, 28800, 38400, 57600, 115200, 200000
+                    ]
 
 BAUDRATES = db_list_4_tuple(LIST_OF_BAUDRATES, LIST_OF_BAUDRATES)
-TIMEOUTS= db_list_4_tuple([i for i in range(6)])
+TIMEOUTS = db_list_4_tuple([i for i in range(6)])
 
 Arduino_Port = ArdComm()
 
+
 # Formular to connect the Arduino based on Connection_Db
 class ConnectionForm(forms.ModelForm):
-    oc_lab          = forms.ChoiceField(label = 'OC_Lab',
-            widget  = forms.Select(attrs={'class': 'form-group custom-select'})
+    oc_lab = forms.ChoiceField(
+            label='OC_Lab',
+            widget=forms.Select(attrs={'class': 'form-group custom-select'})
             )
-    baudrate        = forms.ChoiceField(
-            choices = BAUDRATES,
-            widget  = forms.Select(attrs={'class': 'form-group custom-select'})
+    baudrate = forms.ChoiceField(
+            choices=BAUDRATES,
+            widget=forms.Select(attrs={'class': 'form-group custom-select'})
             )
-    timeout         = forms.ChoiceField(
-            choices = TIMEOUTS,
-            widget  = forms.Select(attrs={'class': 'form-group custom-select'})
+    timeout = forms.ChoiceField(
+            choices=TIMEOUTS,
+            widget=forms.Select(attrs={'class': 'form-group custom-select'})
             )
     # State variables are then used with the context variables in .views
     state = {
-        'connected' : False,
-        'info'      : "",
-        'messages'  : "",
-        'error'     : "",
+        'connected': False,
+        'info': "",
+        'messages': "",
+        'error': "",
     }
-    devices=[] #List of connected devices
+    devices = []  # List of connected devices
 
     class Meta:
         model = Connection_Db
@@ -70,7 +79,7 @@ class ConnectionForm(forms.ModelForm):
                 self.state['messages'] = "Connection Error"
         aux = self.save(commit=False)
         aux.chattext = self.state['messages']
-        aux.save();
+        aux.save()
         return
 
     def update(self):
@@ -91,12 +100,13 @@ class ConnectionForm(forms.ModelForm):
 # Formular to send the Arduino based on Connection_Db
 class ChatForm(forms.ModelForm):
 
-    chattext        = forms.CharField(label="",
-            required= False,
-            widget  = forms.TextInput(attrs={
+    chattext = forms.CharField(
+            label="",
+            required=False,
+            widget=forms.TextInput(attrs={
                         'class': "form-control overflow-y:scroll",
                         'type': "text",
-                        'aria-describedby':"basic-addon2",
+                        'aria-describedby': "basic-addon2",
                         'style': "resize: none; background-color : #FEFEFE"
             })
     )
