@@ -55,14 +55,17 @@ def profile_view(request):
     if request.user.is_authenticated == True:
         USER_INFO['username'] = request.user.get_username()
         USER_INFO['email'] = request.user.email
-        form = ProfileForm(request.POST or None, initial=USER_INFO)
-        context['username'] = request.user.get_username()
+        form = ProfileForm(user=request.user, data=request.POST or None)
         if form.is_valid():
-            username_qs = User.objects.get(username=context['username'])
-            username_qs.username = form.cleaned_data.get('username')
+            username_qs = User.objects.get(username=USER_INFO['username'])
+            if form.cleaned_data.get('username'):
+                username_qs.username = form.cleaned_data.get('username')
+            if form.cleaned_data.get('email'):
+                username_qs.email = form.cleaned_data.get('email')
             username_qs.save()
             return redirect("/")
     else:
         return redirect("/register/")
     context['form'] = form
+    context.update(USER_INFO)
     return render(request,'profile.html',context)

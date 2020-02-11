@@ -3,6 +3,7 @@ from .forms import ConnectionForm, ChatForm
 from .models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
+from accounts.views import USER_INFO
 
 form = {
     'connectionset': ConnectionForm(initial={
@@ -18,6 +19,10 @@ data = {
 }
 state = {
     'connected': 'False',
+}
+
+USER_INFO = {
+
 }
 
 
@@ -36,11 +41,13 @@ def get_baudrate():
 class Connection_test(View):
 
     def get(self, request):
+        USER_INFO['username']=request.user.get_username()
+
         self.update_parameters()
         return render(
                         request,
                         "connection.html",
-                        {**state, **form, **data}
+                        {**state, **form, **data, **USER_INFO}
                         )
 
     def post(self, request):

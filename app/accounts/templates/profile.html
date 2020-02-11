@@ -46,36 +46,47 @@
             </div>
           </div>
           <div class="row">
-            <div class="col">
-              <div class="card" style="width: 18rem;">
+            <div class="col col-sm-10 col-md-8 col-lg-3">
+              <div class="card">
                 <img src="{% static 'img/image.png' %}" class="card-img-top" alt="">
                 <div class="card-body">
-                  <h5 class="card-title">{{username}}</h5>
-                  <p class="card-text">
-                    <form class="user" method="post"> {% csrf_token %}
-                      {{form}}
-                      <a class="btn btn-primary btn-user btn-block" href="#" data-toggle="modal" data-target="#changeModal">
-                        Change information
-                      </a>
-                      <div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="exampleModalLabel">Want to change you user information?</h5>
-                              <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </div>
-                            <div class="modal-body">Select "Change it!"" if you want to change your user information now.</div>
-                            <div class="modal-footer">
-                              <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                              <input type="submit" class="btn btn-primary" name="" value="Change it!">
-                            </div>
+                  <h5 class="card-title">Personal data:</h5>
+                  <table class="card-table table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Username:</th>
+                        <td>{{username}}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Email:</th>
+                        <td>{{email}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="card-text"></p>
+                  <form class="user" method="post"> {% csrf_token %}
+                    {{form}}
+                    <a class="btn btn-primary btn-user btn-block" id='changebttn' href="#" data-toggle="modal" data-target="#changeModal">
+                      Change information
+                    </a>
+                    <div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Want to change you user information?</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">Select "Change it!"" if you want to change your user information now.</div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <input type="submit" id='changeitbttn' class="btn btn-primary" name="" value="Change it!">
                           </div>
                         </div>
                       </div>
-                    </form>
-                  </p>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -129,10 +140,19 @@
   <!-- Bootstrap core JavaScript-->
   <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
-
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $(window).keydown(function(event){
+      if(event.keyCode == 13) {
+        event.preventDefault();
+        document.getElementById("changebttn").click();
+        return false;
+      }
+    });
+  });
+  </script>
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
 

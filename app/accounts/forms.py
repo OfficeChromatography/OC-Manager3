@@ -77,12 +77,12 @@ class ProfileForm(forms.ModelForm):
     username = forms.CharField(
         required=False,
         label=False,
-        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Username'})
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'New Username'})
     )
     email = forms.CharField(
         required=False,
         label=False,
-        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Email'})
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'New Email'})
     )
     password = forms.CharField(
         label=False,
@@ -95,18 +95,24 @@ class ProfileForm(forms.ModelForm):
             'email',
             'password',
         ]
+    def __init__(self, user, data=None):
+        self.user = user
+        super(ProfileForm, self).__init__(data=data)
 
     def clean(self, *args, **kwargs):
         username = self.cleaned_data.get("username")
         email = self.cleaned_data.get("email")
         password = self.cleaned_data.get("password")
-        if (not email) and (not username):
+        if email=='' and username=='':
             raise forms.ValidationError('Theres nothing to change!')
         if username:
             username_qs = User.objects.filter(username=username)
             if username_qs.exists():
-                raise forms.ValidationError('Error Username already exists!')
+                raise forms.ValidationError('Error this Username already exists!')
         if email:
             email_qs = User.objects.filter(email=email)
             if email_qs.exists():
-                raise forms.ValidationError('Error email already exists!')
+                raise forms.ValidationError('Error this email already exists!')
+        if password:
+            if not self.user.check_password(password):
+                raise forms.ValidationError('Wrong password')
