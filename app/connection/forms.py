@@ -54,7 +54,7 @@ class ConnectionForm(forms.ModelForm):
 
     class Meta:
         model = Connection_Db
-        exclude = ('chattext',)
+        exclude = ('chattext', 'username',)
 
     # Look for and list every Arduino connected
     def __init__(self, *args, **kwargs):
@@ -89,12 +89,18 @@ class ConnectionForm(forms.ModelForm):
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
         return
 
+    def useridentification(self, user):
+        aux = self.save(commit=False)
+        aux.username = user.username
+        aux.save()
+
     def clean_oc_lab(self, *args, **kwargs):
         oc_lab = self.cleaned_data.get('oc_lab')
         choices = self.fields['oc_lab'].choices
         if 'Plug an OC-Lab' in choices[0]:
             raise forms.ValidationError('Please connect an OC-Lab')
         return oc_lab
+
 
 
 # Formular to send the Arduino based on Connection_Db

@@ -7,6 +7,7 @@ from accounts.views import USER_INFO
 
 form = {
     'connectionset': ConnectionForm(initial={
+                        'username': 'LUCAS',
                         'baudrate': '115200',
                         'timeout': '2'}),
     'commandsend': ChatForm(),
@@ -42,7 +43,6 @@ class Connection_test(View):
 
     def get(self, request):
         USER_INFO['username']=request.user.get_username()
-
         self.update_parameters()
         return render(
                         request,
@@ -56,6 +56,7 @@ class Connection_test(View):
             data['monitor'] = ""
             if form['connectionset'].is_valid():
                 form['connectionset'].connect()
+                form['connectionset'].useridentification(request.user)
                 self.update_parameters(connected='True')
             return render(
                             request,
