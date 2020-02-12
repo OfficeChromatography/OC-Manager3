@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'connection',
     'finecontrol',
     'accounts',
+    'Printrun.printrun',
     # 'users',
     # 'users_api',
     # 'rest_framework',
