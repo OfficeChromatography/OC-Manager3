@@ -4,7 +4,7 @@ from .models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
 from accounts.views import USER_INFO
-
+import time
 form = {
     'connectionset': ConnectionForm(initial={
                         'username': 'LUCAS',
@@ -57,7 +57,8 @@ class Connection_test(View):
             if form['connectionset'].is_valid():
                 form['connectionset'].connect()
                 form['connectionset'].useridentification(request.user)
-                self.update_parameters(connected='True')
+                time.sleep(2)
+                # self.update_parameters(connected='True')
             return render(
                             request,
                             "connection.html",

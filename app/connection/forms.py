@@ -65,15 +65,11 @@ class ConnectionForm(forms.ModelForm):
     def connect(self):
         # Look for the selected arduino in the list of obcjets that cointains the USB ports
         selected_port = list(filter(lambda x: x.device == self.cleaned_data['oc_lab'], self.devices))[0].device
-        baudarate = self.cleaned_data['baudrate']
+        selected_baudarate = self.cleaned_data['baudrate']
         timeout = int(self.cleaned_data['timeout'])
-        self.state['messages'] = ""
-
-
-
-        aux = self.save(commit=False)
-        aux.chattext = self.state['messages']
-        aux.save()
+        
+        self.save()
+        OC_LAB.connect(port=selected_port, baud=selected_baudarate)
         return
 
     def update(self):
