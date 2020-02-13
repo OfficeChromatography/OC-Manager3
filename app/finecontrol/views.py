@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from connection.views import data, state, form
 from django.contrib.auth.mixins import LoginRequiredMixin
-from Printrun.printrun import printcore
+from printrun import printcore
 
 def update_monitor(**kwargs):
     return Connection_Db.objects.last().chattext

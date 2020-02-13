@@ -1,7 +1,7 @@
 from django import forms
 from .models import Connection_Db
 from .serialarduino import ArdComm
-
+from printrun.printcore import printcore
 
 def db_list_4_tuple(*args):
     merged_list = []
@@ -26,7 +26,7 @@ LIST_OF_BAUDRATES = [
 BAUDRATES = db_list_4_tuple(LIST_OF_BAUDRATES, LIST_OF_BAUDRATES)
 TIMEOUTS = db_list_4_tuple([i for i in range(6)])
 
-Arduino_Port = ArdComm()
+OC_LAB = printcore() 
 
 
 # Formular to connect the Arduino based on Connection_Db
@@ -69,14 +69,8 @@ class ConnectionForm(forms.ModelForm):
         timeout = int(self.cleaned_data['timeout'])
         self.state['messages'] = ""
 
-        # Try to connect
-        while self.state['messages'] == "":
-            try:
-                self.state['connected'] = Arduino_Port.connectArduino(selected_port, baudarate, timeout)
-                self.state['messages'] += Arduino_Port.readArduino()
-                self.state['info'] = "Connected to " + selected_port
-            except:
-                self.state['messages'] = "Connection Error"
+
+
         aux = self.save(commit=False)
         aux.chattext = self.state['messages']
         aux.save()
