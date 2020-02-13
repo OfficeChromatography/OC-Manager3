@@ -42,7 +42,7 @@ try:
 except:
     pass
 install_locale('pronterface')
-from .plugins import PRINTCORE_HANDLER
+from .eventhandler import PrinterEventHandler
 
 def locked(f):
     @wraps(f)
@@ -120,7 +120,7 @@ class printcore():
         self.print_thread = None
         self.readline_buf = []
         self.selector = None
-        self.event_handler = PRINTCORE_HANDLER
+        self.event_handler = [PrinterEventHandler(),]
         # Not all platforms need to do this parity workaround, and some drivers
         # don't support it.  Limit it to platforms that actually require it
         # here to avoid doing redundant work elsewhere and potentially breaking
