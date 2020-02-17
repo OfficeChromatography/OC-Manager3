@@ -18,6 +18,7 @@ from django.urls import path
 # from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import include
 
 from pages import views as pages_views
 from accounts import views as accounts_views
@@ -33,6 +34,7 @@ urlpatterns = [
     path('logout/',  accounts_views.logout_view, name='logout'),
     path('register/',  accounts_views.register_view, name='register'),
     path('profile/',  accounts_views.profile_view, name='profile'),
+    path('monitor/', include('monitor.urls')),
 ]
 
 if settings.DEBUG:

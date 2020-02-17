@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'finecontrol',
     'accounts',
     'printrun',
+    'monitor',
+    'channels'
     # 'users',
     # 'users_api',
     # 'rest_framework',
@@ -148,3 +150,5 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'templates/media')
 
 MEDIA_URL = '/media/'
+
+ASGI_APPLICATION = 'app.routing.application'
