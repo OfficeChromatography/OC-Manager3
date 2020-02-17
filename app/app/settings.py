@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'printrun',
     'monitor',
-    'channels'
+    'channels',
     # 'users',
     # 'users_api',
     # 'rest_framework',
@@ -152,3 +152,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'templates/media')
 MEDIA_URL = '/media/'
 
 ASGI_APPLICATION = 'app.routing.application'
+CHANNEL_LAYERS = {
+    "default": {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        "CONFIG": {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}

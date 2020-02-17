@@ -1,16 +1,21 @@
 version: "3"
 
 services:
+  redis:
+    restart: always
+    image: redis:latest
+    command: redis-server
+    ports:
+      - '6379:6379'
   app:
+    restart: always
     build: .
+    depends_on:
+      - redis
+    # links:
+    #   - redis:redis
     environment:
       - UDEV=1
-    #   - DB_HOST=db
-    #   - DB_NAME=app
-    #   - DB_USER=postgres
-    #   - DB_PASS=Hptlc123
-    # depends_on:
-    #   - db
     ports:
       - "8000:8000" # Map 8000 to 8000 of our docker image
     volumes:
@@ -23,7 +28,6 @@ services:
     command: >
       sh -c " python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
-
 
 
   # db:
