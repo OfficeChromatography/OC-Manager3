@@ -13,9 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Printrun.  If not, see <http://www.gnu.org/licenses/>.
 from connection.models import Connection_Db
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+channel_layer = get_channel_layer()
 
 
-class PrinterEventHandler:
+
+
+class PrinterEventHandler():
     '''
     Defines a skeletton of an event-handler for printer events. It
     allows attaching to the printcore and will be triggered for
@@ -51,14 +57,14 @@ class PrinterEventHandler:
         aux = Connection_Db.objects.last()
         aux.chattext += line
         aux.save()
+        async_to_sync(channel_layer.group_send)("monitor_123", {'type': 'chat_message', 'message': line[:-1]})
         pass
-
 
     def on_connect(self):
         '''
         Called whenever printcore is connected.
         '''
-        print("se conecto papa")
+        async_to_sync(channel_layer.group_send)("monitor_123", {'type': 'chat_message', 'message': 'Connected!'})
         pass
 
     def on_disconnect(self):

@@ -1,21 +1,16 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-import time
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        print('HOLAAAA')
-        time.sleep(3)
         self.room_name = '123'
-        print(self.room_name)
         self.room_group_name = 'monitor_%s' % self.room_name
-        print(self.room_group_name)
         # # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
-        print('ERRORRRRRR')
         self.accept()
 
     def disconnect(self, close_code):
