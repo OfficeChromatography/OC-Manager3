@@ -7,7 +7,6 @@ from accounts.views import USER_INFO
 import time
 form = {
     'connectionset': ConnectionForm(initial={
-                        'username': 'LUCAS',
                         'baudrate': '115200',
                         'timeout': '2'}),
     'commandsend': ChatForm(),
@@ -25,8 +24,6 @@ state = {
 USER_INFO = {
 
 }
-
-
 def update_monitor(**kwargs):
     return Connection_Db.objects.last().chattext
 
@@ -58,7 +55,7 @@ class Connection_test(View):
                 form['connectionset'].connect()
                 form['connectionset'].useridentification(request.user)
                 time.sleep(2)
-                # self.update_parameters(connected='True')
+                self.update_parameters(connected='True')
             return render(
                             request,
                             "connection.html",
@@ -68,12 +65,9 @@ class Connection_test(View):
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
-                if request.POST.get('chattext') == 'CLEAR':
-                    data['monitor'] = ""
-                else:
-                    form['commandsend'].send()
-                    self.update_parameters()
-                    form['commandsend'] = ChatForm()
+                form['commandsend'].send()
+                self.update_parameters()
+                form['commandsend'] = ChatForm()
             return JsonResponse(data)
 
     def update_parameters(self, **kwargs):

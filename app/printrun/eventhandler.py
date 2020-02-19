@@ -46,6 +46,10 @@ class PrinterEventHandler():
         @param command: The command to be sent.
         @param gline: The parsed high-level command.
         '''
+        aux = Connection_Db.objects.last()
+        aux.chattext += command+'\n'
+        aux.save()
+        async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': command})
         pass
 
     def on_recv(self, line):
@@ -57,14 +61,14 @@ class PrinterEventHandler():
         aux = Connection_Db.objects.last()
         aux.chattext += line
         aux.save()
-        async_to_sync(channel_layer.group_send)("monitor_123", {'type': 'chat_message', 'message': line[:-1]})
+        async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': line[:-1]})
         pass
 
     def on_connect(self):
         '''
         Called whenever printcore is connected.
         '''
-        async_to_sync(channel_layer.group_send)("monitor_123", {'type': 'chat_message', 'message': 'Connected!'})
+        async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': 'Connected!'})
         pass
 
     def on_disconnect(self):

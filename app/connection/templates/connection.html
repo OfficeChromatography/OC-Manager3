@@ -70,14 +70,9 @@
                 </div>
                 <div class="card-body">
                       <!-- Input Group -->
-                  <form method="post" id="serialport"> {% csrf_token %}
+                  <form class="ajax-form" method="post" id="serialport"> {% csrf_token %}
                     {{ connectionset.as_p }}
                     <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
-                    <!-- {% if object %}
-                      <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
-                    {% else %}
-                      <button class="btn btn-outline-secondary" type="submit" disabled>Connect</button> -->
-                    {% endif %}
                   </form>
                 </div>
                   <div class="card-footer text-muted">{{message}}</div>
@@ -107,7 +102,7 @@
                     <div class="col">
                       <div class="form-group noresize" style="height:90%">
                         <!-- <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
-                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'>{{monitor}}</textarea>
+                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'></textarea>
                         <form class="ajax-form" method="post" data-url='/monitor/' id="send_area"> {% csrf_token %}
                           <div class="input-group mb-3 pt-2">
                             {{commandsend}}
@@ -182,9 +177,6 @@
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script type="text/javascript">
     document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
-    if("{{connected}}"=='False'){
-      document.getElementById("send_area").style.display = 'none'
-    }
   </script>
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>

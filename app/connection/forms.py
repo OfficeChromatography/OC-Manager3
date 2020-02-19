@@ -26,14 +26,14 @@ LIST_OF_BAUDRATES = [
 BAUDRATES = db_list_4_tuple(LIST_OF_BAUDRATES, LIST_OF_BAUDRATES)
 TIMEOUTS = db_list_4_tuple([i for i in range(6)])
 
-OC_LAB = printcore() 
+OC_LAB = printcore()
 
 
 # Formular to connect the Arduino based on Connection_Db
 class ConnectionForm(forms.ModelForm):
     oc_lab = forms.ChoiceField(
             label='OC_Lab',
-            widget=forms.Select(attrs={'class': 'form-group custom-select'})
+            widget=forms.Select(attrs={'class': 'form-group custom-select','id':'chat-message-input'})
             )
     baudrate = forms.ChoiceField(
             choices=BAUDRATES,
@@ -67,8 +67,10 @@ class ConnectionForm(forms.ModelForm):
         selected_port = list(filter(lambda x: x.device == self.cleaned_data['oc_lab'], self.devices))[0].device
         selected_baudarate = self.cleaned_data['baudrate']
         timeout = int(self.cleaned_data['timeout'])
-        
+
+        # Save above information in a new db entry
         self.save()
+
         OC_LAB.connect(port=selected_port, baud=selected_baudarate)
         return
 
@@ -113,8 +115,5 @@ class ChatForm(forms.ModelForm):
 
     def send(self):
         message = self.cleaned_data['chattext']
-        message = Arduino_Port.writeArduino(message)
-        aux = Connection_Db.objects.last()
-        aux.chattext += message
-        aux.save()
+        OC_LAB.send_now(message)
         return message

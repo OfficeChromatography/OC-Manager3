@@ -4,7 +4,6 @@ $(document).ready(function(){
     event.preventDefault()
     var $formData = $(this).serialize()
     var $endpoint = window.location.href
-
     $.ajax({
       method: 'POST',
       url:    $endpoint,
@@ -15,7 +14,7 @@ $(document).ready(function(){
   })
 
   function handleFormSuccess(data, textStatus, jqXHR){
-      document.getElementById("sentit").value = data.monitor
+      // document.getElementById("sentit").value = data.monitor
       scrollit()
       console.log(data);
       console.log(textStatus)
@@ -31,6 +30,27 @@ $(document).ready(function(){
 })
 
 //Monitor Function
-function scrollit(){
-    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+var roomName = 'oc_lab';
+var data = '{{ monitor|escapejs }}';
+console.log(data);
+var chatSocket = new WebSocket(
+    'ws://' + window.location.host +
+    '/ws/monitor/' + roomName + '/');
+
+chatSocket.onmessage = function(e) {
+    var data = JSON.parse(e.data);
+    var message = data['message'];
+    document.querySelector('#sentit').value += (message + '\n');
+    afterSentit()
+};
+
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+};
+
+
+function afterSentit(){
+    document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
+    document.getElementById('id_chattext').value = ''
+    document.getElementById('id_chattext').focus();
 }
