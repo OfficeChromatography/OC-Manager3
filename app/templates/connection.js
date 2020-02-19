@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  document.querySelector('#sentit').value = monitor_text
   var $myForm = $(".ajax-form")
   $myForm.submit(function(event){
     event.preventDefault()
@@ -15,7 +16,7 @@ $(document).ready(function(){
 
   function handleFormSuccess(data, textStatus, jqXHR){
       // document.getElementById("sentit").value = data.monitor
-      scrollit()
+      afterSentit()
       console.log(data);
       console.log(textStatus)
       console.log(jqXHR)
@@ -29,10 +30,10 @@ $(document).ready(function(){
   }
 })
 
+
+
 //Monitor Function
 var roomName = 'oc_lab';
-var data = '{{ monitor|escapejs }}';
-console.log(data);
 var chatSocket = new WebSocket(
     'ws://' + window.location.host +
     '/ws/monitor/' + roomName + '/');
