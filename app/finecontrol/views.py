@@ -80,11 +80,11 @@ def simple_move_Gcode_gen(request):
     if 'arrow' in direction:
         gcode = "G1 "
         if 'left' in direction:
-            gcode += "-X"
+            gcode += "X-"
         elif 'right' in direction:
-            gcode += "X+"
+            gcode += "X"
         elif 'down' in direction:
-            gcode += "-Y"
+            gcode += "Y-"
         else:
             gcode += "Y+"
         gcode += str(step)
