@@ -300,7 +300,9 @@
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
   <script src="{% static 'motorcontrol.js' %}"></script>
-
+  <script type="text/javascript">
+     var monitor_text = "{{monitor|escapejs|safe}}"
+  </script>
 </body>
 
 </html>

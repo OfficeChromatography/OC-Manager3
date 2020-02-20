@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import ConnectionForm, ChatForm
+from .forms import ConnectionForm, ChatForm, OC_LAB
 from .models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
@@ -54,7 +54,6 @@ class Connection_test(View):
             if form['connectionset'].is_valid():
                 form['connectionset'].connect()
                 form['connectionset'].useridentification(request.user)
-                time.sleep(2)
                 self.update_parameters(connected='True')
             return render(
                             request,
@@ -64,9 +63,8 @@ class Connection_test(View):
 
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
-            if form['commandsend'].is_valid():
-                form['commandsend'].send()
-                self.update_parameters()
+            if 'chattext' in request.POST:
+                OC_LAB.send(request.POST['chattext'])
                 form['commandsend'] = ChatForm()
             return JsonResponse(data)
 

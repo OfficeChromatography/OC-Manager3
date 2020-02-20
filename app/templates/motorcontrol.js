@@ -1,5 +1,6 @@
 // AJAX POST
 $(document).ready(function(){
+  document.querySelector('#sentit').value = monitor_text
   var $myForm = $("#Gcode_form")
   $myForm.submit(function(event){
     event.preventDefault()
@@ -15,8 +16,7 @@ $(document).ready(function(){
   })
 
   function handleFormSuccess(data, textStatus, jqXHR){
-      document.getElementById("sentit").value = data.monitor
-      scrollit()
+      afterSentit()
       // console.log(data);
       console.log(textStatus)
       // console.log(jqXHR)
@@ -38,8 +38,10 @@ function erase(){
 }
 
 // MONITOR CONTROLLER
-function scrollit(){
-    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+function afterSentit(){
+    document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
+    document.getElementById('id_chattext').value = ''
+    document.getElementById('id_chattext').focus();
 }
 
 // Slider
@@ -49,6 +51,7 @@ function sliderChange(val,id){
 
 // Buttons move
 $(document).ready(function(){
+  document.querySelector('#sentit').value = monitor_text
   var $myForm = $(".move-form")
   $myForm.submit(function(event){
     button_pressed = document.activeElement.id
@@ -67,6 +70,7 @@ $(document).ready(function(){
 
   function handleFormSuccess(data, textStatus, jqXHR){
       document.getElementById("sentit").value = data.monitor
+      afterSentit()
       console.log("bien");
       // console.log(data);
       // console.log(textStatus)
@@ -75,6 +79,7 @@ $(document).ready(function(){
 
   function handleFormError(jqXHR, textStatus, errorThrown){
     console.log("error");
+    afterSentit()
       // console.log(jqXHR)
       // console.log(textStatus)
       // console.log(errorThrown)
@@ -82,4 +87,4 @@ $(document).ready(function(){
 })
 
 //Intialization
-window.onload=scrollit()
+window.onload=afterSentit()

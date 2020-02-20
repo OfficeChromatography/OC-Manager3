@@ -1,5 +1,5 @@
 # IMPORTS FOR CLASS BASED View
-from connection.forms import ChatForm
+from connection.forms import ChatForm, OC_LAB
 from connection.models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
@@ -7,6 +7,7 @@ from django.shortcuts import render
 from connection.views import data, state, form
 from django.contrib.auth.mixins import LoginRequiredMixin
 from printrun import printcore
+import time
 
 def update_monitor(**kwargs):
     return Connection_Db.objects.last().chattext
@@ -71,6 +72,24 @@ class MotorControl(View):
         else:
             for i in data:
                 data[i] = ''
+
+class PumpControl(View):
+
+    def get(self, request):
+        return render(
+            request,
+            "./pumpcontrol.html",
+            {**form, **data, **state})
+
+    def post(self, request):
+        if 'cycles' in request.POST:
+            for i in range(0,int(request.POST['cycles'])):
+                OC_LAB.send('M42 P63 T')
+                time.sleep(3/5)
+        return render(
+            request,
+            "./pumpcontrol.html",
+            {**form, **data, **state})
 
 
 def simple_move_Gcode_gen(request):
