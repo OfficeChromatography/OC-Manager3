@@ -23,19 +23,15 @@ from django.conf.urls import include
 from pages import views as pages_views
 from accounts import views as accounts_views
 from connection.views import Connection_test
-from finecontrol.views import MotorControl, PumpControl
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', Connection_test.as_view(), name='connection'),
     path('connection/', Connection_test.as_view(), name='connection'),
-    path('motorcontrol/',  MotorControl.as_view(), name='motorcontrol'),
-    path('pumpcontrol/',  PumpControl.as_view(), name='pumpcontrol'),
-    path('login/',  accounts_views.login_view, name='login'),
-    path('logout/',  accounts_views.logout_view, name='logout'),
-    path('register/',  accounts_views.register_view, name='register'),
-    path('profile/',  accounts_views.profile_view, name='profile'),
     path('monitor/', include('monitor.urls')),
+    path('', include('accounts.urls')),
+    path('', include('finecontrol.urls')),
 ]
 
 if settings.DEBUG:

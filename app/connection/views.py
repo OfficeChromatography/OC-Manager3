@@ -44,7 +44,7 @@ class Connection_test(View):
         return render(
                         request,
                         "connection.html",
-                        {**state, **form, **data, **USER_INFO}
+                        {**state, **form, **data}
                         )
 
     def post(self, request):

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -69,3 +70,9 @@ def profile_view(request):
     context['form'] = form
     context.update(USER_INFO)
     return render(request,'profile.html',context)
+
+def username_view(request):
+    if request.user.is_authenticated == True:
+        return JsonResponse({'username':request.user.get_username()})
+    else:
+        return JsonResponse({'username':''})

@@ -17,21 +17,15 @@ $(document).ready(function(){
 
   function handleFormSuccess(data, textStatus, jqXHR){
       afterSentit()
-      // console.log(data);
       console.log(textStatus)
-      // console.log(jqXHR)
       $myForm[0].reset(); // reset form data
   }
 
   function handleFormError(jqXHR, textStatus, errorThrown){
-      // console.log(jqXHR)
-      console.log(textStatus)
-      // console.log(errorThrown)
   }
 })
 
 // Erase button
-
 function erase(){
   event.preventDefault()
   document.getElementById("id_chattext").value = ''
@@ -51,6 +45,7 @@ function sliderChange(val,id){
 
 // Buttons move
 $(document).ready(function(){
+  afterSentit()
   document.querySelector('#sentit').value = monitor_text
   var $myForm = $(".move-form")
   $myForm.submit(function(event){
@@ -67,24 +62,12 @@ $(document).ready(function(){
       error: handleFormError,
     })
   })
-
   function handleFormSuccess(data, textStatus, jqXHR){
       document.getElementById("sentit").value = data.monitor
       afterSentit()
-      console.log("bien");
-      // console.log(data);
-      // console.log(textStatus)
-      // console.log(jqXHR)
   }
 
   function handleFormError(jqXHR, textStatus, errorThrown){
-    console.log("error");
     afterSentit()
-      // console.log(jqXHR)
-      // console.log(textStatus)
-      // console.log(errorThrown)
   }
 })
-
-//Intialization
-window.onload=afterSentit()
