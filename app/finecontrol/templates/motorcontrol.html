@@ -169,20 +169,27 @@
                   <h6 class="m-0 font-weight-bold text-primary">Upload G-Code</h6>
                 </div>
                 <div class="card-body" >
-                  <form class="form-inline" id='lenghtforupload' enctype="multipart/form-data" method="POST">{% csrf_token %}
-                    <div class="form-group" id='uploadform'>
-                        <input  type="file" id='uploadfile' class="form-control" style="height:auto" name="document"  aria-describedby="basic-addon2">
-                        <button type="submit" id='btt_upload_file' class="btn btn-primary btn-icon-split">
-                          <span class="icon text-white-50">
-                            <i class="fas fa-play"></i>
-                          </span>
-                        </button>
-                          <span class="icon text-white-50">
-                            <i class="fas fa-trash-alt"></i>
-                          </span>
-                        </a>
+                  <div class="input-group">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" id="inputGroupFile01"
+                        aria-describedby="inputGroupFileAddon01">
+                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                     </div>
-                  </form>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-icon-split" onclick="" id="play_bttn">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-play"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-icon-split" onclick="" id="btt_erase_file">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-trash-alt"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 {% if gcode_url %}
                 <div class="card-footer text-muted font-italic font-weight-bold">
