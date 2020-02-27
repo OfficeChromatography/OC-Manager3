@@ -43,6 +43,28 @@ function sliderChange(val,id){
   document.getElementById(id).value = val;
 }
 
+// Upload form
+document.querySelector('.custom-file-input').addEventListener('change',function(e){
+  var fileName = document.getElementById("GFile").files[0].name
+  document.getElementById('upload_label').innerHTML = fileName
+
+
+  // Enable the buttons son you can run or erase empty file
+  document.getElementById('play_upload').disabled = false;
+  document.getElementById('erase_upload').disabled = false;
+  document.getElementById('erase_upload').classList.remove("disabled");
+})
+
+function erase_upload(){
+  document.getElementById('GFile').value = "";
+  document.getElementById('upload_label').innerHTML ='Choose file'
+
+  // Disable the buttons son you can not run or erase empty file
+  document.getElementById('play_upload').disabled = true
+  document.getElementById('erase_upload').disabled = true;
+  document.getElementById('erase_upload').classList.add("disabled");
+}
+
 // Buttons move
 $(document).ready(function(){
   afterSentit()

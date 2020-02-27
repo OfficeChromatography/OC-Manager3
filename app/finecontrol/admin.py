@@ -1,3 +1,6 @@
-# from django.contrib import admin
+from django.contrib import admin
+from .models import GcodeFile
 
-# Register your models here.
+class GcodeFileAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(GcodeFile, GcodeFileAdmin)

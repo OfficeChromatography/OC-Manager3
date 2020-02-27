@@ -6,6 +6,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from connection.views import data, state, form
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files.storage import FileSystemStorage
+
 from printrun import printcore
 import time
 
@@ -55,6 +57,16 @@ class MotorControl(View):
                 self.update_parameters()
                 form['commandsend'] = ChatForm()
                 return JsonResponse(data)
+
+        if request.FILES['GFile']:
+            uploaded_file = request.FILES['GFile']
+            fs = FileSystemStorage()
+            fs.save(uploaded_file.name, uploaded_file)
+            
+            return render(
+                    request,
+                    "./motorcontrol.html",
+                    {**form, **data, **state})
         else:
             return render(
                     request,

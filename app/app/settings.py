@@ -147,10 +147,12 @@ STATIC_URL = '/static/'
 
 # AUTH_USER_MODEL = 'users.User'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'templates/media')
-
+# Upload File conf
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+
+# Channels CONFIG
 ASGI_APPLICATION = 'app.routing.application'
 CHANNEL_LAYERS = {
     "default": {
