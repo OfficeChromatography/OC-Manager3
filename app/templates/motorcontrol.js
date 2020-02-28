@@ -1,4 +1,7 @@
 // AJAX POST
+var roomName = 'oc_lab';
+var roomName
+
 $(document).ready(function(){
   document.querySelector('#sentit').value = monitor_text
   var $myForm = $("#Gcode_form")
@@ -18,6 +21,7 @@ $(document).ready(function(){
   function handleFormSuccess(data, textStatus, jqXHR){
       scrollIt()
       console.log(textStatus)
+      console.log('O DEDSDE ESTE');
       $myForm[0].reset(); // reset form data
   }
 
@@ -85,11 +89,27 @@ $(document).ready(function(){
     })
   })
   function handleFormSuccess(data, textStatus, jqXHR){
-      document.getElementById("sentit").value = data.monitor
-      scrollIt()
+    scrollIt()
   }
 
   function handleFormError(jqXHR, textStatus, errorThrown){
     scrollIt()
   }
+
+  chatSocket = new WebSocket(
+      'ws://' + window.location.host +
+      '/ws/monitor/' + roomName + '/');
+
+  // MONITOR FUNCTIONS
+  chatSocket.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      var message = data['message'];
+      document.querySelector('#sentit').value += (message + '\n');
+      scrollIt()
+  };
+
+  chatSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+
 })
