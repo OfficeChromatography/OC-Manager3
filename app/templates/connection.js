@@ -1,7 +1,40 @@
+var roomName = 'oc_lab';
+var chatSocket = ''
+
 $(document).ready(function(){
+  // Load the text from the DataBase
   document.querySelector('#sentit').value = monitor_text
-  var $myForm = $(".ajax-form")
-  $myForm.submit(function(event){
+  scrolldown()
+
+  // AJAX POST of the serial_port connection
+  var $myConnectionForm = $('.connection-form')
+  $myConnectionForm.submit(function(event){
+    event.preventDefault()
+    document.querySelector('#sentit').value = ''
+    var $formData = $(this).serialize()
+    var $endpoint = window.location.href
+    $.ajax({
+      method: 'POST',
+      url:    $endpoint,
+      data:   $formData,
+      success: connectionFormSuccess,
+      error: connectionFormError,
+    })
+  })
+  function connectionFormSuccess(data, textStatus, jqXHR){
+    scrolldown()
+    document.querySelector('#sentit').value += data['monitor']
+    device = data['device']
+    connect.connect = data['connected']
+    document.querySelector('#sentit').value
+    console.log(data);
+  }
+  function connectionFormError(jqXHR, textStatus, errorThrown){}
+
+
+
+  var $myConnectionForm = $('.message-form')
+  $myConnectionForm.submit(function(event){
     event.preventDefault()
     var $formData = $(this).serialize()
     var $endpoint = window.location.href
@@ -9,48 +42,37 @@ $(document).ready(function(){
       method: 'POST',
       url:    $endpoint,
       data:   $formData,
-      success: handleFormSuccess,
-      error: handleFormError,
+      success: handleFormSuccess1,
+      error: handleFormError1,
     })
   })
 
-  function handleFormSuccess(data, textStatus, jqXHR){
-      // document.getElementById("sentit").value = data.monitor
-      afterSentit()
-      console.log(data);
-      console.log(textStatus)
-      console.log(jqXHR)
-      $myForm[0].reset(); // reset form data
+  function handleFormSuccess1(data, textStatus, jqXHR){scrolldown()
   }
-
-  function handleFormError(jqXHR, textStatus, errorThrown){
-      console.log(jqXHR)
-      console.log(textStatus)
-      console.log(errorThrown)
-  }
+  function handleFormError1(jqXHR, textStatus, errorThrown){}
 })
 
+if(connectionStatus='true'){
+  chatSocket = new WebSocket(
+      'ws://' + window.location.host +
+      '/ws/monitor/' + roomName + '/');
 
+  // MONITOR FUNCTIONS
+  chatSocket.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      var message = data['message'];
+      document.querySelector('#sentit').value += (message + '\n');
+      scrolldown()
+  };
+
+  chatSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+
+}
 
 //Monitor Function
-var roomName = 'oc_lab';
-var chatSocket = new WebSocket(
-    'ws://' + window.location.host +
-    '/ws/monitor/' + roomName + '/');
-
-chatSocket.onmessage = function(e) {
-    var data = JSON.parse(e.data);
-    var message = data['message'];
-    document.querySelector('#sentit').value += (message + '\n');
-    afterSentit()
-};
-
-chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-};
-
-
-function afterSentit(){
+function scrolldown(){
     document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
     document.getElementById('id_chattext').value = ''
     document.getElementById('id_chattext').focus();

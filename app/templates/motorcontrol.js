@@ -16,7 +16,7 @@ $(document).ready(function(){
   })
 
   function handleFormSuccess(data, textStatus, jqXHR){
-      afterSentit()
+      scrollIt()
       console.log(textStatus)
       $myForm[0].reset(); // reset form data
   }
@@ -32,7 +32,7 @@ function erase(){
 }
 
 // MONITOR CONTROLLER
-function afterSentit(){
+function scrollIt(){
     document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
     document.getElementById('id_chattext').value = ''
     document.getElementById('id_chattext').focus();
@@ -67,7 +67,7 @@ function erase_upload(){
 
 // Buttons move
 $(document).ready(function(){
-  afterSentit()
+  scrollIt()
   document.querySelector('#sentit').value = monitor_text
   var $myForm = $(".move-form")
   $myForm.submit(function(event){
@@ -86,10 +86,10 @@ $(document).ready(function(){
   })
   function handleFormSuccess(data, textStatus, jqXHR){
       document.getElementById("sentit").value = data.monitor
-      afterSentit()
+      scrollIt()
   }
 
   function handleFormError(jqXHR, textStatus, errorThrown){
-    afterSentit()
+    scrollIt()
   }
 })

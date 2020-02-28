@@ -70,7 +70,7 @@
                 </div>
                 <div class="card-body">
                       <!-- Input Group -->
-                  <form class="ajax-form" method="post" id="serialport"> {% csrf_token %}
+                  <form class="connection-form" method="post" id="serialport"> {% csrf_token %}
                     {{ connectionset.as_p }}
                     <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
                   </form>
@@ -103,7 +103,7 @@
                       <div class="form-group noresize" style="height:90%">
                         <!-- <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
                         <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'></textarea>
-                        <form class="ajax-form" method="post" data-url='/monitor/' id="send_area"> {% csrf_token %}
+                        <form method="post" class='message-form' data-url='/monitor/' id="send_area"> {% csrf_token %}
                           <div class="input-group mb-3 pt-2">
                             {{commandsend}}
                             <div class="input-group-append">

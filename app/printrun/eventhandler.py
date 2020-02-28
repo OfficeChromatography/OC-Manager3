@@ -15,7 +15,6 @@
 from connection.models import Connection_Db
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
 channel_layer = get_channel_layer()
 
 
@@ -75,6 +74,7 @@ class PrinterEventHandler():
         '''
         Called whenever printcore is disconnected.
         '''
+        print('disconnectado chabon')
         pass
 
     def on_error(self, error):

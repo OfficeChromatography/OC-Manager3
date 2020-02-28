@@ -152,6 +152,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
+
 # Channels CONFIG
 ASGI_APPLICATION = 'app.routing.application'
 CHANNEL_LAYERS = {

@@ -5,6 +5,7 @@ from django.views import View
 from django.http import JsonResponse
 from accounts.views import USER_INFO
 import time
+
 form = {
     'connectionset': ConnectionForm(initial={
                         'baudrate': '115200',
@@ -18,7 +19,7 @@ data = {
     'baudrate': '',
 }
 state = {
-    'connected': 'False',
+    'connected': 'false',
 }
 
 USER_INFO = {
@@ -41,6 +42,7 @@ class Connection_test(View):
     def get(self, request):
         USER_INFO['username']=request.user.get_username()
         self.update_parameters()
+        print(data)
         return render(
                         request,
                         "connection.html",
@@ -54,12 +56,8 @@ class Connection_test(View):
             if form['connectionset'].is_valid():
                 form['connectionset'].connect()
                 form['connectionset'].useridentification(request.user)
-                self.update_parameters(connected='True')
-            return render(
-                            request,
-                            "connection.html",
-                            {**state, **form, **data}
-                            )
+                self.update_parameters(connected='true')
+            return JsonResponse({**state, **data})
 
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
@@ -71,7 +69,7 @@ class Connection_test(View):
     def update_parameters(self, **kwargs):
         for key, value in kwargs.items():
             state[key] = value
-        if state['connected'] == 'True':
+        if state['connected'] == 'true':
             form['connectionset'].update()
             data['monitor'] = update_monitor()
             data['device'] = get_device()

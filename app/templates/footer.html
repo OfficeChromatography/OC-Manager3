@@ -6,22 +6,39 @@
   </div>
 
   <script>
-    var connectionStatus = "{{connected}}";
     var device = "{{device}}"
-    var busy = "{{busy}}"
 
-    connectionVerify(connectionStatus)
-    function connectionVerify(connectionStatus){
+    // Creates a connect object with a listener, every time the state of
+    //connection changes, then the bottom bar change the color
+    connect = {
+      connectInternal: 'false',           // Internal value for the connect object
+      connectListener: function(val){}, //
+
+      set connect(val){                       // Definition of the setter
+        this.connectInternal = val;
+        this.connectListener(val);
+      },
+      get connect(){
+        return this.connectInternal;
+      },
+      registerListener: function(listener){  // Listener of event
+        this.connectListener = listener;
+      }
+    }
+
+    connect.registerListener(function(val) {  // Listener function
       foot = document.getElementById("footer")
       footText = document.getElementById("footerText")
-      if (connectionStatus!='False'){
+      if (this.connect!='false'){
         foot.classList.replace(foot.classList[1],'bg-success')
-        footText.innerHTML="OC-Lab Connected to "+device
+        footText.innerHTML="OC-Lab Connected to "+ device
       } else{
         foot.classList.replace(foot.classList[1],'bg-warning')
         footText.innerHTML="OC-Lab Disconnected"
       }
-    }
+    });
+
+    connect.connect = "{{connected}}" // Assign the internal val, at the beginning
 
   </script>
 </footer>
