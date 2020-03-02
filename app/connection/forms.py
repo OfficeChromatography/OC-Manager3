@@ -54,7 +54,7 @@ class ConnectionForm(forms.ModelForm):
 
     class Meta:
         model = Connection_Db
-        exclude = ('chattext', 'username',)
+        exclude = ('chattext', 'username','auth_id')
 
     # Look for and list every Arduino connected
     def __init__(self, *args, **kwargs):
@@ -83,7 +83,7 @@ class ConnectionForm(forms.ModelForm):
 
     def useridentification(self, user):
         aux = self.save(commit=False)
-        aux.username = user.username
+        aux.auth_id = user
         aux.save()
 
     def clean_oc_lab(self, *args, **kwargs):
