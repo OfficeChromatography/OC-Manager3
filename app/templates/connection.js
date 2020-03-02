@@ -3,14 +3,14 @@ var chatSocket = ''
 
 $(document).ready(function(){
   // Load the text from the DataBase
-  document.querySelector('#sentit').value = monitor_text
+  document.querySelector('#MonitorTextArea').value = monitor_text
   scrolldown()
 
   // AJAX POST of the serial_port connection
-  var $myConnectionForm = $('.connection-form')
-  $myConnectionForm.submit(function(event){
+  var $ConnectionForm = $('.connection-form')
+  $ConnectionForm.submit(function(event){
     event.preventDefault()
-    document.querySelector('#sentit').value = ''
+    document.querySelector('#MonitorTextArea').value = ''
     var $formData = $(this).serialize()
     var $endpoint = window.location.href
     $.ajax({
@@ -23,18 +23,18 @@ $(document).ready(function(){
   })
   function connectionFormSuccess(data, textStatus, jqXHR){
     scrolldown()
-    document.querySelector('#sentit').value += data['monitor']
+    document.querySelector('#MonitorTextArea').value += data['monitor']
     device = data['device']
     connect.connect = data['connected']
-    document.querySelector('#sentit').value
+    document.querySelector('#MonitorTextArea').value
     console.log(data);
   }
   function connectionFormError(jqXHR, textStatus, errorThrown){}
 
 
 
-  var $myConnectionForm = $('.message-form')
-  $myConnectionForm.submit(function(event){
+  var $ConnectionForm = $('.message-form')
+  $ConnectionForm.submit(function(event){
     event.preventDefault()
     var $formData = $(this).serialize()
     var $endpoint = window.location.href
@@ -61,7 +61,7 @@ if(connectionStatus='true'){
   chatSocket.onmessage = function(e) {
       var data = JSON.parse(e.data);
       var message = data['message'];
-      document.querySelector('#sentit').value += (message + '\n');
+      document.querySelector('#MonitorTextArea').value += (message + '\n');
       scrolldown()
   };
 
@@ -73,7 +73,7 @@ if(connectionStatus='true'){
 
 //Monitor Function
 function scrolldown(){
-    document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
+    document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
     document.getElementById('id_chattext').value = ''
     document.getElementById('id_chattext').focus();
 }

@@ -101,8 +101,8 @@
                   <div class="row no-gutters align-items-start">
                     <div class="col">
                       <div class="form-group noresize" style="height:90%">
-                        <!-- <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
-                        <textarea class="form-control" disabled id="sentit" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'></textarea>
+                        <!-- <textarea class="form-control" disabled id="MonitorTextArea" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
+                        <textarea class="form-control" disabled id="MonitorTextArea" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'></textarea>
                         <form method="post" class='message-form' data-url='/monitor/' id="send_area"> {% csrf_token %}
                           <div class="input-group mb-3 pt-2">
                             {{commandsend}}
@@ -176,7 +176,7 @@
   <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script type="text/javascript">
-    document.getElementById("sentit").scrollTop = document.getElementById("sentit").scrollHeight
+    document.getElementById("MonitorTextArea").scrollTop = document.getElementById("MonitorTextArea").scrollHeight
   </script>
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>

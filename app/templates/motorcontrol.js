@@ -3,7 +3,7 @@ var roomName = 'oc_lab';
 var roomName
 
 $(document).ready(function(){
-  document.querySelector('#sentit').value = monitor_text
+  document.querySelector('#MonitorTextArea').value = monitor_text
   var $myForm = $("#Gcode_form")
   $myForm.submit(function(event){
     event.preventDefault()
@@ -37,7 +37,7 @@ function erase(){
 
 // MONITOR CONTROLLER
 function scrollIt(){
-    document.getElementById('sentit').scrollTop = document.getElementById("sentit").scrollHeight
+    document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
     document.getElementById('id_chattext').value = ''
     document.getElementById('id_chattext').focus();
 }
@@ -72,7 +72,7 @@ function erase_upload(){
 // Buttons move
 $(document).ready(function(){
   scrollIt()
-  document.querySelector('#sentit').value = monitor_text
+  document.querySelector('#MonitorTextArea').value = monitor_text
   var $myForm = $(".move-form")
   $myForm.submit(function(event){
     button_pressed = document.activeElement.id
@@ -104,7 +104,7 @@ $(document).ready(function(){
   chatSocket.onmessage = function(e) {
       var data = JSON.parse(e.data);
       var message = data['message'];
-      document.querySelector('#sentit').value += (message + '\n');
+      document.querySelector('#MonitorTextArea').value += (message + '\n');
       scrollIt()
   };
 
