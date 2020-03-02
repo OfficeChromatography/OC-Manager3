@@ -1,6 +1,6 @@
 from django import forms
 from .models import Connection_Db
-from .serialarduino import ArdComm
+import serial.tools.list_ports
 from printrun.printcore import printcore
 
 def db_list_4_tuple(*args):
@@ -75,7 +75,7 @@ class ConnectionForm(forms.ModelForm):
         return
 
     def update(self):
-        self.devices = ArdComm.ArduinosConnected()
+        self.devices = DevicesConnected()
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
@@ -117,3 +117,11 @@ class ChatForm(forms.ModelForm):
         message = self.cleaned_data['chattext']
         OC_LAB.send_now(message)
         return message
+
+def DevicesConnected():
+    list = []
+    a = serial.tools.list_ports.comports()
+    for devices in a:
+        if str(devices.description) != 'n/a':
+            list.append(devices)
+    return list
