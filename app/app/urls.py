@@ -32,6 +32,7 @@ urlpatterns = [
     path('monitor/', include('monitor.urls')),
     path('', include('accounts.urls')),
     path('', include('finecontrol.urls')),
+    path('', include('application.urls')),
 ]
 
 if settings.DEBUG:

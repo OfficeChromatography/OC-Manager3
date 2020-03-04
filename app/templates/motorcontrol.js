@@ -21,7 +21,6 @@ $(document).ready(function(){
   function handleFormSuccess(data, textStatus, jqXHR){
       scrollIt()
       console.log(textStatus)
-      console.log('O DEDSDE ESTE');
       $myForm[0].reset(); // reset form data
   }
 
@@ -49,8 +48,9 @@ function sliderChange(val,id){
 
 // Upload form
 document.querySelector('.custom-file-input').addEventListener('change',function(e){
-  var fileName = document.getElementById("GFile").files[0].name
-  document.getElementById('upload_label').innerHTML = fileName
+  var fileName = document.getElementById("GFile").files[0]
+  document.getElementById('upload_label').innerHTML = fileName.name
+  document.getElementById('localpath').innerHTML = 'Size: '+ Math.round(fileName.size/1000) + ' Kbytes'
 
 
   // Enable the buttons son you can run or erase empty file
@@ -103,7 +103,7 @@ $(document).ready(function(){
   // MONITOR FUNCTIONS
   chatSocket.onmessage = function(e) {
       var data = JSON.parse(e.data);
-      var message = data['message'];
+      var message = data.message
       document.querySelector('#MonitorTextArea').value += (message + '\n');
       scrollIt()
   };

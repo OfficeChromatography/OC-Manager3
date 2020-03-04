@@ -62,7 +62,7 @@ class MotorControl(View):
             uploaded_file = request.FILES['GFile']
             fs = FileSystemStorage()
             fs.save(uploaded_file.name, uploaded_file)
-            
+            data['localpath']=fs.location
             return render(
                     request,
                     "./motorcontrol.html",
