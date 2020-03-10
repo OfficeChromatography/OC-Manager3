@@ -63,7 +63,7 @@
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">MotorSpeed</label>
                               <input type="text" class="form-control" placeholder="300~5000"
-                                aria-describedby="inputGroupPrepend" required>
+                                aria-describedby="inputGroupPrepend" id='motorspeed' required>
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm/m]</span>
                               </div>
@@ -71,9 +71,9 @@
                           </div>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Pressure</label>
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" >Pressure</label>
                               <input type="text" class="form-control" placeholder="0.00~0.345"
-                                aria-describedby="inputGroupPrepend" required>
+                                aria-describedby="inputGroupPrepend" id='pressure' required>
                               <div class="input-group-append">
                                 <span class="input-group-text">[bar]</span>
                               </div>
@@ -83,7 +83,7 @@
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">&Delta; Pressure</label>
                               <input type="text" class="form-control" placeholder="1~5"
-                                aria-describedby="inputGroupPrepend" required>
+                                aria-describedby="inputGroupPrepend" id='deltapressure' required>
                               <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                               </div>
@@ -190,7 +190,7 @@
                           <div class="form-group mt-3 mb-1 row" id='nbandsform'>
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">N° Bands</label>
-                              <input type="text" class="form-control" placeholder="0.00~100"
+                              <input type="text" class="form-control" value='0'
                                 aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" id='nbands'>
                               <div class="input-group-append">
                                 <span class="input-group-text">[#]</span>
@@ -238,11 +238,13 @@
                 </div>
                 <div class="card-body">
                         <!-- Editable table -->
-                  <form>
+                  <form class="savesampleapplication-form"  action="/samplesave/" target='_parent' id='saveform' method="post">{% csrf_token %}
                     <div class="row">
+                      <!-- Table COL -->
                       <div class="col-xl">
                         <label for="colFormLabelSm">Resume</label>
-                        <table class="table table-sm">
+                        <div class="input-group">
+                          <table class="table table-sm" id='resumetable'>
                           <thead>
                             <tr>
                               <th scope="col">#</th>
@@ -253,54 +255,60 @@
                           <tbody>
                             <tr>
                               <th scope="row">MotorSpeed</th>
-                              <td>Mark</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.motorspeed}}</td>
+                              <td>[mm/m]</td>
                             </tr>
                             <tr>
                               <th scope="row">Pressure</th>
-                              <td>Jacob</td>
-                              <td>Jacob</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Offsets</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.pressure}}</td>
+                              <td>[bar, %]</td>
                             </tr>
                             <tr>
                               <th scope="row">Sizes</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.sizes}}</td>
+                              <td>[mm, mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Offsets</th>
+                              <td>{{SampleApplicationForm.offsets}}</td>
+                              <td>[mm, mm]</td>
                             </tr>
                             <tr>
                               <th scope="row">Bands Properties</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.bandproperties}}</td>
+                              <td></td>
                             </tr>
-                            <tr>
+                            <tr id='nbandsrow'>
                               <th scope="row">N° Bands</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.nbands}}</td>
+                              <td>[#]</td>
+                            </tr>
+                            <tr id='lengthbandsrow'>
+                              <th scope="row">Length Bands</th>
+                              <td>{{SampleApplicationForm.lengthbands}}</td>
+                              <td>[mm]</td>
                             </tr>
                             <tr>
                               <th scope="row">Height</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.height}}</td>
+                              <td>[mm]</td>
                             </tr>
                             <tr>
                               <th scope="row">Gap</th>
-                              <td>Larry</td>
-                              <td>Jacob</td>
+                              <td>{{SampleApplicationForm.gap}}</td>
+                              <td>[mm]</td>
                             </tr>
                           </tbody>
                         </table>
+                        </div>
                       </div>
                       <div class="col-xl">
-                        <label for="colFormLabelSm">Save</label>
+                        <label>Save</label>
                         <div class="input-group">
-                          <input type="text" class="form-control" placeholder="300~5000"
-                            aria-describedby="inputGroupPrepend" required>
+                          <input type="text" class="form-control" name='filename' placeholder="Filename"
+                            aria-describedby="inputGroupPrepend">
                           <div class="input-group-append">
-                            <span class="input-group-text">[mm/m]</span>
+                            <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
                           </div>
                         </div>
                       </div>
