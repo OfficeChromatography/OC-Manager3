@@ -136,7 +136,7 @@
                                 <div class="input-group-prepend">
                                   <span class="input-group-text">Size X</span>
                                 </div>
-                                <input type="text" class="form-control" placeholder="1~1200"
+                                <input type="number" class="form-control" placeholder="1~1200"
                                   aria-describedby="inputGroupPrepend" required value="100" onchange="changegraph(event)" id='sizex'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
@@ -149,7 +149,7 @@
                                   <span class="input-group-text">Size Y</span>
                                 </div>
                                 <!-- <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">Size Y</label> -->
-                                <input type="text" class="form-control" placeholder="1~1200"
+                                <input type="number" class="form-control" placeholder="1~1200"
                                   aria-describedby="inputGroupPrepend" required value="100" onchange="changegraph(event)" id='sizey'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
@@ -160,7 +160,7 @@
                             <div class="form-group mt-3 mb-1 row">
                               <div class="input-group">
                                 <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">[X]</label>
-                                <input type="text" class="form-control"
+                                <input type="number" class="form-control"
                                   aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" value='0' id='offsetx'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
@@ -170,7 +170,7 @@
                             <div class="form-group row">
                               <div class="input-group">
                                 <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">[Y]</label>
-                                <input type="text" class="form-control"
+                                <input type="number" class="form-control"
                                   aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" value='0' id='offsety'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
@@ -190,7 +190,7 @@
                           <div class="form-group mt-3 mb-1 row" id='nbandsform'>
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">N° Bands</label>
-                              <input type="text" class="form-control" value='0'
+                              <input type="number" class="form-control" value='0'
                                 aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" id='nbands'>
                               <div class="input-group-append">
                                 <span class="input-group-text">[#]</span>
@@ -200,7 +200,7 @@
                           <div class="form-group mb-1 row" id='bandlengthform' hidden=true>
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Length</label>
-                              <input type="text" class="form-control" value='0'
+                              <input type="number" class="form-control" value='0'
                                 aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" id='bandlength'>
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm]</span>
@@ -210,7 +210,7 @@
                           <div class="form-group mb-1 row">
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Height</label>
-                              <input type="text" class="form-control" value='0'
+                              <input type="number" class="form-control" value='0'
                                 aria-describedby="inputGroupPrepend" required onchange="changegraph(event)" id='bandheight'>
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm]</span>
@@ -266,12 +266,12 @@
                             <tr>
                               <th scope="row">Sizes</th>
                               <td>{{SampleApplicationForm.sizes}}</td>
-                              <td>[mm, mm]</td>
+                              <td>[mm]</td>
                             </tr>
                             <tr>
                               <th scope="row">Offsets</th>
                               <td>{{SampleApplicationForm.offsets}}</td>
-                              <td>[mm, mm]</td>
+                              <td>[mm]</td>
                             </tr>
                             <tr>
                               <th scope="row">Bands Properties</th>
@@ -310,6 +310,12 @@
                           <div class="input-group-append">
                             <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
                           </div>
+                        </div>
+                        <label for="list-load" class="mt-4">Load</label>
+                        <div class="list-group" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
+                          {% for list in list_load %}
+                              <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.filename }}</a>
+                          {% endfor %}
                         </div>
                       </div>
                     </div>

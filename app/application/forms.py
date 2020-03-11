@@ -1,54 +1,55 @@
 from django import forms
 from .models import SampleApplication_Db, PlateProperties_Db
+from django.contrib.auth.models import User
 
 class SampleApplicationForm(forms.ModelForm):
-    filename =forms.CharField(label='Save', max_length=20,required=False,
+    filename =forms.CharField(label='Save', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'filename',
                     'name': 'filename',
                     'class':'form-control',
                     'value': '',
                     'placeholder':'Filename',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
 
-    motorspeed = forms.CharField(label='MotorSpeed', max_length=20,required=False,
+    motorspeed = forms.CharField(label='MotorSpeed', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumemotorspeed',
                     'name': 'motorspeed',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    pressure = forms.CharField(label='Pressure', max_length=20,required=False,
+    pressure = forms.CharField(label='Pressure', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumepressure',
                     'name': 'pressure',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    deltapressure = forms.CharField(label='Pressure', max_length=20,required=False,
+    deltapressure = forms.CharField(label='Pressure', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumepressure',
                     'name': 'pressure',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
 
-    sizes = forms.CharField(label='Sizes', max_length=20,required=False,
+    sizes = forms.CharField(label='Sizes', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumesizes',
                     'name': 'sizes',
@@ -59,70 +60,70 @@ class SampleApplicationForm(forms.ModelForm):
                 }
             )
         )
-    offsets = forms.CharField(label='Offsets', max_length=20,required=False,
+    offsets = forms.CharField(label='Offsets', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumeoffsets',
                     'name': 'offsets',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    bandproperties = forms.CharField(label='Bands Properties', max_length=20,required=False,
+    bandproperties = forms.CharField(label='Bands Properties', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumebandproperties',
                     'name': 'bandproperties',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
 
-    nbands = forms.CharField(label='N° Bands', max_length=20,required=False,
+    nbands = forms.CharField(label='N° Bands', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumenbands',
                     'name': 'nbands',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    lengthbands = forms.CharField(label='Length Bands', max_length=20,required=False,
+    lengthbands = forms.CharField(label='Length Bands', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumelengthbands',
                     'name': 'lengthbands',
                     'value': '0',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    height = forms.CharField(label='Height', max_length=20,required=False,
+    height = forms.CharField(label='Height', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumeheigth',
                     'name': 'height',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
-    gap = forms.CharField(label='Gap', max_length=20,required=False,
+    gap = forms.CharField(label='Gap', max_length=16,required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumegap',
                     'name': 'gap',
                     'value': '',
                     'style': 'border-width:0px; background-color:transparent',
                     'readonly': 'readonly',
-                    'size':'20'
+                    'size':'14'
                 }
             )
         )
@@ -133,6 +134,10 @@ class SampleApplicationForm(forms.ModelForm):
     class Meta:
         model = SampleApplication_Db
         fields = ('motorspeed','pressure','deltapressure',)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(SampleApplicationForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         finaldict = self.cleaned_data.copy()
@@ -166,8 +171,9 @@ class SampleApplicationForm(forms.ModelForm):
     def clean_filename(self):
         filename = self.cleaned_data['filename']
         try:
-            SampleApplication_Db.objects.get(filename=filename)
-            raise forms.ValidationError("File exist already")
+            in_db=SampleApplication_Db.objects.filter(filename=filename).filter(auth_id=self.user)
+            if len(in_db)>0:
+                raise forms.ValidationError("File exist already")
         except SampleApplication_Db.DoesNotExist:
             return filename
 

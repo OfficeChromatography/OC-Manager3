@@ -2,22 +2,22 @@ var ctx = document.getElementById('plotPreview').getContext('2d');
 
 // Parameter Inital Values
   // Plate sizes
-  var sizex = parseInt(document.getElementById('sizex').value);
-  var sizey = parseInt(document.getElementById('sizey').value);
+  var sizex = parseInt($('#sizex')[0].value);
+  var sizey = parseInt($('#sizey')[0].value);
   // Offsets
-  var offsety = parseInt(document.getElementById('offsety').value);
-  var offsetx = parseInt(document.getElementById('offsetx').value);
+  var offsety = parseInt($('#offsety')[0].value);
+  var offsetx = parseInt($('#offsetx')[0].value);
   // Bands Properties
   var method = $('#method')[0]
-  var nbands = parseInt(document.getElementById('nbands').value);
-  var bandlength = parseInt(document.getElementById('bandlength').value);
-  var gap = parseInt(document.getElementById('gap').value);
-  var bandheight = parseInt(document.getElementById('bandheight').value);
+  var nbands = parseInt($('#nbands')[0].value);
+  var bandlength = parseInt($('#bandlength')[0].value);
+  var gap = parseInt($('#gap')[0].value);
+  var bandheight = parseInt($('#bandheight')[0].value);
 
 // Settings initial values
-var motorspeed = document.getElementById('motorspeed').value
-var pressure = document.getElementById('pressure').value
-var deltapressure = document.getElementById('deltapressure').value
+var motorspeed = parseInt($('#motorspeed')[0].value);
+var pressure = parseInt($('#pressure')[0].value);
+var deltapressure = parseInt($('#deltapressure')[0].value);
 
 
 var workingarea = {x:0,y:0}
@@ -249,9 +249,48 @@ $(document).ready(function(){
       error: connectionFormError,
     })
   })
+
+  $('#list-load a').on('click', function (e) {
+  e.preventDefault()
+  data={'filename':$(this)[0].innerHTML}
+  $.ajax({
+    method: 'GET',
+    url:    window.location.origin+'/samplesave/',
+    data:   data,
+    success: connectionFormSuccess1,
+    error: connectionFormError1,
+  })
 })
-function connectionFormSuccess(data, textStatus, jqXHR){
+
+})
+
+function connectionFormSuccess1(data, textStatus, jqXHR){
   console.log(data)
+  $('#motorspeed')[0].value = data.motorspeed
+  $('#pressure')[0].value = data.pressure
+  $('#deltapressure')[0].value = data.deltapressure
+  $('#sizex')[0].value = data.sizex
+  $('#sizey')[0].value = data.sizey
+  $('#offsetx')[0].value = data.offsetx
+  $('#offsety')[0].value = data.offsetx
+  method.value = data.bandsetting
+  $('#nbands')[0].value = data.nbands
+  $('#bandlength')[0].value = data.lengthbands
+  $('#bandheight')[0].value = data.height
+  $('#gap')[0].value = data.gap
+  if(method.value=='N° Bands'){
+    $("#nbands").change()
+  }
+  else{
+    $("#bandlength").change()
+  }
+}
+function connectionFormError1(jqXHR, textStatus, errorThrown){
+  console.log('error');
+}
+function connectionFormSuccess(data, textStatus, jqXHR){
+  console.log('todo ok');
+
 }
 function connectionFormError(jqXHR, textStatus, errorThrown){
   console.log('error');
