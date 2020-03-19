@@ -5,6 +5,8 @@ from django.views import View
 from django.http import JsonResponse
 from accounts.views import USER_INFO
 import time
+import json
+
 
 form = {
     'connectionset': ConnectionForm(initial={
@@ -42,7 +44,6 @@ class Connection_test(View):
     def get(self, request):
         USER_INFO['username']=request.user.get_username()
         self.update_parameters()
-        print(data)
         return render(
                         request,
                         "connection.html",
@@ -77,3 +78,9 @@ class Connection_test(View):
         else:
             for i in data:
                 data[i] = ''
+
+class IsConnected(View):
+    def get(self, request):
+        info={}
+        info['port'] = OC_LAB.port
+        return JsonResponse(info)

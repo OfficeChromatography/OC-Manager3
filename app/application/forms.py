@@ -142,13 +142,14 @@ class SampleApplicationForm(forms.ModelForm):
     def clean(self):
         finaldict = self.cleaned_data.copy()
 
-        finaldict['pressure'] = self.formatdata(self.cleaned_data['pressure'],0)
-        finaldict['deltapressure'] = self.formatdata(self.cleaned_data['pressure'],1)
-
-        self.plate_properties['sizex'] = self.formatdata(self.cleaned_data['sizes'],0)
-        self.plate_properties['sizey'] = self.formatdata(self.cleaned_data['sizes'],1)
-        self.plate_properties['offsetx'] = self.formatdata(self.cleaned_data['offsets'],0)
-        self.plate_properties['offsety'] = self.formatdata(self.cleaned_data['offsets'],1)
+        finaldict['pressure'] = self.formatdata(self.cleaned_data['pressure'])[0]
+        finaldict['deltapressure'] = self.formatdata(self.cleaned_data['pressure'])[1]
+        auxsizes = self.formatdata(self.cleaned_data['sizes'])
+        auxpressure = self.formatdata(self.cleaned_data['offsets'])
+        self.plate_properties['sizex'] = auxsizes[0]
+        self.plate_properties['sizey'] = auxsizes[1]
+        self.plate_properties['offsetx'] = auxpressure[0]
+        self.plate_properties['offsety'] = auxpressure[1]
 
         self.band_settings['bandsetting'] = self.cleaned_data['bandproperties']
         self.band_settings['nbands'] = self.cleaned_data['nbands']
@@ -160,6 +161,13 @@ class SampleApplicationForm(forms.ModelForm):
         del finaldict['offsets']
 
         finaldict.update(self.plate_properties)
+
+        # Verify that the if nbands is selected, then nbands value should be !=0
+        if self.band_settings['bandsetting'] == 'N° Bands' and int(self.band_settings['nbands']) <= 0:
+            raise forms.ValidationError("Invalid Data")
+        if self.band_settings['bandsetting'] == 'Length' and int(self.band_settings['lengthbands']) == 0:
+            raise forms.ValidationError("Invalid Data")
+
         return finaldict
 
     def clean_motorspeed(self):
@@ -168,22 +176,45 @@ class SampleApplicationForm(forms.ModelForm):
             motorspeed = 0
         return motorspeed
 
-    def clean_filename(self):
-        filename = self.cleaned_data['filename']
-        try:
-            in_db=SampleApplication_Db.objects.filter(filename=filename).filter(auth_id=self.user)
-            if len(in_db)>0:
-                raise forms.ValidationError("File exist already")
-        except SampleApplication_Db.DoesNotExist:
-            return filename
+    # def clean_filename(self):
+        # IMPLEMENT IN DB VALIDATOR
+        # filename = self.cleaned_data['filename']
+        # try:
+        #     in_db=SampleApplication_Db.objects.filter(filename=filename).filter(auth_id=self.user)
+        #     if len(in_db)>0:
+        #         raise forms.ValidationError("File already exist")
+        # except SampleApplication_Db.DoesNotExist:
+            # return filename
 
-
-    def formatdata(self,data,i):
+    def formatdata(self,data):
         lista = data.split(',')
         res=[]
         for sub in lista:
-            try:
-                res.append(int(sub.split(':')[1]))
-            except ValueError:
-                res.append('0')
-        return res[i]
+            if ','in sub:
+                try:
+                    res.append(int(sub.split(':')[1]))
+                except ValueError:
+                    res.append('0')
+            else:
+                try:
+                    res.append(float(sub.split(':')[1]))
+                except ValueError:
+                    res.append('0')
+        return res
+
+
+        def formatdata(data):
+            lista = data.split(',')
+            res=[]
+            for sub in lista:
+                if ','in sub:
+                    try:
+                        res.append(int(sub.split(':')[1]))
+                    except ValueError:
+                        res.append('0')
+                else:
+                    try:
+                        res.append(float(sub.split(':')[1]))
+                    except ValueError:
+                        res.append('0')
+            return res
