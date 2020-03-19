@@ -74,7 +74,6 @@ class PrinterEventHandler():
         '''
         Called whenever printcore is disconnected.
         '''
-        print('disconnectado chabon')
         pass
 
     def on_error(self, error):
