@@ -79,7 +79,19 @@
                 <div class="card-body">
                       <!-- Input Group -->
                   <form class="connection-form" method="post" id="serialport"> {% csrf_token %}
-                    {{ connectionset.as_p }}
+                    <!--OC-LAB  -->
+                    {{ connectionset.oc_lab.errors }}
+                    {{ connectionset.oc_lab.label_tag }}
+                    {{ connectionset.oc_lab }}
+                    <!--BAUDRATE  -->
+                    {{ connectionset.baudrate.errors }}
+                    {{ connectionset.baudrate.label_tag }}
+                    {{ connectionset.baudrate }}
+                    <!--TIMEOUT  -->
+                    {{ connectionset.timeout.errors }}
+                    {{ connectionset.timeout.label_tag }}
+                    {{ connectionset.timeout }}
+
                     <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
                   </form>
                 </div>

@@ -1,7 +1,9 @@
 from django import forms
 from .models import Connection_Db
+from monitor.models import Monitor_Db
 import serial.tools.list_ports
 from printrun.printcore import printcore
+from django.contrib.auth.models import User
 
 def db_list_4_tuple(*args):
     merged_list = []
@@ -43,6 +45,7 @@ class ConnectionForm(forms.ModelForm):
             choices=TIMEOUTS,
             widget=forms.Select(attrs={'class': 'form-group custom-select'})
             )
+    auth_id = None
     # State variables are then used with the context variables in .views
     state = {
         'connected': False,
@@ -54,37 +57,24 @@ class ConnectionForm(forms.ModelForm):
 
     class Meta:
         model = Connection_Db
-        exclude = ('chattext', 'username','auth_id')
+        exclude = ('chattext',)
 
     # Look for and list every Arduino connected
     def __init__(self, *args, **kwargs):
+        if 'user' in kwargs:
+            self.auth_id = kwargs.pop('user')
         super(ConnectionForm, self).__init__(*args, **kwargs)
         self.update()
 
     # Connect to the Arduino and wait for response also save the response in the DB
-    def connect(self):
-        # Look for the selected arduino in the list of obcjets that cointains the USB ports
-        selected_port = list(filter(lambda x: x.device == self.cleaned_data['oc_lab'], self.devices))[0].device
-        selected_baudarate = self.cleaned_data['baudrate']
-        timeout = int(self.cleaned_data['timeout'])
-
-        # Save above information in a new db entry
-        self.save()
-
-        OC_LAB.connect(port=selected_port, baud=selected_baudarate)
-        return
 
     def update(self):
         self.devices = DevicesConnected()
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
+        # print('Los puertos son: {}'.format(db_list_4_tuple(self.devices)))
         return
-
-    def useridentification(self, user):
-        aux = self.save(commit=False)
-        aux.auth_id = user
-        aux.save()
 
     def clean_oc_lab(self, *args, **kwargs):
         oc_lab = self.cleaned_data.get('oc_lab')
@@ -93,6 +83,23 @@ class ConnectionForm(forms.ModelForm):
             raise forms.ValidationError('Please connect an OC-Lab')
         return oc_lab
 
+    def clean_monitor(self, *args, **kwargs):
+        monitor = Monitor_Db()
+        monitor.save()
+        return monitor
+
+    def clean_auth_id(self, *args, **kwargs):
+        auth_id = self.auth_id
+        return auth_id
+
+    def clean(self, *args, **kwargs):
+        selected_port = list(filter(lambda x: x.device == self.cleaned_data['oc_lab'], self.devices))[0].device
+        selected_baudarate = int(self.cleaned_data['baudrate'])
+        timeout = int(self.cleaned_data['timeout'])
+        try:
+            OC_LAB.connect(port=selected_port, baud=selected_baudarate)
+        except:
+            raise forms.ValidationError('Imposible to connect to {}'.format(selected_port))
 
 
 # Formular to send the Arduino based on Connection_Db

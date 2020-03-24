@@ -4,86 +4,61 @@ from connection.models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import render
-from connection.views import data, state, form
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 
 from printrun import printcore
 import time
 
-def update_monitor(**kwargs):
-    return Connection_Db.objects.last().chattext
+form = {
+    'commandsend' : ChatForm()
+}
 
-
-def get_device():
-    return Connection_Db.objects.last().oc_lab
-
-
-def get_baudrate():
-    return Connection_Db.objects.last().baudrate
-
-
-# class MotorControl(LoginRequiredMixin, View):
-#     login_url = '/login/'
-#     redirect_field_name = 'login'
 class MotorControl(View):
-
+    # Manage the GET request
     def get(self, request):
-        data['monitor'] = update_monitor()
         return render(
             request,
             "./motorcontrol.html",
-            {**form, **data, **state})
+            form)
 
     def post(self, request):
+        # Steps follow after a message is Send (Monitor send Form)
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
-                if request.POST.get('chattext') == 'CLEAR':
-                    data['monitor'] = ""
-                else:
-                    form['commandsend'].send()
-                    self.update_parameters()
-                    form['commandsend'] = ChatForm()
+                form['commandsend'].send()
             return JsonResponse(data)
 
         if 'speedrange' in request.POST:
+            # Converts the request into a valid gcode
             gcode = simple_move_Gcode_gen(request)
-            print(gcode)
-            # print(type_of(gcode))
             form['commandsend'] = ChatForm({'chattext': gcode})
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
-                self.update_parameters()
-                form['commandsend'] = ChatForm()
                 return JsonResponse(data)
 
         if request.FILES['GFile']:
+            # Upload the Gcode file
             uploaded_file = request.FILES['GFile']
-            fs = FileSystemStorage()
-            fs.save(uploaded_file.name, uploaded_file)
-            data['localpath']=fs.location
-            return render(
-                    request,
-                    "./motorcontrol.html",
-                    {**form, **data, **state})
-        else:
-            return render(
-                    request,
-                    "./motorcontrol.html",
-                    {**form, **data, **state})
+            if 'gcode' in uploaded_file.content_type:
+                fs = FileSystemStorage()
+                new_name = fs.save(uploaded_file.name, uploaded_file)
+                print(f'{fs.location}/{new_name}')
+                # with open(f'{fs.location}/{new_name}', 'w') as file:
+                #     gcode = [code_line.strip() for code_line in file]
+                #     print(gcode)
 
-    def update_parameters(self, **kwargs):
-        for key, value in kwargs.items():
-            state[key] = value
-        if state['connected'] == 'True':
-            form['connectionset'].update()
-            data['monitor'] = update_monitor()
-            data['device'] = get_device()
-            data['baudrate'] = get_baudrate()
+
+            return render(
+                    request,
+                    "./motorcontrol.html",
+                    form)
         else:
-            for i in data:
-                data[i] = ''
+            return render(
+                    request,
+                    "./motorcontrol.html",
+                    form)
 
 class PumpControl(View):
 

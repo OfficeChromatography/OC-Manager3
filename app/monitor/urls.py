@@ -1,9 +1,9 @@
 # chat/urls.py
 from django.urls import path
+from .views import MonitorView
 
 from . import views
 
 urlpatterns = [
-    path('', views.monitor, name='monitor'),
-    path('<str:room_name>/', views.room, name='room'),
+    path('monitor/', MonitorView.as_view(), name='monitor'),
 ]
