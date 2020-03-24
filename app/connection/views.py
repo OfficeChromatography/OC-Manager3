@@ -1,20 +1,17 @@
 from django.shortcuts import render
-from .forms import ConnectionForm, ChatForm, OC_LAB
-from .models import Connection_Db
 from django.views import View
 from django.http import JsonResponse
-from accounts.views import USER_INFO
-import time
-import json
+from .forms import ConnectionForm, ChatForm, OC_LAB
 
 
+# Some inital DATA
 form = {
     'connectionset': ConnectionForm(initial={
                         'baudrate': '115200',
-                        'timeout': '2'}),
+                        'timeout': '2',
+                        }),
     'commandsend': ChatForm(),
 }
-
 data = {
     'monitor': "",
     'device': '',
@@ -24,26 +21,11 @@ state = {
     'connected': 'false',
 }
 
-USER_INFO = {
-
-}
-def update_monitor(**kwargs):
-    return Connection_Db.objects.last().chattext
-
-
-def get_device():
-    return Connection_Db.objects.last().oc_lab
-
-
-def get_baudrate():
-    return Connection_Db.objects.last().baudrate
-
-
+# MainView of Connection
 class Connection_test(View):
 
     def get(self, request):
-        USER_INFO['username']=request.user.get_username()
-        self.update_parameters()
+        form['connectionset'].update()
         return render(
                         request,
                         "connection.html",
@@ -51,36 +33,32 @@ class Connection_test(View):
                         )
 
     def post(self, request):
+        # Steps follow after a ConnectionRequest is Send (Connection Form)
         if 'oc_lab' in request.POST:
-            form['connectionset'] = ConnectionForm(request.POST)
-            data['monitor'] = ""
-            if form['connectionset'].is_valid():
-                form['connectionset'].connect()
-                form['connectionset'].useridentification(request.user)
-                self.update_parameters(connected='true')
+            connection_form_instance = ConnectionForm(request.POST, user=request.user)
+            if connection_form_instance.is_valid():
+                data = {
+                    'connected':True,
+                    'device': connection_form_instance.cleaned_data['oc_lab'],
+                    'baudrate': connection_form_instance.cleaned_data['baudrate'],
+                }
+                connection_form_instance.save()
+            else:
+                print(connection_form_instance.errors)
             return JsonResponse({**state, **data})
 
+        # Steps follow after a message is Send (Monitor send Form)
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
-            if 'chattext' in request.POST:
-                OC_LAB.send(request.POST['chattext'])
-                form['commandsend'] = ChatForm()
+            if form['commandsend'].is_valid():
+                form['commandsend'].send()
             return JsonResponse(data)
 
-    def update_parameters(self, **kwargs):
-        for key, value in kwargs.items():
-            state[key] = value
-        if state['connected'] == 'true':
-            form['connectionset'].update()
-            data['monitor'] = update_monitor()
-            data['device'] = get_device()
-            data['baudrate'] = get_baudrate()
-        else:
-            for i in data:
-                data[i] = ''
-
+# EndPoint to Know if theres a current connection to an OC-Lab
 class IsConnected(View):
     def get(self, request):
         info={}
         info['port'] = OC_LAB.port
+        if OC_LAB.port:
+            info['connected'] = True
         return JsonResponse(info)

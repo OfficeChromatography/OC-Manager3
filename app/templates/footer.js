@@ -1,6 +1,9 @@
 $(document).ready(function(){
+  checkconnection();
+})
+
+function checkconnection(){
   $.get( window.location.origin + '/isconnected/', function( data ) {
-    console.log(data);
     foot = document.getElementById("footer")
     footText = document.getElementById("footerText")
     if (data.port!=null){
@@ -11,4 +14,4 @@ $(document).ready(function(){
       footText.innerHTML="OC-Lab Disconnected"
     }
   });
-})
+}

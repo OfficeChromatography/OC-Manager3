@@ -29,7 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', Connection_test.as_view(), name='connection'),
     # path('connection/', Connection_test.as_view(), name='connection'),
-    path('monitor/', include('monitor.urls')),
+    path('', include('monitor.urls')),
     path('', include('accounts.urls')),
     path('', include('finecontrol.urls')),
     path('', include('application.urls')),

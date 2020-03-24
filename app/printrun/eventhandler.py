@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Printrun.  If not, see <http://www.gnu.org/licenses/>.
-from connection.models import Connection_Db
+from monitor.models import Monitor_Db
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 channel_layer = get_channel_layer()
@@ -45,8 +45,8 @@ class PrinterEventHandler():
         @param command: The command to be sent.
         @param gline: The parsed high-level command.
         '''
-        aux = Connection_Db.objects.last()
-        aux.chattext += command+'\n'
+        aux = Monitor_Db.objects.last()
+        aux.monitortext += command+'\n'
         aux.save()
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': command})
         pass
@@ -57,8 +57,8 @@ class PrinterEventHandler():
 
         @param line: The data has been read from printer.
         '''
-        aux = Connection_Db.objects.last()
-        aux.chattext += line
+        aux = Monitor_Db.objects.last()
+        aux.monitortext += line
         aux.save()
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': line[:-1]})
         pass
