@@ -115,10 +115,6 @@ class ChatForm(forms.ModelForm):
             })
     )
 
-    class Meta:
-        model = Monitor_Db
-        fields = ('monitortext',)
-
     # method to send to the connected OC_LAB
     def send(self):
         message = self.cleaned_data['chattext']
