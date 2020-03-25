@@ -16,7 +16,7 @@ from monitor.models import Monitor_Db
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 channel_layer = get_channel_layer()
-
+import time
 
 
 
@@ -67,6 +67,7 @@ class PrinterEventHandler():
         '''
         Called whenever printcore is connected.
         '''
+        time.sleep(1)
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': 'Connected!'})
         pass
 
