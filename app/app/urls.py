@@ -15,20 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from django.conf.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import include
-
-from pages import views as pages_views
 from accounts import views as accounts_views
-from connection.views import Connection_test
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', Connection_test.as_view(), name='connection'),
-    # path('connection/', Connection_test.as_view(), name='connection'),
     path('', include('monitor.urls')),
     path('', include('accounts.urls')),
     path('', include('finecontrol.urls')),

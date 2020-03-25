@@ -66,7 +66,7 @@ class PumpControl(View):
         return render(
             request,
             "./pumpcontrol.html",
-            {**form, **data, **state})
+            {})
 
     def post(self, request):
         if 'cycles' in request.POST:

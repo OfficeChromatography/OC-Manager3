@@ -102,7 +102,7 @@ class ConnectionForm(forms.ModelForm):
 
 
 # Formular to send the Arduino based on Connection_Db
-class ChatForm(forms.ModelForm):
+class ChatForm(forms.Form):
 
     chattext = forms.CharField(
             label="",
