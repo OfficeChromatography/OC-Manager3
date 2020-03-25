@@ -16,7 +16,6 @@ class Connection_Db(models.Model):
     baudrate = models.DecimalField(decimal_places=0, max_digits=6)
     timeout = models.DecimalField(decimal_places=0, max_digits=4)
     time_of_connection = models.DateTimeField(auto_now_add=True)
-    chattext = models.TextField(blank=True)
     monitor = models.OneToOneField(
         Monitor_Db,
         on_delete=models.CASCADE,
