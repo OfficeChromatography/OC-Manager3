@@ -201,20 +201,3 @@ class SampleApplicationForm(forms.ModelForm):
                 except ValueError:
                     res.append('0')
         return res
-
-
-        def formatdata(data):
-            lista = data.split(',')
-            res=[]
-            for sub in lista:
-                if ','in sub:
-                    try:
-                        res.append(int(sub.split(':')[1]))
-                    except ValueError:
-                        res.append('0')
-                else:
-                    try:
-                        res.append(float(sub.split(':')[1]))
-                    except ValueError:
-                        res.append('0')
-            return res

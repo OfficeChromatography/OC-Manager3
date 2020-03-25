@@ -45,20 +45,13 @@ class MotorControl(View):
                 fs = FileSystemStorage()
                 new_name = fs.save(uploaded_file.name, uploaded_file)
                 print(f'{fs.location}/{new_name}')
-                # with open(f'{fs.location}/{new_name}', 'w') as file:
-                #     gcode = [code_line.strip() for code_line in file]
-                #     print(gcode)
-
-
-            return render(
-                    request,
-                    "./motorcontrol.html",
-                    form)
-        else:
-            return render(
-                    request,
-                    "./motorcontrol.html",
-                    form)
+                with open(f'{fs.location}/{new_name}', 'r') as file:
+                    mylist = list(file)
+                    OC_LAB.send(mylist)
+                return render(
+                        request,
+                        "./motorcontrol.html",
+                        form)
 
 class PumpControl(View):
 
@@ -66,7 +59,7 @@ class PumpControl(View):
         return render(
             request,
             "./pumpcontrol.html",
-            {**form, **data, **state})
+            {})
 
     def post(self, request):
         if 'cycles' in request.POST:
