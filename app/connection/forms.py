@@ -117,8 +117,8 @@ class ChatForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Connection_Db
-        fields = ('chattext',)
+        model = Monitor_Db
+        fields = ('monitortext',)
 
     def send(self):
         message = self.cleaned_data['chattext']
