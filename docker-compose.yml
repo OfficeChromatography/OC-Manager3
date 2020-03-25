@@ -3,14 +3,17 @@ version: "3"
 services:
   redis:
     restart: always
+    container_name: OC_redis_cont
     image: redis:latest
     command: redis-server
     ports:
       - '6379:6379'
-      
+
   app:
     restart: always
     build: .
+    image: oc-image:octag
+    container_name: OC_main_cont
     depends_on:
       - redis
     environment:
