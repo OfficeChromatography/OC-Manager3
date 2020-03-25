@@ -73,7 +73,6 @@ class ConnectionForm(forms.ModelForm):
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
-        # print('Los puertos son: {}'.format(db_list_4_tuple(self.devices)))
         return
 
     def clean_oc_lab(self, *args, **kwargs):
@@ -120,6 +119,7 @@ class ChatForm(forms.ModelForm):
         model = Monitor_Db
         fields = ('monitortext',)
 
+    # method to send to the connected OC_LAB
     def send(self):
         message = self.cleaned_data['chattext']
         OC_LAB.send_now(message)
