@@ -5,6 +5,7 @@ from django.contrib.auth import (
     get_user_model,
     login,
     logout,
+    update_session_auth_hash,
 )
 User = get_user_model()
 
@@ -12,7 +13,8 @@ USER_INFO = {
 
 }
 
-from .forms import UserRegisterForm, UserLoginForm, ProfileForm
+from .forms import UserRegisterForm, UserLoginForm, ProfileForm, ChangePasswordForm
+
 
 def login_view(request):
     print(request.user.is_authenticated)
@@ -52,7 +54,7 @@ def register_view(request):
     return render(request,'register.html',context)
 
 def profile_view(request):
-    context = {    }
+    context = {}
     if request.user.is_authenticated == True:
         USER_INFO['username'] = request.user.get_username()
         USER_INFO['email'] = request.user.email
@@ -76,3 +78,14 @@ def username_view(request):
         return JsonResponse({'username':request.user.get_username()})
     else:
         return JsonResponse({'username':''})
+
+def change_password_view(request):
+    form =  ChangePasswordForm(user=request.user, data=request.POST or None)
+    if request.POST:
+        if form.is_valid():
+            u = User.objects.get(username__exact=request.user)
+            u.set_password(form.cleaned_data['newpassword'])
+            u.save()
+            update_session_auth_hash(request, request.user)
+            return redirect("/login/")
+    return render(request,'changepass.html',{'form':form})

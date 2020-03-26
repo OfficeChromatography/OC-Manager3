@@ -21,4 +21,5 @@ urlpatterns = [
     path('register/',  accounts_views.register_view, name='register'),
     path('profile/',  accounts_views.profile_view, name='profile'),
     path('userinfo/',  accounts_views.username_view, name='username'),
+    path('changepass/',  accounts_views.change_password_view, name='username'),
 ]

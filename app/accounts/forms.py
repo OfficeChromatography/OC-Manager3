@@ -4,7 +4,9 @@ from django.contrib.auth import (
     get_user_model,
     login,
     logout,
+    update_session_auth_hash,
 )
+from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
 
@@ -59,7 +61,7 @@ class UserRegisterForm(forms.ModelForm):
             'email',
             'email2',
             'password',
-            'password2'
+            'password2',
         ]
 
 
@@ -116,3 +118,43 @@ class ProfileForm(forms.ModelForm):
         if password:
             if not self.user.check_password(password):
                 raise forms.ValidationError('Wrong password')
+
+class ChangePasswordForm(forms.ModelForm):
+    username = forms.CharField(
+        required=False,
+        label=False,
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Username'})
+    )
+    password = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Password'}))
+
+    newpassword = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'New Password'}))
+
+    confirmnewpassword = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Confirm New Password'}))
+
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'password',
+        ]
+    def __init__(self, user, data=None):
+        self.username = user
+        super(ChangePasswordForm, self).__init__(data=data)
+
+    def clean(self, *args, **kwargs):
+        username = self.username
+        password = self.cleaned_data.get("password")
+        newpassword = self.cleaned_data.get("newpassword")
+        confirm = self.cleaned_data.get("confirmnewpassword")
+        user = authenticate(username=username, password=password)
+        if not user:
+            raise forms.ValidationError("Incorrect Password")
+        if newpassword != confirm:
+            raise forms.ValidationError("Passwords don't match")

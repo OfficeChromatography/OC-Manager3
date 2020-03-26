@@ -42,52 +42,55 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col">
-              <h1 class="h3 mb-4 text-gray-800">{{username}}'s profile</h1>
+              <h1 class="h3 mb-4 text-gray-800" id='username_profile'>'s profile</h1>
             </div>
           </div>
           <div class="row">
-            <div class="col col-sm-10 col-md-8 col-lg-3">
+            <div class="col col-sm-10 col-md-9 col-lg-6 col-xl-5">
               <div class="card">
-                <img src="{% static 'img/image.png' %}" class="card-img-top" alt="">
-                <div class="card-body">
-                  <h5 class="card-title">Personal data:</h5>
-                  <table class="card-table table">
-                    <tbody>
-                      <tr>
-                        <th scope="row">Username:</th>
-                        <td>{{username}}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">Email:</th>
-                        <td>{{email}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <p class="card-text"></p>
-                  <form class="user" method="post"> {% csrf_token %}
-                    {{form}}
-                    <a class="btn btn-primary btn-user btn-block" id='changebttn' href="#" data-toggle="modal" data-target="#changeModal">
-                      Change information
-                    </a>
+                <div class="card-header">
+                  <img src="{% static 'img/image.png' %}" class="rounded mx-auto d-block mt-2" style="width:25%; height:25%" alt="">
+                </div>
+                <form class="user" method="post"> {% csrf_token %}
+                  <div class="card-body">
+                    <h5 class="card-title">Personal data:</h5>
+                    <table class="card-table table">
+                      <tbody>
+                        {{ form.non_field_errors }}
+                        <tr>
+                          <th>Password:</th>
+                          <td>{{form.password}}</td>
+                        </tr>
+                        <tr>
+                          <th>New Password:</th>
+                          <td>{{form.newpassword}}</td>
+                        </tr>
+                        <tr>
+                          <th>New Password confirm:</th>
+                          <td>{{form.confirmnewpassword}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <a class="btn btn-primary btn-user btn-block" id='changebttn' href="#" data-toggle="modal" data-target="#changeModal">Change information</a>
                     <div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Want to change you user information?</h5>
-                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                          </div>
-                          <div class="modal-body">Select "Change it!"" if you want to change your user information now.</div>
-                          <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <input type="submit" id='changeitbttn' class="btn btn-primary" name="" value="Change it!">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Want to change you user information?</h5>
+                              <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">Select "Change it!"" if you want to change your user information now.</div>
+                            <div class="modal-footer">
+                              <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                              <input type="submit" id='changeitbttn' class="btn btn-primary" name="" value="Change it!">
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </form>
-                </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -101,7 +104,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
+            <span>&copy; OC-Manager 2020</span>
           </div>
         </div>
       </footer>
@@ -145,6 +148,21 @@
   <!-- Custom scripts for all pages-->
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
   <script src="{% static 'topbar.js' %}"></script>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      get_username_profile()
+    })
+
+    function get_username_profile() {
+      $.getJSON('/userinfo', function (data, textStatus, jqXHR){
+          document.getElementById('username_profile').innerHTML=data.username+"'s profile"
+          if(data.username==''){
+            window.location.href = 'login'
+          }
+      });
+    };
+  </script>
 
 </body>
+
 </html>
