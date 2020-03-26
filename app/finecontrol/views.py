@@ -44,7 +44,6 @@ class MotorControl(View):
             if 'gcode' in uploaded_file.content_type:
                 fs = FileSystemStorage()
                 new_name = fs.save(uploaded_file.name, uploaded_file)
-                print(f'{fs.location}/{new_name}')
                 with open(f'{fs.location}/{new_name}', 'r') as file:
                     mylist = list(file)
                     OC_LAB.send(mylist)
