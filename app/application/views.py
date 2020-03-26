@@ -52,6 +52,7 @@ class SampleAppSaveAndLoad(View):
 class SampleAppPlay(View):
     def post(self, request):
         f = SampleApplicationForm(request.POST, user=request.user)
+        print(request.POST)
         if f.is_valid():
             nbands = int(f.band_settings['nbands'])
             bandlength = float(f.band_settings['lengthbands'])
@@ -72,13 +73,11 @@ class SampleAppPlay(View):
             else:
                 floatnbands = (workingarea+gapvalue)/(bandlength+gapvalue)
               # Then we get the integer value of bands
-                intnbands = int(floatnbands)
+                nbands = int(floatnbands)
               # the fractions of band is added as offsets
-                leftover = bandlength*(floatnbands%intnbands)
+                leftover = bandlength*(floatnbands%nbands)
                 offsetxvalue += leftover
                 bandsize = bandlength
-
-            # print(bandsetting)
 
             if bandsize>=0:
                 applicationsurface = []
@@ -92,11 +91,13 @@ class SampleAppPlay(View):
                         else:
                           applicationline.append([offsetyvalue+heightofapplication,i*(bandsize+gapvalue)+offsetxvalue])
                           applicationline.append([offsetyvalue+heightofapplication,(i+1)*bandsize+(gapvalue*i)+offsetxvalue])
+                        print(applicationline)
                         applicationsurface.append(applicationline)
                     heightofapplication+=0.1
+                print(applicationsurface)
                 gcode = GcodeGen(applicationsurface)
                 OC_LAB.send(gcode)
-                print(gcode)
+
 
         return JsonResponse({'error':f.errors})
 
@@ -104,16 +105,12 @@ class SampleAppStop(View):
     def get(self, request):
         print(request.GET)
         if 'stop' in request.GET:
-            print('PARO')
             OC_LAB.cancelprint()
         if 'pause' in request.GET:
             if OC_LAB.printing:
                 OC_LAB.pause()
-                print('pauso')
             else:
-                print(OC_LAB.printing)
                 OC_LAB.resume()
-                print('resumio')
         return JsonResponse({})
 
 def GcodeGen(listoflines):

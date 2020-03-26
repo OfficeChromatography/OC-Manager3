@@ -325,11 +325,11 @@ function saveMethodSuccess(data, textStatus, jqXHR){
   console.log('todo ok');
 }
 function saveMethodError(jqXHR, textStatus, errorThrown){}
-function playMethodSuccess(jqXHR, textStatus, errorThrown){
+function playMethodSuccess(data, textStatus, jqXHR){
   console.log(data);
 }
 function playMethodError(jqXHR, textStatus, errorThrown){}
-function stopMethodSuccess(jqXHR, textStatus, errorThrown){}
+function stopMethodSuccess(data, textStatus, jqXHR){}
 function stopMethodError(jqXHR, textStatus, errorThrown){}
-function pauseMethodSuccess(jqXHR, textStatus, errorThrown){}
+function pauseMethodSuccess(data, textStatus, jqXHR){}
 function pauseMethodError(jqXHR, textStatus, errorThrown){}

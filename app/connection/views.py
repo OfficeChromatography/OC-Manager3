@@ -52,7 +52,7 @@ class Connection_test(View):
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
-            return JsonResponse(data)
+            return JsonResponse({})
 
 # EndPoint to Know if theres a current connection to an OC-Lab
 class IsConnected(View):
