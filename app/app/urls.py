@@ -28,6 +28,7 @@ urlpatterns = [
     path('', include('finecontrol.urls')),
     path('', include('application.urls')),
     path('', include('connection.urls')),
+    path('', include('detection.urls')),
 ]
 
 if settings.DEBUG:

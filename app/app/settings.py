@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'printrun',
     'monitor',
     'channels',
-    'application'
+    'application',
+    'detection',
     # 'users',
     # 'users_api',
     # 'rest_framework',
