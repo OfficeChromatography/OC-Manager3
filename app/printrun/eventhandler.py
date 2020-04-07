@@ -67,7 +67,7 @@ class PrinterEventHandler():
         '''
         Called whenever printcore is connected.
         '''
-        time.sleep(1)
+        time.sleep(2)
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': 'Connected!'})
         pass
 
