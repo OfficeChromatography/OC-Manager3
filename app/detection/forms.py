@@ -1,69 +1,69 @@
 from django import forms
 from django.contrib.auth.models import User
-try:
-    from picamera import PiCamera
-    AWB_MODES = PiCamera.AWB_MODES
-    # EXPOSURE_MODES
-    # IMAGE_EFFECTS
-except OSError:
-    AWB_MODES = (('0', 'off'),
+# try:
+#     from picamera import PiCamera
+#     AWB_MODES = PiCamera.AWB_MODES
+#     # EXPOSURE_MODES
+#     # IMAGE_EFFECTS
+# except OSError:
+AWB_MODES = (('0', 'off'),
+            ('1', 'auto'),
+            ('2', 'sunlight'),
+            ('3', 'cloudy'),
+            ('4', 'shade'),
+            ('5', 'tungsten'),
+            ('6', 'fluorescent'),
+            ('7', 'incandescent'),
+            ('8', 'flash'),
+            ('9', 'horizon'))
+EXPOSURE_MODES = (('0', 'off'),
                 ('1', 'auto'),
-                ('2', 'sunlight'),
-                ('3', 'cloudy'),
-                ('4', 'shade'),
-                ('5', 'tungsten'),
-                ('6', 'fluorescent'),
-                ('7', 'incandescent'),
-                ('8', 'flash'),
-                ('9', 'horizon'))
-    EXPOSURE_MODES = (('0', 'off'),
-                    ('1', 'auto'),
-                    ('2', 'night'),
-                    ('3', 'nightpreview'),
-                    ('4', 'backlight'),
-                    ('5', 'spotlight'),
-                    ('6', 'sports'),
-                    ('7', 'snow'),
-                    ('8', 'beach'),
-                    ('9', 'verylong'),
-                    ('10', 'fixedfps'),
-                    ('11', 'antishake'),
-                    ('12', 'fireworks'))
-    IMAGE_EFFECTS = (('0', 'none'),
-                    ('1', 'negative'),
-                    ('2', 'solarize'),
-                    ('6', 'sketch'),
-                    ('7', 'denoise'),
-                    ('8', 'emboss'),
-                    ('9', 'oilpaint'),
-                    ('10', 'hatch'),
-                    ('11', 'gpen'),
-                    ('12', 'pastel'),
-                    ('13', 'watercolor'),
-                    ('14', 'film'),
-                    ('15', 'blur'),
-                    ('16', 'saturation'),
-                    ('17', 'colorswap'),
-                    ('18', 'washedout'),
-                    ('19', 'posterise'),
-                    ('20', 'colorpoint'),
-                    ('21', 'colorbalance'),
-                    ('22', 'cartoon'),
-                    ('23', 'deinterlace1'),
-                    ('24', 'deinterlace2'))
+                ('2', 'night'),
+                ('3', 'nightpreview'),
+                ('4', 'backlight'),
+                ('5', 'spotlight'),
+                ('6', 'sports'),
+                ('7', 'snow'),
+                ('8', 'beach'),
+                ('9', 'verylong'),
+                ('10', 'fixedfps'),
+                ('11', 'antishake'),
+                ('12', 'fireworks'))
+IMAGE_EFFECTS = (('0', 'none'),
+                ('1', 'negative'),
+                ('2', 'solarize'),
+                ('6', 'sketch'),
+                ('7', 'denoise'),
+                ('8', 'emboss'),
+                ('9', 'oilpaint'),
+                ('10', 'hatch'),
+                ('11', 'gpen'),
+                ('12', 'pastel'),
+                ('13', 'watercolor'),
+                ('14', 'film'),
+                ('15', 'blur'),
+                ('16', 'saturation'),
+                ('17', 'colorswap'),
+                ('18', 'washedout'),
+                ('19', 'posterise'),
+                ('20', 'colorpoint'),
+                ('21', 'colorbalance'),
+                ('22', 'cartoon'),
+                ('23', 'deinterlace1'),
+                ('24', 'deinterlace2'))
 
 ISO = (('0','Auto'),
-    ('1','100'),
-    ('2','200'),
-    ('3','320'),
-    ('4','400'),
-    ('5','500'),
-    ('6','640'),
-    ('7','800'))
+('1','100'),
+('2','200'),
+('3','320'),
+('4','400'),
+('5','500'),
+('6','640'),
+('7','800'))
 ROTATION = (('0','0'),
-    ('1','90'),
-    ('2','180'),
-    ('3','270'))
+('1','90'),
+('2','180'),
+('3','270'))
 
 class ShootConfigurationForm(forms.Form):
     # # awb_mode = should be in off if we want to control using awb_gains los valores posibles se pueden sacar de PiCamera.AWB_MODES

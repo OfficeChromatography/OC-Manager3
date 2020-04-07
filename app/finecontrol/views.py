@@ -28,7 +28,7 @@ class MotorControl(View):
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
-            return JsonResponse(data)
+            return JsonResponse({})
 
         if 'speedrange' in request.POST:
             # Converts the request into a valid gcode
@@ -36,7 +36,7 @@ class MotorControl(View):
             form['commandsend'] = ChatForm({'chattext': gcode})
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
-                return JsonResponse(data)
+                return JsonResponse({})
 
         if request.FILES['GFile']:
             # Upload the Gcode file
@@ -68,7 +68,7 @@ class PumpControl(View):
         return render(
             request,
             "./pumpcontrol.html",
-            {**form, **data, **state})
+            {**form})
 
 
 def simple_move_Gcode_gen(request):
