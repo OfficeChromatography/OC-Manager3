@@ -1,4 +1,4 @@
-version: "3"
+version: "2.1"
 
 services:
   redis:
@@ -12,16 +12,15 @@ services:
   app:
     restart: always
     build: .
+    labels:
+      io.balena.features.supervisor-api: '1'
     image: oc-image:octag
-    container_name: OC_main_cont
     depends_on:
       - redis
     environment:
       - UDEV=1
     ports:
       - "8000:8000" # Map 8000 to 8000 of our docker image
-    volumes:
-      - ./app:/app # Map ./app directory en docker app folder
     privileged: true
     cap_add:
       - SYS_ADMIN

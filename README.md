@@ -1,6 +1,13 @@
 # OC-Lab-2.0
 ## Install
-The installation process is really simple. First you have to 'clone' this git repository.
+The installation process is really simple. You just need to follow the next steps.
+
+### 0. Install git
+Before we begin with the installation, we need to install git.
+```bash
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get install git
+```
 
 ### 1. Clone the git repository
 The simplest way to clone a git repository is opening a Terminal (`Ctrl+t`), then go to the directory where you would like to have the folder that contains all the configuration files of your OC-LAB **(and between those, it is included the OC-Manager files too)**  
