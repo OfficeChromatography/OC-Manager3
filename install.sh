@@ -3,7 +3,6 @@ echo 'Welcome to OC-MANAGER installation'
 echo 'Please Insert your password:'
 
 sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install arduino
 
 # Install docker
 sudo curl -fsSL https://get.docker.com -o get-docker.sh
