@@ -29,3 +29,7 @@ from django.db import models
     # shutter_speed = 0 automatic
     # vflip = True/False
     # zoom = tupple of float (x,y,w,h) default=(0,0,1.0,1.0)
+
+class PlatePhoto_Db(models.Model):
+    name = models.CharField(max_length=255)
+    photo = models.FileField(upload_to='media/')

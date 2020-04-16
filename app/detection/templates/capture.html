@@ -60,7 +60,7 @@
                   <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
                 </div>
                 <div class="card-body align-items-center d-flex justify-content-center">
-
+                  <img src={{url}} alt="">
                 </div>
               </div>
             </div>
@@ -143,13 +143,32 @@
                       <div class="col">
                         <div class="input-group mb-1">
                           <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.sharpeness.label}}</span>
+                            <span class="input-group-text">{{form.red_balance.label}}</span>
                           </div>
-                        {{form.sharpeness}}
+                        {{form.red_balance}}
                         </div>
                       </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <div class="form-row">
+                      <div class="col">
+                        <div class="input-group mb-1">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">{{form.blue_balance.label}}</span>
+                          </div>
+                        {{form.blue_balance}}
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="input-group mb-1">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">{{form.exposure.label}}</span>
+                          </div>
+                        {{form.exposure}}
+                        </div>
+                      </div>
+                    </div>
+                    <hr/>
+                    <button type="submit" class="btn btn-primary">Shoot</button>
                   </form>
                 </div>
               </div>
