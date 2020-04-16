@@ -68,11 +68,12 @@ ROTATION = (('0','0'),
 class ShootConfigurationForm(forms.Form):
     # User Controls
     #
-    #                  brightness 0x00980900 (int)    : min=0 max=100 step=1 default=50 value=50 flags=slider
-    #                    contrast 0x00980901 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
-    #                  saturation 0x00980902 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
-    #                 red_balance 0x0098090e (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
-    #                blue_balance 0x0098090f (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
+                   #   brightness 0x00980900 (int)    : min=0 max=100 step=1 default=50 value=50 flags=slider
+                   #     contrast 0x00980901 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
+                   #   saturation 0x00980902 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
+                   #  red_balance 0x0098090e (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
+                   # blue_balance 0x0098090f (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
+
     #             horizontal_flip 0x00980914 (bool)   : default=0 value=0
     #               vertical_flip 0x00980915 (bool)   : default=0 value=0
     #        power_line_frequency 0x00980918 (menu)   : min=0 max=3 default=1 value=1
