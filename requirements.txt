@@ -3,5 +3,3 @@ channels>=2.2.0
 channels_redis>=2.4.0
 flake8>=3.6.0,<3.7.0
 pyserial>=3.4.0
-opencv-python>4.0.0
-Pillow>7.0.0

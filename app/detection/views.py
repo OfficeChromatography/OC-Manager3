@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 from .forms import ShootConfigurationForm
-import cv2
 from app.settings import STATIC_ROOT
 from .models import PlatePhoto_Db
 from django.core.files import File
