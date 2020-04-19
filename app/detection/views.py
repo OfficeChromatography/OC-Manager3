@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 import time
 import subprocess
 
+
 INITIALS = { 'brightness': 50,
             'contrast': 0,
             'saturation': 0,
@@ -100,7 +101,7 @@ class Capture_View(View):
                 print(fs.url(name))
                 # foto = PlatePhoto_Db(name='foto1', photo=File(contents))
                 data = {
-                    'url':'http://127.0.0.1:8000'+fs.url(name)
+                    'url':request.META['HTTP_ORIGIN']+fs.url(name)
                 }
 
             # if request.FILES['GFile']:
