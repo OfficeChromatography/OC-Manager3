@@ -81,6 +81,22 @@ ROTATION = (('0','0'),
 ('2','180'),
 ('3','270'))
 
+class SaveShot(forms.Form):
+    name = forms.CharField(label='Name',
+                    required=True,
+                    max_length = 9,
+                    widget=forms.TextInput(
+                                        attrs={
+                                                'size': '9',
+                                                'placeholder':'FileName',
+                                                'class':'form-control',
+                                                'data-toggle':"tooltip",
+                                                'data-placement':'top',
+                                                'title':"Please insert a name to save your Photo",
+                                                }
+                                            )
+                                        )
+
 class ShootConfigurationForm(forms.Form):
     # User Controls
     #
@@ -98,7 +114,6 @@ class ShootConfigurationForm(forms.Form):
     #               color_effects 0x0098091f (menu)   : min=0 max=15 default=0 value=0
     #                      rotate 0x00980922 (int)    : min=0 max=360 step=90 default=0 value=0 flags=modify-layout
     #          color_effects_cbcr 0x0098092a (int)    : min=0 max=65535 step=1 default=32896 value=32896
-
 
 
 # USER CONTROLS:
