@@ -104,5 +104,5 @@ function scrolldown(){
     document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
   //Clean the 'chattext' field and Focus it.
     document.getElementById('id_chattext').value = ''
-    document.getElementById('id_chattext').focus();
+    // document.getElementById('id_chattext').focus();
 }
