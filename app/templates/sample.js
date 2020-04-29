@@ -62,15 +62,13 @@ var plotPreview = new Chart(ctx, {
 
 var workingarea = {x:0,y:0}
 
+
 window.onload = function(){
   loadresume()
 }
 
 // OnChange Event Listeners
-document.getElementById('method').onchange = function(e){
-  configurationdisplay(e)
-  loadresume()
-}
+
 document.getElementById('motorspeed').onchange = function(){
   loadresume()
 }
@@ -79,6 +77,44 @@ document.getElementById('pressure').onchange = function(){
 }
 document.getElementById('deltapressure').onchange = function(){
   loadresume()
+}
+
+
+document.getElementById('sizex').onchange = function(event){
+  loadresume();
+}
+document.getElementById('sizey').onchange = function(event){
+  loadresume()
+}
+document.getElementById('offsetx').onchange = function(event){
+  loadresume()
+  changegraph(event);
+}
+document.getElementById('offsety').onchange = function(event){
+  loadresume()
+  changegraph(event);
+}
+
+document.getElementById('method').onchange = function(e){
+  configurationdisplay(e)
+  changegraph(event);
+  loadresume()
+}
+document.getElementById('nbands').onchange = function(e){
+  loadresume()
+  changegraph(event);
+}
+document.getElementById('bandlength').onchange = function(e){
+  loadresume()
+  changegraph(event);
+}
+document.getElementById('bandheight').onchange = function(e){
+  loadresume()
+  changegraph(event);
+}
+document.getElementById('gap').onchange = function(e){
+  loadresume()
+  changegraph(event);
 }
 
 
@@ -143,7 +179,7 @@ function pointgen(graph, bandsize){
     offsetxvalue=newoffsetcalc()
     bandsize = bandlengthvalue
   }
-  if(bandsize>=0){
+  if(bandsize==0 || bandsize>=1 && bandsize<=sizexvalue-offsetxvalue){
     for(i=0;i<nbandsvalue;i++){
       newdata = []
       if(i==0){
@@ -164,13 +200,21 @@ function pointgen(graph, bandsize){
     }
     loadresume()
   }
-  else if((!Number.isNaN(bandsizevalue) || !Number.isNaN(offsetxvalue)) && !Number.isNaN(nbandsvalue)){
-    dataerror()
+  else if((!Number.isNaN(offsetxvalue)) && !Number.isNaN(nbandsvalue)){
+    // dataerror()
+    $("#myAlert").alert();
+  }
+  else{
+    // dataerror()
+    $("#myAlert").alert();
   }
 }
 // Error alert
 function dataerror(){
   window.alert("Incorrect data");
+  $('<div class="alert alert-warning">' +
+            '<button type="button" class="close" data-dismiss="alert">' +
+            '&times;</button>You should check in on some of those fields below.</div>').hide().appendTo('#response').fadeIn(1000);
 }
 
 // Data plotter
@@ -198,7 +242,7 @@ function configurationdisplay(event){
         $("#nbandsform").prop('disabled',false)
         $("#nbandsform").fadeIn();
         $("#bandlengthform").fadeOut();
-        $("#bandlengthform").value = 0
+        $("#bandlength")[0].value = 0
         $("#bandlengthform").prop('disabled',true)
       break;
     case 1:
@@ -206,14 +250,17 @@ function configurationdisplay(event){
         $("#bandlengthform").removeAttr('hidden')
         $("#bandlengthform").fadeIn();
         $("#nbandsform").fadeOut();
-        $("#nbandsform").value = 0
+        $('#nbands')[0].value= 0
         $("#nbandsform").prop('disabled',true)
       break;
   }
+  loadresume()
 }
 
 // Load resume table
 function loadresume(){
+
+
   $('#resumemotorspeed')[0].value = motorspeed.value
   $('#resumepressure')[0].value = ['P: '+pressure.value+', '+ 'Δ: '+deltapressure.value]
   $('#resumeoffsets')[0].value = ['x: '+parseFloat(offsetx.value).toFixed(2)+', '+ 'y: '+parseFloat(offsety.value).toFixed(2)]
@@ -235,19 +282,19 @@ function loadresume(){
 
 $(document).ready(function(){
   // AJAX POST of the serial_port connection
-  var $SaveSampleApplicationForm = $('.savesampleapplication-form')
-  $SaveSampleApplicationForm.submit(function(event){
-    event.preventDefault()
-    let $formData = $(this).serialize()
-    let $endpoint = window.location.origin+'/samplesave/'
-    $.ajax({
-      method: 'POST',
-      url:    $endpoint,
-      data:   $formData,
-      success: saveMethodSuccess,
-      error: saveMethodError,
-    })
-  })
+  // var $SaveSampleApplicationForm = $('.savesampleapplication-form')
+  // $SaveSampleApplicationForm.submit(function(event){
+  //   event.preventDefault()
+  //   let $formData = $(this).serialize()
+  //   let $endpoint = window.location.origin+'/samplesave/'
+  //   $.ajax({
+  //     method: 'POST',
+  //     url:    $endpoint,
+  //     data:   $formData,
+  //     success: saveMethodSuccess,
+  //     error: saveMethodError,
+  //   })
+  // })
 
   $('#list-load a').on('click', function (e) {
   e.preventDefault()
@@ -264,7 +311,7 @@ $(document).ready(function(){
   $('#playbttn').on('click', function (e) {
     event.preventDefault()
     let $formData = $('.savesampleapplication-form').serialize()
-    let $endpoint = window.location.origin+'/samplesave/'
+    let $endpoint = window.location.origin+'/sampleapp/'
     $.ajax({
     method: 'POST',
     url:    window.location.origin+'/sampleapp/',

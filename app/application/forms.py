@@ -1,5 +1,5 @@
 from django import forms
-from .models import SampleApplication_Db, PlateProperties_Db
+from .models import SampleApplication_Db
 from django.contrib.auth.models import User
 
 class SampleApplicationForm(forms.ModelForm):
@@ -83,7 +83,7 @@ class SampleApplicationForm(forms.ModelForm):
             )
         )
 
-    nbands = forms.CharField(label='N° Bands', max_length=16,required=False,
+    nbands = forms.IntegerField(label='N° Bands', required=False,
         widget = forms.TextInput(attrs={
                     'id':'resumenbands',
                     'name': 'nbands',
@@ -128,9 +128,6 @@ class SampleApplicationForm(forms.ModelForm):
             )
         )
 
-    plate_properties = dict()
-    band_settings = dict()
-
     class Meta:
         model = SampleApplication_Db
         fields = ('motorspeed','pressure','deltapressure',)
@@ -142,30 +139,15 @@ class SampleApplicationForm(forms.ModelForm):
     def clean(self):
         finaldict = self.cleaned_data.copy()
 
-        finaldict['pressure'] = self.formatdata(self.cleaned_data['pressure'])[0]
-        finaldict['deltapressure'] = self.formatdata(self.cleaned_data['pressure'])[1]
-        auxsizes = self.formatdata(self.cleaned_data['sizes'])
-        auxpressure = self.formatdata(self.cleaned_data['offsets'])
-        self.plate_properties['sizex'] = auxsizes[0]
-        self.plate_properties['sizey'] = auxsizes[1]
-        self.plate_properties['offsetx'] = auxpressure[0]
-        self.plate_properties['offsety'] = auxpressure[1]
+        preassureinfo = self.formatdata(self.cleaned_data['pressure'])
+        finaldict['pressure'] = preassureinfo[0]
+        finaldict['deltapressure'] = preassureinfo[1]
 
-        self.band_settings['bandsetting'] = self.cleaned_data['bandproperties']
-        self.band_settings['nbands'] = self.cleaned_data['nbands']
-        self.band_settings['lengthbands'] = self.cleaned_data['lengthbands']
-        self.band_settings['height'] = self.cleaned_data['height']
-        self.band_settings['gap'] = self.cleaned_data['gap']
-
-        del finaldict['sizes']
-        del finaldict['offsets']
-
-        finaldict.update(self.plate_properties)
 
         # Verify that the if nbands is selected, then nbands value should be !=0
-        if self.band_settings['bandsetting'] == 'N° Bands' and int(self.band_settings['nbands']) <= 0:
+        if self.cleaned_data['bandproperties'] == 'N° Bands' and int(self.cleaned_data['nbands']) <= 0:
             raise forms.ValidationError("Invalid Data")
-        if self.band_settings['bandsetting'] == 'Length' and int(self.band_settings['lengthbands']) == 0:
+        if self.cleaned_data['bandproperties'] == 'Length' and int(self.cleaned_data['lengthbands']) == 0:
             raise forms.ValidationError("Invalid Data")
 
         return finaldict
@@ -175,6 +157,20 @@ class SampleApplicationForm(forms.ModelForm):
         if motorspeed == '':
             motorspeed = 0
         return motorspeed
+
+    def clean_sizes(self):
+        sizes = self.formatdata(self.cleaned_data['sizes'])
+        self.cleaned_data['sizex'] = sizes[0]
+        self.cleaned_data['sizey'] = sizes[1]
+        return sizes
+
+    def clean_offsets(self):
+        offsets = self.formatdata(self.cleaned_data['offsets'])
+        self.cleaned_data['offsetx'] = offsets[0]
+        self.cleaned_data['offsety'] = offsets[1]
+        return offsets
+
+
 
     # def clean_filename(self):
         # IMPLEMENT IN DB VALIDATOR

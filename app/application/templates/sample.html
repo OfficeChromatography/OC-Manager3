@@ -53,10 +53,13 @@
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
+
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-4 text-gray-800">Sample Application</h1>
           </div>
+          <div id="response"></div>
+
           <div class="card-group row">
             <div class="col-lg-6">
               <!-- Settings Board -->
@@ -148,7 +151,7 @@
                                   <span class="input-group-text">Size X</span>
                                 </div>
                                 <input type="number" class="form-control" placeholder="1~1200"
-                                  aria-describedby="inputGroupPrepend" required value="100" onchange="changegraph(event)" id='sizex'>
+                                  aria-describedby="inputGroupPrepend" required value="100" id='sizex'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -161,7 +164,7 @@
                                 </div>
                                 <!-- <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">Size Y</label> -->
                                 <input type="number" class="form-control" placeholder="1~1200"
-                                  aria-describedby="inputGroupPrepend" required value="100" onchange="changegraph(event)" id='sizey'>
+                                  aria-describedby="inputGroupPrepend" required value="100" id='sizey'>
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -192,8 +195,8 @@
                             <div class="input-group pt-4">
                               <label for="method" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>Bands Properties</b></h1></label>
                               <select id="method" onchange="configurationdisplay(event)" class="form-control">
-                                <option selected>N° Bands</option>
-                                <option>Bands Length</option>
+                                <option dataid='1'>N° Bands</option>
+                                <option dataid='2'>Bands Length</option>
                               </select>
                             </div>
                           </div>

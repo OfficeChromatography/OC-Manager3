@@ -25,10 +25,25 @@ class SampleAppSaveAndLoad(View):
     def post(self, request):
         f = SampleApplicationForm(request.POST, user=request.user)
         if f.is_valid():
-            new_plateproperties = PlateProperties_Db(**f.plate_properties)
+            plate_properties = {
+                                'sizex'     :   f.cleaned_data['sizex'],
+                                'sizey'     :   f.cleaned_data['sizey'],
+                                'offsetx'   :   f.cleaned_data['offsetx'],
+                                'offsety'   :   f.cleaned_data['offsety'],
+                                }
+            band_settings = {
+                            'bandsetting'   :   f.cleaned_data['bandproperties'],
+                            'nbands'        :   f.cleaned_data['nbands'],
+                            'lengthbands'   :   f.cleaned_data['lengthbands'],
+                            'height'        :   f.cleaned_data['height'],
+                            'gap'           :   f.cleaned_data['gap']
+                            }
+
+            new_plateproperties = PlateProperties_Db(**plate_properties)
             new_plateproperties.save()
-            new_bandsettings = BandSettings_Db(**f.band_settings)
+            new_bandsettings = BandSettings_Db(**band_settings)
             new_bandsettings.save()
+
             new_sampleapp = f.save(commit=False)
             new_sampleapp.auth_id = request.user
             new_sampleapp.filename = request.POST.get('filename')
@@ -36,12 +51,15 @@ class SampleAppSaveAndLoad(View):
             new_sampleapp.bandsettings = new_bandsettings
             new_sampleapp.save()
         return JsonResponse({'error':f.errors})
+
+
     def get(self, request):
         filename=request.GET.get('filename')
 
         sampleapplication_conf=model_to_dict(SampleApplication_Db.objects.filter(filename=filename).filter(auth_id=request.user)[0])
         plateproperties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sampleapplication_conf['plateproperties']))
         bandsettings_conf=model_to_dict(BandSettings_Db.objects.get(id=sampleapplication_conf['bandsettings']))
+
 
         sampleapplication_conf.update(plateproperties_conf)
         sampleapplication_conf.update(bandsettings_conf)
@@ -52,18 +70,18 @@ class SampleAppSaveAndLoad(View):
 class SampleAppPlay(View):
     def post(self, request):
         f = SampleApplicationForm(request.POST, user=request.user)
-        print(request.POST)
         if f.is_valid():
-            nbands = int(f.band_settings['nbands'])
-            bandlength = float(f.band_settings['lengthbands'])
-            bandheight = float(f.band_settings['height'])
-            gapvalue = float(f.band_settings['gap'])
-            bandsetting = f.band_settings['bandsetting']
 
-            sizexvalue = float(f.plate_properties['sizex'])
-            sizeyvalue = float(f.plate_properties['sizey'])
-            offsetxvalue = float(f.plate_properties['offsetx'])
-            offsetyvalue = float(f.plate_properties['offsety'])
+            nbands = int(f.cleaned_data['nbands'])
+            bandlength = float(f.cleaned_data['lengthbands'])
+            bandheight = float(f.cleaned_data['height'])
+            gapvalue = float(f.cleaned_data['gap'])
+            bandsetting = f.cleaned_data['bandproperties']
+
+            sizexvalue = float(f.cleaned_data['sizex'])
+            sizeyvalue = float(f.cleaned_data['sizey'])
+            offsetxvalue = float(f.cleaned_data['offsetx'])
+            offsetyvalue = float(f.cleaned_data['offsety'])
 
 
             workingarea = sizexvalue-2*offsetxvalue
@@ -91,13 +109,13 @@ class SampleAppPlay(View):
                         else:
                           applicationline.append([offsetyvalue+heightofapplication,i*(bandsize+gapvalue)+offsetxvalue])
                           applicationline.append([offsetyvalue+heightofapplication,(i+1)*bandsize+(gapvalue*i)+offsetxvalue])
-                        print(applicationline)
+                        # print(applicationline)
                         applicationsurface.append(applicationline)
                     heightofapplication+=0.1
-                print(applicationsurface)
+                # print(applicationsurface)
                 gcode = GcodeGen(applicationsurface)
-                OC_LAB.send(gcode)
-
+                print(gcode)
+                # OC_LAB.send(gcode)
 
         return JsonResponse({'error':f.errors})
 
