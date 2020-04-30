@@ -72,6 +72,7 @@ class SampleAppPlay(View):
         f = SampleApplicationForm(request.POST, user=request.user)
         if f.is_valid():
 
+            motorspeed = int(f.cleaned_data['motorspeed'])
             nbands = int(f.cleaned_data['nbands'])
             bandlength = float(f.cleaned_data['lengthbands'])
             bandheight = float(f.cleaned_data['height'])
@@ -113,7 +114,7 @@ class SampleAppPlay(View):
                         applicationsurface.append(applicationline)
                     heightofapplication+=0.1
                 # print(applicationsurface)
-                gcode = GcodeGen(applicationsurface)
+                gcode = GcodeGen(applicationsurface, motorspeed)
                 print(gcode)
                 # OC_LAB.send(gcode)
 
@@ -131,11 +132,11 @@ class SampleAppStop(View):
                 OC_LAB.resume()
         return JsonResponse({})
 
-def GcodeGen(listoflines):
+def GcodeGen(listoflines, speed):
     gcode=''
     for listofpoints in listoflines:
         for point in listofpoints:
-            gline = 'G1 Y{} X{} \n'.format(str(point[0]), str(point[1]))
+            gline = 'G1 Y{} X{} F{}\n'.format(str(point[0]), str(point[1]), speed)
             gcode += gline
             gcode += 'M42 P13 S255 \n'
         gcode = gcode[:gcode.rfind('M42 P13 S255 \n')]
