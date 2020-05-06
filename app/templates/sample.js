@@ -67,6 +67,14 @@ window.onload = function(){
   loadresume()
 }
 
+function ErrorCheck(){
+  if(parseInt(document.getElementById('offsetx').value)>=parseInt(document.getElementById('sizex').value) || parseInt(document.getElementById('offsety').value)>=parseInt(document.getElementById('sizey').value)){
+    $('#offsets-error').fadeIn();
+  }
+  else{
+    $('#offsets-error').fadeOut();
+  }
+}
 // OnChange Event Listeners
 
 document.getElementById('motorspeed').onchange = function(){
@@ -79,7 +87,6 @@ document.getElementById('deltapressure').onchange = function(){
   loadresume()
 }
 
-
 document.getElementById('sizex').onchange = function(event){
   loadresume();
 }
@@ -87,10 +94,12 @@ document.getElementById('sizey').onchange = function(event){
   loadresume()
 }
 document.getElementById('offsetx').onchange = function(event){
+  ErrorCheck()
   loadresume()
   changegraph(event);
 }
 document.getElementById('offsety').onchange = function(event){
+  ErrorCheck()
   loadresume()
   changegraph(event);
 }
@@ -242,7 +251,7 @@ function configurationdisplay(event){
         $("#nbandsform").prop('disabled',false)
         $("#nbandsform").fadeIn();
         $("#bandlengthform").fadeOut();
-        $("#bandlength")[0].value = 0
+        $("#bandlength").val(0)
         $("#bandlengthform").prop('disabled',true)
       break;
     case 1:
@@ -250,7 +259,7 @@ function configurationdisplay(event){
         $("#bandlengthform").removeAttr('hidden')
         $("#bandlengthform").fadeIn();
         $("#nbandsform").fadeOut();
-        $('#nbands')[0].value= 0
+        $('#nbands').val(0)
         $("#nbandsform").prop('disabled',true)
       break;
   }
@@ -282,19 +291,19 @@ function loadresume(){
 
 $(document).ready(function(){
   // AJAX POST of the serial_port connection
-  // var $SaveSampleApplicationForm = $('.savesampleapplication-form')
-  // $SaveSampleApplicationForm.submit(function(event){
-  //   event.preventDefault()
-  //   let $formData = $(this).serialize()
-  //   let $endpoint = window.location.origin+'/samplesave/'
-  //   $.ajax({
-  //     method: 'POST',
-  //     url:    $endpoint,
-  //     data:   $formData,
-  //     success: saveMethodSuccess,
-  //     error: saveMethodError,
-  //   })
-  // })
+  var $SaveSampleApplicationForm = $('.savesampleapplication-form')
+  $SaveSampleApplicationForm.submit(function(event){
+    event.preventDefault()
+    let $formData = $(this).serialize()
+    let $endpoint = window.location.origin+'/samplesave/'
+    $.ajax({
+      method: 'POST',
+      url:    $endpoint,
+      data:   $formData,
+      success: saveMethodSuccess,
+      error: saveMethodError,
+    })
+  })
 
   $('#list-load a').on('click', function (e) {
   e.preventDefault()
