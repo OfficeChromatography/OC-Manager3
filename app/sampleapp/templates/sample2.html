@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>OC-Manager</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+  <!-- Bootstrap core JavaScript-->
+  <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js" charset="utf-8"></script>
+
+
+</head>
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    {% include 'sidebar.html' %}
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        {% include 'topbar.html' %}
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-4 text-gray-800">Sample Application</h1>
+          </div>
+          <div id="response"></div>
+
+          <div class="card-group row">
+            <div class="col-lg-6">
+              <!-- Settings Board -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Settings</h6>
+                </div>
+                <div class="card-body">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        <!-- Editable table -->
+                        <form id='movementform'>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.motor_speed.label}}</label>
+                              {{SampleAppForm.motor_speed}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mm/m]</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" >{{SampleAppForm.pressure.label}}</label>
+                              {{SampleAppForm.pressure}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mmHg]</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_pressure.label}}</label>
+                              {{SampleAppForm.delta_pressure}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">%</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_y.label}}</label>
+                              {{SampleAppForm.delta_y}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">mm</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_x.label}}</label>
+                              {{SampleAppForm.delta_x}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">mm</span>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Plate Preview -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                </div>
+                <div class="card-body">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        <canvas id="plotPreview" width="400" height="400"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <!-- Plate Design Board -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Parameters</h6>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
+                    Complete it!
+                  </div>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        <!-- Editable table -->
+                        <form id="plateform">
+                          <p><b>Plate Size</b><hr/><p>
+                            <div class="form-group mt-3 mb-1 row">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">{{SampleAppForm.size_x.label}}</span>
+                                </div>
+                                {{SampleAppForm.size_x}}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">[mm]</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group row pb-4">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">{{SampleAppForm.size_y.label}}</span>
+                                </div>
+                                {{SampleAppForm.size_y}}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">[mm]</span>
+                                </div>
+                              </div>
+                            </div>
+                            <p><b>Offsets<hr/></b><p>
+                            <div class="alert alert-warning collapse" id='id_offsets_error' role="alert">
+                              Remember that the offsets should be smaller than the sizes of the plate /2
+                            </div>
+                            <div class="form-group mt-3 mb-1 row">
+                              <div class="input-group">
+                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.offset_x.label}}</label>
+                                {{SampleAppForm.offset_x}}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">[mm]</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <div class="input-group">
+                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.offset_y.label}}</label>
+                                {{SampleAppForm.offset_y}}
+                                <div class="input-group-append">
+                                  <span class="input-group-text">[mm]</span>
+                                </div>
+                              </div>
+                            </div>
+                          <div class="form-group pt-4 mb-1 row">
+                            <div class="input-group pt-4">
+                              <label for="method" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>{{SampleAppForm.main_property.label}}</b></h1></label>
+                              {{SampleAppForm.main_property}}
+                            </div>
+                          </div>
+                          <hr/>
+                          <div class="alert alert-warning alert-dismissible collapse" id='id_gap_error' role="alert">
+                            Gap too big! For that amount of bands
+                          </div>
+                          <div class="alert alert-warning alert-dismissible collapse" id='id_space_error' role="alert">
+                            Theres no enough space for such parameters
+                          </div>
+                          <div class="form-group mt-3 mb-1 row" id='nbandsform'>
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.n_bands.label}}</label>
+                              {{SampleAppForm.n_bands}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[#]</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group mb-1 row" id='bandlengthform' style="display:none">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.length.label}}</label>
+                              {{SampleAppForm.length}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mm]</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group mb-1 row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.height.label}}</label>
+                              {{SampleAppForm.height}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mm]</span>
+                              </div>
+                            </div>
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.gap.label}}</label>
+                              {{SampleAppForm.gap}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mm]</span>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Save and Load -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Save and Load</h6>
+                </div>
+                <div class="card-body">
+                        <!-- Editable table -->
+                  <form class="resume-form"  action="/samplesave/" target='_parent' id='saveform' method="post">{% csrf_token %}
+                    <div class="row">
+                      <!-- Table COL -->
+                      <div class="col-xl">
+                        <label for="colFormLabelSm">Resume</label>
+                        <div class="input-group">
+                          <table class="table table-sm" id='resumetable'>
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Value</th>
+                              <th scope="col">Units</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th scope="row">MotorSpeed</th>
+                              <td class='val' id='motorspeed_resume'>{{SampleApplicationForm.motorspeed}}</td>
+                              <td>[mm/m]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Pressure</th>
+                              <td class='val'  id='pressure_resume'>{{SampleApplicationForm.pressure}}</td>
+                              <td>[bar, %]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Sizes</th>
+                              <td class='val' id='sizes_resume'>{{SampleApplicationForm.sizes}}</td>
+                              <td>[mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Delta</th>
+                                <td id='delta_resume'></td>
+                              <td>[mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Offsets</th>
+                              <td class='val' id='offsets_resume'>{{SampleApplicationForm.offsets}}</td>
+                              <td>[mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Bands Properties</th>
+                              <td class='val' id='band_properties_resume'>{{SampleApplicationForm.bandproperties}}</td>
+                              <td></td>
+                            </tr>
+                            <tr id='nbandsrow'>
+                              <th scope="row">N° Bands</th>
+                              <td class='val' id='n_bands_resume'>{{SampleApplicationForm.nbands}}</td>
+                              <td>[#]</td>
+                            </tr>
+                            <tr id='lengthbandsrow' style="display:none">
+                              <th scope="row">Length Bands</th>
+                              <td class='val' id='length_resume'>{{SampleApplicationForm.lengthbands}}</td>
+                              <td>[mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Height</th>
+                              <td class='val' id='height_resume'>{{SampleApplicationForm.height}}</td>
+                              <td>[mm]</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">Gap</th>
+                              <td class='val' id='gap_resume'>{{SampleApplicationForm.gap}}</td>
+                              <td>[mm]</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        </div>
+                      </div>
+                      <div class="col-xl">
+                        <label>Save</label>
+                        <div class="input-group">
+                          <input type="text" class="form-control" name='filename' placeholder="Filename"
+                            aria-describedby="inputGroupPrepend">
+                          <div class="input-group-append">
+                            <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
+                          </div>
+                        </div>
+                        <label for="list-load" class="mt-4">Load</label>
+                        <div class="list-group" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
+                          {% for list in list_load %}
+                              <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.filename }}</a>
+                          {% endfor %}
+                        </div>
+                        <label for="list-load" class="mt-4">Control</label>
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <button id='playbttn' name='play' class="btn btn-primary">Play</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button id='stopbttn' class="btn btn-primary">Stop</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button id='pausebttn' class="btn btn-primary">Pause</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      {% include 'footer.html' %}
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'topbar.js' %}"></script>
+  <script src="{% static 'sample2.js' %}"></script>
+  <script type="text/javascript">
+  // using jQuery
+  function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+  </script>
+</body>
+
+</html>

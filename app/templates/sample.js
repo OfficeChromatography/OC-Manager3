@@ -124,7 +124,7 @@ document.getElementById('bandheight').onchange = function(e){
 document.getElementById('gap').onchange = function(e){
   loadresume()
   changegraph(event);
-}
+  }
 
 
 // Event Listener of objects that cause a change on the graph
