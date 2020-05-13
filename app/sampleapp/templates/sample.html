@@ -75,8 +75,8 @@
                         <form id='movementform'>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.motor_speed.label}}</label>
-                              {{SampleAppForm.motor_speed}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{MovementSettings_Form.motor_speed.label}}</label>
+                              {{MovementSettings_Form.motor_speed}}
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm/m]</span>
                               </div>
@@ -84,8 +84,8 @@
                           </div>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" >{{SampleAppForm.pressure.label}}</label>
-                              {{SampleAppForm.pressure}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" >{{PressureSettings_Form.pressure.label}}</label>
+                              {{PressureSettings_Form.pressure}}
                               <div class="input-group-append">
                                 <span class="input-group-text">[mmHg]</span>
                               </div>
@@ -93,8 +93,8 @@
                           </div>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_pressure.label}}</label>
-                              {{SampleAppForm.delta_pressure}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.delta_pressure.label}}</label>
+                              {{PressureSettings_Form.delta_pressure}}
                               <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                               </div>
@@ -102,8 +102,8 @@
                           </div>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_y.label}}</label>
-                              {{SampleAppForm.delta_y}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{MovementSettings_Form.delta_y.label}}</label>
+                              {{MovementSettings_Form.delta_y}}
                               <div class="input-group-append">
                                 <span class="input-group-text">mm</span>
                               </div>
@@ -111,8 +111,8 @@
                           </div>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.delta_x.label}}</label>
-                              {{SampleAppForm.delta_x}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{MovementSettings_Form.delta_x.label}}</label>
+                              {{MovementSettings_Form.delta_x}}
                               <div class="input-group-append">
                                 <span class="input-group-text">mm</span>
                               </div>
@@ -159,9 +159,9 @@
                             <div class="form-group mt-3 mb-1 row">
                               <div class="input-group">
                                 <div class="input-group-prepend">
-                                  <span class="input-group-text">{{SampleAppForm.size_x.label}}</span>
+                                  <span class="input-group-text">{{PlateProperties_Form.size_x.label}}</span>
                                 </div>
-                                {{SampleAppForm.size_x}}
+                                {{PlateProperties_Form.size_x}}
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -170,9 +170,9 @@
                             <div class="form-group row pb-4">
                               <div class="input-group">
                                 <div class="input-group-prepend">
-                                  <span class="input-group-text">{{SampleAppForm.size_y.label}}</span>
+                                  <span class="input-group-text">{{PlateProperties_Form.size_y.label}}</span>
                                 </div>
-                                {{SampleAppForm.size_y}}
+                                {{PlateProperties_Form.size_y}}
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -184,8 +184,8 @@
                             </div>
                             <div class="form-group mt-3 mb-1 row">
                               <div class="input-group">
-                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.offset_x.label}}</label>
-                                {{SampleAppForm.offset_x}}
+                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{PlateProperties_Form.offset_x.label}}</label>
+                                {{PlateProperties_Form.offset_x}}
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -193,8 +193,8 @@
                             </div>
                             <div class="form-group row">
                               <div class="input-group">
-                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.offset_y.label}}</label>
-                                {{SampleAppForm.offset_y}}
+                                <label for="colFormLabelSm" class="col-2 col-form-label col-form-label-sm text-truncate">{{PlateProperties_Form.offset_y.label}}</label>
+                                {{PlateProperties_Form.offset_y}}
                                 <div class="input-group-append">
                                   <span class="input-group-text">[mm]</span>
                                 </div>
@@ -202,8 +202,8 @@
                             </div>
                           <div class="form-group pt-4 mb-1 row">
                             <div class="input-group pt-4">
-                              <label for="method" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>{{SampleAppForm.main_property.label}}</b></h1></label>
-                              {{SampleAppForm.main_property}}
+                              <label for="method" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>{{BandSettings_Form.main_property.label}}</b></h1></label>
+                              {{BandSettings_Form.main_property}}
                             </div>
                           </div>
                           <hr/>
@@ -213,16 +213,16 @@
                           <div class="alert alert-warning alert-dismissible collapse" id='id_space_error' role="alert">
                             Theres no enough space for such parameters
                           </div>
-                          <div class="form-group mt-3 mb-1 row" id='nbandsform'>
+                          <div class="form-group mt-3 mb-1 row" id='id_valuesform'>
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.n_bands.label}}</label>
-                              {{SampleAppForm.n_bands}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.value.label}}</label>
+                              {{BandSettings_Form.value}}
                               <div class="input-group-append">
-                                <span class="input-group-text">[#]</span>
+                                <span id='id_valuesunit'class="input-group-text">[#]</span>
                               </div>
                             </div>
                           </div>
-                          <div class="form-group mb-1 row" id='bandlengthform' style="display:none">
+                          <!-- <div class="form-group mb-1 row" id='bandlengthform' style="display:none">
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.length.label}}</label>
                               {{SampleAppForm.length}}
@@ -230,18 +230,18 @@
                                 <span class="input-group-text">[mm]</span>
                               </div>
                             </div>
-                          </div>
+                          </div> -->
                           <div class="form-group mb-1 row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.height.label}}</label>
-                              {{SampleAppForm.height}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.height.label}}</label>
+                              {{BandSettings_Form.height}}
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm]</span>
                               </div>
                             </div>
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.gap.label}}</label>
-                              {{SampleAppForm.gap}}
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.gap.label}}</label>
+                              {{BandSettings_Form.gap}}
                               <div class="input-group-append">
                                 <span class="input-group-text">[mm]</span>
                               </div>
@@ -260,7 +260,7 @@
                 </div>
                 <div class="card-body">
                         <!-- Editable table -->
-                  <form class="resume-form"  action="/samplesave/" target='_parent' id='saveform' method="post">{% csrf_token %}
+                  <form class="resume-form" id='saveform' method="post">{% csrf_token %}
                     <div class="row">
                       <!-- Table COL -->
                       <div class="col-xl">
@@ -331,17 +331,21 @@
                       </div>
                       <div class="col-xl">
                         <label>Save</label>
-                        <div class="input-group">
-                          <input type="text" class="form-control" name='filename' placeholder="Filename"
-                            aria-describedby="inputGroupPrepend">
-                          <div class="input-group-append">
-                            <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
+                        <div class="alert alert-success alert-dismissible collapse m-1" id='id_save_sucess' role="alert"></div>
+                        <div class="alert alert-danger alert-dismissible collapse m-1" id='id_save_error' role="alert"></div>
+                        <form id='saveform'>
+                          <div class="input-group">
+                            {{SampleApplication_Form.file_name}}
+                            <div class="input-group-append">
+                              <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
+                            </div>
                           </div>
-                        </div>
+                        </form>
                         <label for="list-load" class="mt-4">Load</label>
+                        <div class="alert alert-success alert-dismissible collapse m-1" id='id_load_sucess' role="alert"></div>
                         <div class="list-group" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
                           {% for list in list_load %}
-                              <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.filename }}</a>
+                              <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.file_name }}</a>
                           {% endfor %}
                         </div>
                         <label for="list-load" class="mt-4">Control</label>
@@ -403,7 +407,7 @@
   </div>
 
   <script src="{% static 'topbar.js' %}"></script>
-  <script src="{% static 'sample2.js' %}"></script>
+  <script src="{% static 'sample.js' %}"></script>
   <script type="text/javascript">
   // using jQuery
   function getCookie(name) {

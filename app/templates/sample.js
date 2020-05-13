@@ -1,25 +1,4 @@
 var ctx = document.getElementById('plotPreview').getContext('2d');
-
-// Settings initial values
-var motorspeed = $('#motorspeed')[0];
-var pressure = $('#pressure')[0];
-var deltapressure = $('#deltapressure')[0];
-
-// Parameter Inital Values
-  // Plate sizes
-  var sizex = $('#sizex')[0]
-  var sizey = $('#sizey')[0];
-  // Offsets
-  var offsety = $('#offsety')[0];
-  var offsetx = $('#offsetx')[0];
-  // Bands Properties
-  var method = $('#method')[0]
-  var nbands = $('#nbands')[0];
-  var bandlength = $('#bandlength')[0];
-  var gap = $('#gap')[0];
-  var bandheight = $('#bandheight')[0];
-
-// Plot Declaration
 var plotPreview = new Chart(ctx, {
    type: 'scatter',
    data: {
@@ -59,174 +38,189 @@ var plotPreview = new Chart(ctx, {
    },
 });
 
-
-var workingarea = {x:0,y:0}
-
-
-window.onload = function(){
-  loadresume()
-}
-
-function ErrorCheck(){
-  if(parseInt(document.getElementById('offsetx').value)>=parseInt(document.getElementById('sizex').value) || parseInt(document.getElementById('offsety').value)>=parseInt(document.getElementById('sizey').value)){
-    $('#offsets-error').fadeIn();
+// Execute every time something happens wi
+$("#id_motor_speed").change(
+  function(){
+    console.log('motor');
+    loadresume()
   }
-  else{
-    $('#offsets-error').fadeOut();
+)
+$("#id_pressure").change(
+  function(){
+    console.log('pres');
+    loadresume()
   }
-}
-// OnChange Event Listeners
+)
+$("#id_delta_pressure").change(
+  function(){
+    console.log('dpre');
+    loadresume()
+  }
+)
+$("#id_delta_y").change(
+  function(){
+    console.log('dey');
+    loadresume()
+  }
+)
+$("#id_delta_x").change(
+  function(){
+    console.log('dex');
+    loadresume()
+  }
+)
+$("#id_main_property").change(
+  // The default hiden is in the html file
+  function(){
+    switch ($("#id_main_property").val()) {
+      case '1':
+          $("#id_valuesform").fadeOut();
+          $("#id_valuesunit").html('#');
+          $("#id_valuesform").fadeIn();
+          $("#lengthbandsrow").hide();
+          $("#nbandsrow").show();
+          break;
+      case '2':
+          $("#id_valuesform").fadeOut();
+          $("#id_valuesunit").html('mm');
+          $("#id_valuesform").fadeIn();
+          $("#bandlengthform").fadeIn();
+          $("#nbandsrow").hide();
+          $("#lengthbandsrow").show();
+        break;
+    loadresume()
+    }
+  }
+)
 
-document.getElementById('motorspeed').onchange = function(){
-  loadresume()
-}
-document.getElementById('pressure').onchange = function(){
-  loadresume()
-}
-document.getElementById('deltapressure').onchange = function(){
-  loadresume()
-}
+$("#id_size_x").change(
+  function(){
+    console.log('sizex');
+    plotPreview.config.options.scales.xAxes[0].ticks.max = parseInt($(this).val());
+    plotPreview.update();
+    bandsmain()
+    loadresume()
+  }
+)
+$("#id_size_y").change(
+  function(){
+    console.log('sizey');
+    plotPreview.config.options.scales.yAxes[0].ticks.max = parseInt($(this).val());
+    plotPreview.update();
+    bandsmain()
+    loadresume()
+  }
+);
 
-document.getElementById('sizex').onchange = function(event){
-  loadresume();
-}
-document.getElementById('sizey').onchange = function(event){
-  loadresume()
-}
-document.getElementById('offsetx').onchange = function(event){
-  ErrorCheck()
-  loadresume()
-  changegraph(event);
-}
-document.getElementById('offsety').onchange = function(event){
-  ErrorCheck()
-  loadresume()
-  changegraph(event);
-}
+$("#id_offset_x").change(
+    function(){
+      bandsmain()
+      loadresume()
+    }
+);
+$("#id_offset_y").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+);
 
-document.getElementById('method').onchange = function(e){
-  configurationdisplay(e)
-  changegraph(event);
-  loadresume()
-}
-document.getElementById('nbands').onchange = function(e){
-  loadresume()
-  changegraph(event);
-}
-document.getElementById('bandlength').onchange = function(e){
-  loadresume()
-  changegraph(event);
-}
-document.getElementById('bandheight').onchange = function(e){
-  loadresume()
-  changegraph(event);
-}
-document.getElementById('gap').onchange = function(e){
-  loadresume()
-  changegraph(event);
+$("#id_main_property").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+)
+$("#id_value").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+)
+$("#id_height").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+)
+$("#id_gap").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+)
+
+function bandsmain(){
+  plate_x_size = parseFloat($("#id_size_x").val());
+  plate_y_size = parseFloat($("#id_size_y").val());
+
+  offset_x_size = parseFloat($("#id_offset_x").val());
+  offset_y_size = parseFloat($("#id_offset_y").val());
+
+  gap_size = parseFloat($("#id_gap").val());
+  number_bands = parseFloat($("#id_value").val());
+  band_size = parseFloat($("#id_value").val());
+
+  band_height = parseFloat($("#id_height").val());
+  property = $("#id_main_property").val();
+
+  // Check if theres missing parameters
+  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_x_size)||isNaN(offset_y_size)||isNaN(gap_size)||isNaN(band_height))
+
+  if(theres_error('#id_parameter_error',missing_parameter)){return}
+
+  // Calculate the Working Area [x,y]
+  working_area = nbands_working_area(plate_x_size,offset_x_size,plate_y_size,offset_y_size)
+
+  // Check if its not posible to calculate the wa
+  if(theres_error('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
+
+  // Check if the vertical sizes is enough
+  if(theres_error('#id_space_error',working_area[1]<band_height)){return}
+
+
+  switch (property) {
+    case '1':
+    //Gap process
+      sum_gaps_size = total_gap_length(number_bands, gap_size)
+      if(theres_error('#id_gap_error',isNaN(sum_gaps_size) || sum_gaps_size>= working_area[0])){return}
+
+    //Bands Sizes
+      band_size = total_bands_length(working_area,sum_gaps_size,number_bands)
+      if(theres_error('#id_space_error',isNaN(band_size))){return}
+      break;
+
+
+    case '2':
+      number_bands = Math.trunc(working_area[0]/(band_size+gap_size))
+      if(theres_error('#id_space_error',number_bands<1)){return}
+      break;
   }
 
-
-// Event Listener of objects that cause a change on the graph
-function changegraph(event){
   while(plotPreview.data.datasets.pop()!=undefined){}
-  switch(event.target.id) {
-    case 'sizex':
-      plotPreview.config.options.scales.xAxes[0].ticks.max = parseInt(sizex.value);
-      break;
-    case 'sizey':
-      plotPreview.config.options.scales.yAxes[0].ticks.max = parseInt(sizey.value);
-      break;
-    case 'offsetx':
-      break;
-    case 'offsety':
-      break;
-    case 'nbands':
-      break;
-    case 'gap':
-      break;
-    case 'bandheight':
-      break;
-    case 'bandlength':
-      break;
+  for(i=0;i<number_bands;i++){
+    newdata = []
+    if(i==0){
+      newdata[0]={y:offset_y_size,x:offset_x_size}
+      newdata[1]={y:offset_y_size+band_height,x:offset_x_size}
+      newdata[2]={y:offset_y_size+band_height,x:band_size+offset_x_size}
+      newdata[3]={y:offset_y_size,x:band_size+offset_x_size}
+      newdata[4]=newdata[0]
+    }
+    else{
+      newdata[0]={y:offset_y_size,x:i*(band_size+gap_size)+offset_x_size}
+      newdata[1]={y:offset_y_size+band_height,x:i*(band_size+gap_size)+offset_x_size}
+      newdata[2]={y:offset_y_size+band_height,x:(i+1)*band_size+(gap_size*i)+offset_x_size}
+      newdata[3]={y:offset_y_size,x:(i+1)*band_size+(gap_size*i)+offset_x_size}
+      newdata[4]=newdata[0]
+    }
+    addData(plotPreview,i,'black', newdata)
   }
-  pointgen(plotPreview)
   plotPreview.update();
 }
 
-// Calculation of Workingara=SIZE[]-OFFSETS[]
-function workingareacalc(){
-  calc = {x:sizexvalue-(2*offsetxvalue), y:sizeyvalue-(2*offsetyvalue)}
-  return calc
-}
+function lenghtcalc(){}
 
-// Offset calc for bandlength configuration
-function newoffsetcalc(){
-  var floatnbands = (workingarea.x+gapvalue)/(bandlengthvalue+gapvalue)
-  nbandsvalue = Math.trunc(floatnbands)
-  leftover = bandlengthvalue*(floatnbands%nbandsvalue)
-  return offsetxvalue += leftover
-}
-
-// Ponits generator Function
-function pointgen(graph, bandsize){
-  nbandsvalue = parseInt(nbands.value)
-  bandlengthvalue = parseInt(bandlength.value)
-  bandheightvalue = parseInt(bandheight.value)
-  gapvalue = parseInt(gap.value)
-  sizexvalue = parseInt(sizex.value)
-  sizeyvalue = parseInt(sizey.value)
-  offsetxvalue = parseInt(offsetx.value)
-  offsetyvalue = parseInt(offsety.value)
-
-  workingarea = workingareacalc()
-
-  if(method.selectedIndex==0){
-    bandsize = (workingarea.x-(gapvalue*(nbandsvalue-1)))/nbandsvalue;
-  }
-  else{
-    offsetxvalue=newoffsetcalc()
-    bandsize = bandlengthvalue
-  }
-  if(bandsize==0 || bandsize>=1 && bandsize<=sizexvalue-offsetxvalue){
-    for(i=0;i<nbandsvalue;i++){
-      newdata = []
-      if(i==0){
-        newdata[0]={y:offsetyvalue,x:offsetxvalue}
-        newdata[1]={y:offsetyvalue+bandheightvalue,x:offsetxvalue}
-        newdata[2]={y:offsetyvalue+bandheightvalue,x:bandsize+offsetxvalue}
-        newdata[3]={y:offsetyvalue,x:bandsize+offsetxvalue}
-        newdata[4]={y:offsetyvalue,x:offsetxvalue}
-      }
-      else{
-        newdata[0]={y:offsetyvalue,x:i*(bandsize+gapvalue)+offsetxvalue}
-        newdata[1]={y:offsetyvalue+bandheightvalue,x:i*(bandsize+gapvalue)+offsetxvalue}
-        newdata[2]={y:offsetyvalue+bandheightvalue,x:(i+1)*bandsize+(gapvalue*i)+offsetxvalue}
-        newdata[3]={y:offsetyvalue,x:(i+1)*bandsize+(gapvalue*i)+offsetxvalue}
-        newdata[4]={y:offsetyvalue,x:i*(bandsize+gapvalue)+offsetxvalue}
-      }
-      addData(graph,i,'black', newdata)
-    }
-    loadresume()
-  }
-  else if((!Number.isNaN(offsetxvalue)) && !Number.isNaN(nbandsvalue)){
-    // dataerror()
-    $("#myAlert").alert();
-  }
-  else{
-    // dataerror()
-    $("#myAlert").alert();
-  }
-}
-// Error alert
-function dataerror(){
-  window.alert("Incorrect data");
-  $('<div class="alert alert-warning">' +
-            '<button type="button" class="close" data-dismiss="alert">' +
-            '&times;</button>You should check in on some of those fields below.</div>').hide().appendTo('#response').fadeIn(1000);
-}
-
-// Data plotter
 function addData(chart, label, color, data) {
 		chart.data.datasets.push({
 	    label: label,
@@ -243,149 +237,147 @@ function addData(chart, label, color, data) {
     chart.update();
 }
 
-// Configuration Properties
-function configurationdisplay(event){
-  value=event.target.selectedIndex
-  switch (value) {
-    case 0:
-        $("#nbandsform").prop('disabled',false)
-        $("#nbandsform").fadeIn();
-        $("#bandlengthform").fadeOut();
-        $("#bandlength").val(0)
-        $("#bandlengthform").prop('disabled',true)
-      break;
-    case 1:
-        $("#bandlengthform").prop('disabled',false)
-        $("#bandlengthform").removeAttr('hidden')
-        $("#bandlengthform").fadeIn();
-        $("#nbandsform").fadeOut();
-        $('#nbands').val(0)
-        $("#nbandsform").prop('disabled',true)
-      break;
+//Calculates the Working Area
+function nbands_working_area(plate_x_size,offset_x_size,plate_y_size,offset_y_size){
+  working_area = [plate_x_size-2*offset_x_size,plate_y_size-2*offset_y_size]
+  if(working_area[0] <= 0 || working_area[1] <= 0 || isNaN(working_area[0]) || isNaN(working_area[1])){
+    return [NaN,NaN];
   }
-  loadresume()
+  else{
+      return working_area;
+  }
 }
 
-// Load resume table
+function total_gap_length(number_bands, gap_size){
+  number_of_gaps = number_bands - 1;
+  if(number_of_gaps<0){
+    return NaN
+  }
+  else{
+    return gap_size*number_of_gaps;
+  }
+}
+
+function total_bands_length(workingarea,sum_gaps_size,number_bands){
+  bands_size = (working_area[0]-sum_gaps_size)/number_bands
+  if(bands_size<=0){
+    return NaN
+  }
+  else{
+    return bands_size
+  }
+}
+
+function theres_error(error_id, bolean_exp){
+  if(bolean_exp){
+    $(error_id).fadeIn();
+    return true
+  }
+  else{
+    $(error_id).fadeOut();
+    return false
+  }
+}
+
 function loadresume(){
-
-
-  $('#resumemotorspeed')[0].value = motorspeed.value
-  $('#resumepressure')[0].value = ['P: '+pressure.value+', '+ 'Δ: '+deltapressure.value]
-  $('#resumeoffsets')[0].value = ['x: '+parseFloat(offsetx.value).toFixed(2)+', '+ 'y: '+parseFloat(offsety.value).toFixed(2)]
-  $('#resumesizes')[0].value = ['x: '+sizex.value+', '+'y: '+sizey.value]
-  $('#resumebandproperties')[0].value = method.value
-  if(method.selectedIndex==0){
-    $('#nbandsrow').hidden = false
-    $('#resumenbands')[0].value = nbands.value
-    $('#lengthbandsrow').hidden = true
-  }
-  else{
-    $('#lengthbandsrow').hidden = false
-    $('#resumelengthbands')[0].value = bandlength.value
-    $('#nbandsrow').hidden = true
-  }
-  $('#resumeheigth')[0].value = bandheight.value
-  $('#resumegap')[0].value = gap.value
+  $('#motorspeed_resume').text($("#id_motor_speed").val())
+  $('#pressure_resume').text($("#id_pressure").val()+','+$("#id_delta_pressure").val())
+  $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
+  $('#offsets_resume').text($("#id_offset_x").val()+','+$("#id_offset_y").val())
+  $('#band_properties_resume').text($("#id_main_property option:selected").text())
+  $('#n_bands_resume').text($("#id_value").val())
+  $('#length_resume').text($("#id_value").val())
+  $('#delta_resume').text($("#id_delta_x").val()+','+$("#id_delta_y").val())
+  $('#height_resume').text($("#id_height").val())
+  $('#gap_resume').text($("#id_gap").val())
 }
 
-$(document).ready(function(){
-  // AJAX POST of the serial_port connection
-  var $SaveSampleApplicationForm = $('.savesampleapplication-form')
-  $SaveSampleApplicationForm.submit(function(event){
-    event.preventDefault()
-    let $formData = $(this).serialize()
-    let $endpoint = window.location.origin+'/samplesave/'
-    $.ajax({
-      method: 'POST',
-      url:    $endpoint,
-      data:   $formData,
-      success: saveMethodSuccess,
-      error: saveMethodError,
-    })
-  })
-
-  $('#list-load a').on('click', function (e) {
-  e.preventDefault()
-  data={'filename':$(this)[0].innerHTML}
+$('#playbttn').on('click', function (e) {
+  event.preventDefault()
+  //
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()
+  $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
-    method: 'GET',
-    url:    window.location.origin+'/samplesave/',
-    data:   data,
-    success: loadMethodSuccess,
-    error: loadMethodError,
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: playMethodSuccess,
+  error: playMethodError,
   })
 })
-
-  $('#playbttn').on('click', function (e) {
-    event.preventDefault()
-    let $formData = $('.savesampleapplication-form').serialize()
-    let $endpoint = window.location.origin+'/sampleapp/'
-    $.ajax({
-    method: 'POST',
-    url:    window.location.origin+'/sampleapp/',
-    data:   $formData,
-    success: playMethodSuccess,
-    error: playMethodError,
-    })
-  })
-
-  $('#stopbttn').on('click', function (e) {
-    data=''
-    event.preventDefault()
-    $.ajax({
-    method: 'GET',
-    url:    window.location.origin+'/samplestop/',
-    data:   {'stop':''},
-    success: stopMethodSuccess,
-    error: stopMethodError,
-    })
-  })
-
-  $('#pausebttn').on('click', function (e) {
-    event.preventDefault()
-    $.ajax({
-    method: 'GET',
-    url:    window.location.origin+'/samplestop/',
-    data:   {'pause':''},
-    success: pauseMethodSuccess,
-    error: pauseMethodError,
-    })
+$('#savebttn').on('click', function (e) {
+  event.preventDefault()
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
+  $endpoint = window.location.origin+'/samplesave/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: saveMethodSuccess,
+  error: saveMethodError,
   })
 })
+$('#list-load a').on('click', function (e) {
+e.preventDefault()
+data={'filename':$(this)[0].innerHTML}
+console.log(data);
+$.ajax({
+  method: 'GET',
+  url:    window.location.origin+'/samplesave/',
+  data:   data,
+  success: loadMethodSuccess,
+  error: loadMethodError,
+})
+})
 
+function playMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+
+}
+function playMethodError(jqXHR, textStatus, errorThrown){}
 function loadMethodSuccess(data, textStatus, jqXHR){
-  motorspeed.value = data.motorspeed
-  pressure.value = data.pressure
-  deltapressure.value = data.deltapressure
-  sizex.value = data.sizex
-  sizey.value = data.sizey
-  offsetx.value = data.offsetx
-  offsety.value = data.offsety
-  method.value = data.bandsetting
-  nbands.value = data.nbands
-  bandlength.value = data.lengthbands
-  bandheight.value = data.height
-  gap.value = data.gap
-  if(method.value=='N° Bands'){
-    $('#nbands').change()
-  }
-  else{
-    $('#bandlength').change()
-  }
+  console.log(data);
+  // Load all the fields with the ones get in the database
+  $("#id_motor_speed").val(data.motor_speed)
+  $("#id_pressure").val(data.pressure)
+  $("#id_delta_pressure").val(data.delta_pressure)
+  $("#id_delta_y").val(data.delta_y)
+  $("#id_delta_x").val(data.delta_x)
+
+
+  $("#id_size_x").val(data.size_x)
+  $("#id_size_y").val(data.size_y)
+
+  $("#id_offset_x").val(data.offset_x)
+  $("#id_offset_y").val(data.offset_y)
+
+  $("#id_main_property").val(data.main_property)
+  $("#id_value").val(data.value)
+  $("#id_height").val(data.height)
+  $("#id_gap").val(data.gap)
+
+  $( "#id_value" ).trigger( "change" );
+  $('#id_load_sucess').html(data.file_name+' successfully load!')
+  $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
 }
 function saveMethodSuccess(data, textStatus, jqXHR){
-  console.log('todo ok');
+  console.log(typeof(data.error));
+  if(data.error==undefined){
+    $('#id_save_sucess').html(data.message)
+    $( "#id_save_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
+  }
+  else {
+    $('#id_save_error').html(data.error)
+    $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
+  }
+
+
 }
-function saveMethodError(jqXHR, textStatus, errorThrown){}
-function playMethodSuccess(data, textStatus, jqXHR){
+function saveMethodError(jqXHR, textStatus, errorThrown){
   console.log(data);
+  $('#id_save_error').html(data.error)
+  $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
-function playMethodError(jqXHR, textStatus, errorThrown){}
-function stopMethodSuccess(data, textStatus, jqXHR){}
-function stopMethodError(jqXHR, textStatus, errorThrown){}
-function pauseMethodSuccess(data, textStatus, jqXHR){}
-function pauseMethodError(jqXHR, textStatus, errorThrown){}

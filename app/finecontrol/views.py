@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 
-from printrun import printcore
+from printrun import printcore, gcoder
 import time
 
 form = {
@@ -44,9 +44,13 @@ class MotorControl(View):
             if 'gcode' in uploaded_file.content_type:
                 fs = FileSystemStorage()
                 new_name = fs.save(uploaded_file.name, uploaded_file)
-                with open(f'{fs.location}/{new_name}', 'r') as file:
-                    mylist = list(file)
-                    OC_LAB.send(mylist)
+
+                gcode = [code_line.strip() for code_line in open(f'{fs.location}/{new_name}')]
+                light_gcode = gcoder.LightGCode(gcode)
+                OC_LAB.startprint(light_gcode)
+                while OC_LAB.printing:
+                    time.sleep(1)
+                    
                 return render(
                         request,
                         "./motorcontrol.html",
