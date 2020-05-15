@@ -88,6 +88,33 @@
                   </form>
                 </div>
               </div>
+
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">Cleaning Process</h6>
+                </div>
+                <div class="card-body">
+                  <form  class="move-form" id='ajax-form' method="post"> {% csrf_token %}
+                    <div class="flex-row-reverse align-items-center">
+                      <div class="form-group col d-flex justify-content-start px-0 pt-2">
+                        <button class="btn btn-secondary btn-icon-split btn-sm" id='id_clean' type="submit">
+                          <span class="icon text-white-50">
+                            <!-- <i class="fas fa-gas-pump"></i> -->
+                            <i class="fas fa-hand-sparkles"></i>
+                          </span>
+                          <span class="text">Clean it, now!</span>
+                        </button>
+                      </div>
+                      <div class="progress">
+                        <div id='id_clean_progress_bar'class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="card-footer">
+                  <div class="alert alert-dismissible collapse" id='id_cleaning_status' role="alert"></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -135,5 +162,37 @@
   <script src="{% static 'pumpcontrol.js' %}"></script>
   <script src="{% static 'topbar.js' %}"></script>
 </body>
+<script type="text/javascript">
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+</script>
 
 </html>

@@ -14,6 +14,35 @@ form = {
     'commandsend' : ChatForm()
 }
 
+class Cleaning(object):
+
+    def __init__(self):
+        self.time_left = 0
+        self.time_window = 5 # Minimun time for each frequency 5 sec
+        self.duration = 0
+        # self._lastcheck = time.now()
+
+    def dinamic_cleaning(self,fi,fo,step):
+        # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
+        # range(start, stop, step)
+        self.duration = 0
+        f = open("dinamic_clean.gcode", "w+")
+        for i in range(fi,fo+step,step):
+            for j in range(1,self.time_window*i+1):
+                f.write(f'G93 F{i}'+'\n')
+            f.write('G94 P0\n')
+            self.duration += self.time_window
+        f.close()
+        self.duration*=1.2 # Error correction
+        self.time_left = self.duration
+
+    def read_cleaning_file(self):
+        return [code_line.strip() for code_line in open(f'{fs.location}/{new_name}')]
+
+    def remain_time(self):
+        self.time_left-=3
+        return self.time_left
+
 class MotorControl(View):
     # Manage the GET request
     def get(self, request):
@@ -50,7 +79,7 @@ class MotorControl(View):
                 OC_LAB.startprint(light_gcode)
                 while OC_LAB.printing:
                     time.sleep(1)
-                    
+
                 return render(
                         request,
                         "./motorcontrol.html",
@@ -73,6 +102,44 @@ class PumpControl(View):
             request,
             "./pumpcontrol.html",
             {**form})
+
+clean = Cleaning();
+
+class CleanControl(View):
+
+    def post(self, request):
+        if 'process' in request.POST:
+
+            clean.dinamic_cleaning(100,500,50)
+
+            gcode = [code_line.strip() for code_line in open('dinamic_clean.gcode')]
+            light_gcode = gcoder.LightGCode(gcode)
+            OC_LAB.startprint(light_gcode)
+
+            data= {'message':f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()} sec'}
+            data.update({'duration':clean.duration})
+        return  JsonResponse(data)
+
+
+    def get(self, request):
+        # Check the status
+        if 'checkstatus' in request.GET:
+            data = {    'busy':'true',
+                        'message':'',
+                        }
+            if clean.time_left>=0:
+                data['message'] = f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()}s'
+                data.update({'duration':clean.duration})
+                data.update({'time_left':clean.time_left})
+                return  JsonResponse(data)
+            else:
+                data['busy']='false'
+                data['message']='Done!'
+                data.update({'duration':clean.duration})
+                data.update({'time_left':clean.time_left})
+                return  JsonResponse(data)
+
+
 
 
 def simple_move_Gcode_gen(request):
@@ -97,3 +164,15 @@ def simple_move_Gcode_gen(request):
         else:
             gcode += 'Y'
     return gcode + ' F' + str(speed)
+
+
+
+
+def static_cleaning():
+    # THE GCODE TO PUMP NO MATTER THE PRESSURE
+    gcode = ''
+    # OPEN DE VALVE AND LEAVE IT LIKE THAT
+    f = open("static_clean.gcode", "w+")
+    for i in range(0,100):
+        f.write(gcode+f'{i}'+'\n')
+    f.close()

@@ -26,7 +26,6 @@ urlpatterns = [
     path('', include('monitor.urls')),
     path('', include('accounts.urls')),
     path('', include('finecontrol.urls')),
-    path('', include('application.urls')),
     path('', include('connection.urls')),
     path('', include('detection.urls')),
     path('', include('sampleapp.urls')),
