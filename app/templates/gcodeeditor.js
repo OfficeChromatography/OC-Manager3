@@ -1,3 +1,5 @@
+var alert_showing =  false;
+
 $('#newbttn').on('click', function (e) {
   event.preventDefault()
   editor.setValue('');
@@ -44,22 +46,38 @@ $('#startbttn').on('click', function (e) {
   })
 })
 
+$('#stopbttn').on('click', function (e) {
+  event.preventDefault()
+  $endpoint = window.location.origin+'/gcode-editor/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   '&STOP',
+  success: stopExecMethodSuccess,
+  error: stopExecMethodError,
+  })
+})
+
 // Functions after ajax call
 function loadfileMethodSuccess(data, textStatus, jqXHR){
   editor.setValue(data.text);
   $('#filename').val(data.filename)
+  alertManager(data)
 }
 function loadfileMethodError(jqXHR, textStatus, errorThrown){}
 function savefileMethodSuccess(data, textStatus, jqXHR){
+  alertManager(data)
   loadlistofgcodes()
 }
 function savefileMethodError(jqXHR, textStatus, errorThrown){}
 function startFileMethodSuccess(data, textStatus, jqXHR){
   alertManager(data)
-  console.log(data);
 }
 function startFileMethodError(jqXHR, textStatus, errorThrown){}
-
+function stopExecMethodSuccess(data, textStatus, jqXHR){
+  alertManager(data)
+}
+function stopExecMethodError(jqXHR, textStatus, errorThrown){}
 function alertManager(data){
   if (data.primary){
     alertAnimation('primary',data.primary)
@@ -87,9 +105,12 @@ function alertManager(data){
   }
 }
 function alertAnimation(typeofalert,message){
-  $('#alert').addClass('alert-'+typeofalert)
-  $('#alert').html(message)
-  $('#alert').fadeIn().delay(800).fadeOut(400, function(){$('#alert').removeClass('alert-'+typeofalert)});
+  if (alert_showing==false){
+    alert_showing = true
+    $('#alert').addClass('alert-'+typeofalert).html(message)
+    $('#alert').fadeIn().delay(800).fadeOut(400, function(){$('#alert').removeClass('alert-'+typeofalert)});
+    alert_showing = false
+  }
 }
 function loadlistofgcodes(){
   $.ajax({

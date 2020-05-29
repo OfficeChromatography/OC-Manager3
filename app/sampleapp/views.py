@@ -129,7 +129,7 @@ class SampleAppPlay(View):
             OC_LAB.startprint(light_gcode)
             return JsonResponse({'error':'f.errors'})
         if 'STOP' in request.POST:
-            OC_LAB.send_now('M112')
+            OC_LAB.send_now('M84')
             return JsonResponse({'message':'stopped'})
         if 'PAUSE' in request.POST:
             print(request.POST)

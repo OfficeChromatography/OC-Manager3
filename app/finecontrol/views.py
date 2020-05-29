@@ -167,7 +167,10 @@ class GcodeEditor(View):
             with open(gcodefile[0].gcode.path,'r') as f:
                 text = f.read()
 
-            return JsonResponse({'text':text,'filename':gcodefile[0].filename})
+            response = {'text':text,
+                        'filename':gcodefile[0].filename,
+                        'success':'File opened!'}
+            return JsonResponse(response)
 
 
         return render(
@@ -219,6 +222,10 @@ class GcodeEditor(View):
                         return JsonResponse({'success':'Printing!'})
             except DoesNotExist:
                 return JsonResponse({'danger':'File Not Found'})
+
+        if 'STOP' in request.POST:
+            OC_LAB.send_now('M84')
+            return JsonResponse({'danger':'STOP'})
 
 
 def simple_move_Gcode_gen(request):
