@@ -292,17 +292,45 @@ function loadresume(){
   $('#gap_resume').text($("#id_gap").val())
 }
 
-$('#playbttn').on('click', function (e) {
+
+$('#stopbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()
+  $formData = 'STOP&'
   $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
   data:   $formData,
-  success: playMethodSuccess,
-  error: playMethodError,
+  success: stopMethodSuccess,
+  error: stopMethodError,
+  })
+})
+$('#pausebttn').on('click', function (e) {
+  event.preventDefault()
+  //
+  $formData = 'PAUSE&'
+  $endpoint = window.location.origin+'/sampleapp/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: pauseMethodSuccess,
+  error: pauseMethodError,
+  })
+})
+
+$('#startbttn').on('click', function (e) {
+  event.preventDefault()
+  //
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()
+  $endpoint = window.location.origin+'/sampleapp/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: startMethodSuccess,
+  error: startMethodError,
   })
 })
 $('#savebttn').on('click', function (e) {
@@ -314,7 +342,7 @@ $('#savebttn').on('click', function (e) {
   url:    $endpoint,
   data:   $formData,
   success: saveMethodSuccess,
-  error: saveMethodError,
+  error: saveMethodError,stopbttn
   })
 })
 $('#list-load a').on('click', function (e) {
@@ -329,12 +357,53 @@ $.ajax({
   error: loadMethodError,
 })
 })
+$('#hommingbttn').on('click', function (e) {
+  event.preventDefault()
+  sizes=[,parseFloat($("#id_size_y").val())]
+  $formData = 'HOMMING&x='+$("#id_size_x").val()+'&y='+$("#id_size_y").val()
+  $endpoint = window.location.origin+'/gohomming/'
+  // if
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: hommingMethodSuccess,
+  error: hommingMethodError,
+  })
+})
 
-function playMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
+function hommingMethodSuccess(data, textStatus, jqXHR){
+  if(data.error!=''){
+    theres_error('#id_parameter_error',false)
+  }
+  else{
+    theres_error('#id_parameter_error',true)
+  }
 
 }
-function playMethodError(jqXHR, textStatus, errorThrown){}
+function hommingMethodError(jqXHR, textStatus, errorThrown){}
+
+function stopMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+  $('.control-bttn').removeClass('btn-success btn-secondary')
+  $('.control-bttn').addClass('btn btn-danger')
+}
+function stopMethodError(jqXHR, textStatus, errorThrown){}
+
+function pauseMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+    $('.control-bttn').removeClass('btn-success btn-danger')
+  $('.control-bttn').addClass('btn btn-secondary')
+}
+function pauseMethodError(jqXHR, textStatus, errorThrown){}
+
+function startMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+  $('.control-bttn').removeClass('btn-danger btn-secondary')
+  $('.control-bttn').addClass('btn btn-success')
+}
+function startMethodError(jqXHR, textStatus, errorThrown){}
+
 function loadMethodSuccess(data, textStatus, jqXHR){
   console.log(data);
   // Load all the fields with the ones get in the database
@@ -363,6 +432,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
 }
+
 function saveMethodSuccess(data, textStatus, jqXHR){
   console.log(typeof(data.error));
   if(data.error==undefined){

@@ -94,6 +94,7 @@ $('.message-form').submit(function(event){
 })
 function handleFormSuccess1(data, textStatus, jqXHR){
   scrolldown()
+  document.getElementById('id_chattext').value = ''
   $ConnectionForm[0].reset()
 }
 function handleFormError1(jqXHR, textStatus, errorThrown){}
@@ -103,6 +104,6 @@ function scrolldown(){
   //Move the Scroll to the bottom every time a message is add
     document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
   //Clean the 'chattext' field and Focus it.
-    document.getElementById('id_chattext').value = ''
+    // document.getElementById('id_chattext').value = ''
     // document.getElementById('id_chattext').focus();
 }

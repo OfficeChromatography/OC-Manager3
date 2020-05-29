@@ -2,11 +2,14 @@
 from connection.forms import ChatForm, OC_LAB
 from connection.models import Connection_Db
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
+from django.core.files import File
+from django.core import serializers
 
+from .models import GcodeFile
 from printrun import printcore, gcoder
 import time
 
@@ -27,9 +30,10 @@ class Cleaning(object):
         # range(start, stop, step)
         self.duration = 0
         f = open("dinamic_clean.gcode", "w+")
+        f.write(f'G94 P400')
         for i in range(fi,fo+step,step):
             for j in range(1,self.time_window*i+1):
-                f.write(f'G93 F{i}'+'\n')
+                f.write(f'G93 F{i} P300'+'\n')
             f.write('G94 P0\n')
             self.duration += self.time_window
         f.close()
@@ -72,7 +76,7 @@ class MotorControl(View):
             uploaded_file = request.FILES['GFile']
             if 'gcode' in uploaded_file.content_type:
                 fs = FileSystemStorage()
-                new_name = fs.save(uploaded_file.name, uploaded_file)
+                new_name = fs.save("gfiles/"+uploaded_file.name, uploaded_file)
 
                 gcode = [code_line.strip() for code_line in open(f'{fs.location}/{new_name}')]
                 light_gcode = gcoder.LightGCode(gcode)
@@ -120,7 +124,6 @@ class CleanControl(View):
             data.update({'duration':clean.duration})
         return  JsonResponse(data)
 
-
     def get(self, request):
         # Check the status
         if 'checkstatus' in request.GET:
@@ -141,6 +144,82 @@ class CleanControl(View):
 
 
 
+class GcodeEditor(View):
+
+    def get(self, request):
+        form['list_load'] = GcodeFile.objects.filter(uploader=request.user).order_by('-id')
+
+        # LIST LOADING
+        if 'LISTLOAD' in request.GET:
+            gcodefiles = GcodeFile.objects.filter(uploader=request.user).order_by('-id')
+            names = [i.filename for i in gcodefiles]
+            return JsonResponse(names, safe=False)
+
+        # FILE LOADING
+        if 'LOADFILE' in request.GET:
+
+            filename = request.GET.get('filename')
+            gcodefile = GcodeFile.objects.filter(uploader=request.user,filename=filename)
+
+
+            #Open the file
+            print(gcodefile[0].filename)
+            with open(gcodefile[0].gcode.path,'r') as f:
+                text = f.read()
+
+            return JsonResponse({'text':text,'filename':gcodefile[0].filename})
+
+
+        return render(
+            request,
+            "./gcodeeditor.html",
+            form)
+
+
+    def post(self, request):
+        print(request.POST)
+        if 'SAVE' in request.POST:
+
+            filename = request.POST.get('name')
+            text = request.POST.get('text')
+
+            if GcodeFile.objects.filter(filename=filename):
+                return JsonResponse({'danger':'Filename already exist'})
+
+            fs = FileSystemStorage('media/gfiles/')
+            # Create the file
+            with open(f'last.gcode','w+') as f:
+                myfile = File(f)
+                myfile.write(text)
+                new_name = fs.save(filename+'.gcode',content=myfile)
+
+
+                gcode = GcodeFile()
+                gcode.filename = filename;
+                gcode.gcode = fs.location+'/'+new_name;
+                gcode.gcode_url = fs.url(new_name)
+                gcode.uploader = request.user
+                gcode.save()
+                return JsonResponse({'success':'File Saved!'})
+
+        if 'REMOVE' in request.POST:
+            return JsonResponse({'success':'File removed!'})
+
+        if 'START' in request.POST:
+            filename = request.POST.get('name')
+            if not filename:
+                return JsonResponse({'warning':'First save the file and Open it!'})
+            try:
+                file = GcodeFile.objects.get(filename=filename,uploader=request.user)
+                if file:
+                    with open(f'{file.gcode}','r') as f:
+                        lines_gcode = [code_line.strip() for code_line in f]
+                        light_gcode = gcoder.LightGCode(lines_gcode)
+                        OC_LAB.startprint(light_gcode)
+                        return JsonResponse({'success':'Printing!'})
+            except DoesNotExist:
+                return JsonResponse({'danger':'File Not Found'})
+
 
 def simple_move_Gcode_gen(request):
     direction = request.POST.get('button')
@@ -158,14 +237,12 @@ def simple_move_Gcode_gen(request):
             gcode += "Y+"
         gcode += str(step)
     if 'homming' in direction:
-        gcode = "G0 G28 "
+        gcode = "G28 "
         if 'x' in direction:
             gcode += 'X'
         else:
             gcode += 'Y'
     return gcode + ' F' + str(speed)
-
-
 
 
 def static_cleaning():

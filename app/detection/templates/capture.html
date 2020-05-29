@@ -59,11 +59,10 @@
                 <div class="card-header py-3">
                   <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
                 </div>
-                <div class="card-body align-items-center d-flex justify-content-center">
+                <div class="card-body align-items-center d-flex justify-content-center" style="display: none;" id='card_image_body'>
                   <img src={{url}} alt="" style="width:50%">
                 </div>
                 <hr>
-                
               </div>
             </div>
             <div class="col-lg-6">
@@ -237,7 +236,7 @@
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
   </a>
-
+  <script src="{% static 'detection.js' %}" charset="utf-8"></script>
   <!-- Logout Modal-->
   <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

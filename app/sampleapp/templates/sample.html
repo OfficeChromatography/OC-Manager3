@@ -144,7 +144,10 @@
               <!-- Plate Design Board -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Parameters</h6>
+                  <div class="d-flex flex-row ">
+                    <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Parameters</h6>
+                    <button id='hommingbttn' name='start' class="btn btn-primary control-bttn"><i class="fas fa-home"></i></button>
+                  </div>
                 </div>
                 <div class="card-body">
                   <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
@@ -351,13 +354,13 @@
                         <label for="list-load" class="mt-4">Control</label>
                         <div class="input-group">
                           <div class="input-group-prepend">
-                            <button id='playbttn' name='play' class="btn btn-primary">Play</button>
+                            <button id='startbttn' name='start' class="btn btn-primary control-bttn">Start</button>
                           </div>
                           <div class="input-group-append">
-                            <button id='stopbttn' class="btn btn-primary">Stop</button>
+                            <button id='stopbttn' class="btn btn-primary control-bttn">Stop</button>
                           </div>
                           <div class="input-group-append">
-                            <button id='pausebttn' class="btn btn-primary">Pause</button>
+                            <button id='pausebttn' class="btn btn-primary control-bttn">Pause</button>
                           </div>
                         </div>
                       </div>

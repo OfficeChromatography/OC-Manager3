@@ -29,10 +29,11 @@ form={}
 class Capture_View(View):
     def get(self, request):
         form['form'] = ShootConfigurationForm(initial=INITIALS)
+        data={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
         return render(
                         request,
                         "capture.html",
-                        form
+                        {**form, **data}
                         )
 
     def post(self, request):
