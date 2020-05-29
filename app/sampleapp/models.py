@@ -22,7 +22,7 @@ class MovementSettings_Db(models.Model):
 
 class PressureSettings_Db(models.Model):
     pressure = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    delta_pressure = models.DecimalField(null=True, decimal_places=0, max_digits=6)
+    frequency = models.DecimalField(null=True, decimal_places=0, max_digits=6)
 
 class SampleApplication_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)

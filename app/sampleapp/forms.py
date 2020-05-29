@@ -74,9 +74,9 @@ class MovementSettings_Form(forms.ModelForm):
 class PressureSettings_Form(forms.ModelForm):
     class Meta:
         model = PressureSettings_Db
-        fields = ['pressure','delta_pressure']
+        fields = ['pressure','frequency']
         widgets = {
             'pressure'         : forms.NumberInput(attrs={'class': 'form-control'}),
-            'delta_pressure'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'frequency'   : forms.NumberInput(attrs={'class': 'form-control'}),
 
         }

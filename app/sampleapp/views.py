@@ -83,7 +83,7 @@ class SampleAppPlay(View):
 
             if pressure_settings_form.is_valid():
                 pressure = int(pressure_settings_form.cleaned_data['pressure'])
-                delta_pressure = int(pressure_settings_form.cleaned_data['delta_pressure'])
+                frequency = int(pressure_settings_form.cleaned_data['frequency'])
             else:
                 print('pressure_settings_form')
 
@@ -112,7 +112,6 @@ class SampleAppPlay(View):
                         current_length+=delta_x
                     applicationsurface.append(applicationline)
                 current_height+=delta_y
-            frequency = delta_pressure
 
             # Creates the Gcode for the app
             gcode = GcodeGen(applicationsurface, motor_speed, frequency)

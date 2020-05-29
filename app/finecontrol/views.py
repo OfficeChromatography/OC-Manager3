@@ -224,7 +224,7 @@ class GcodeEditor(View):
                 return JsonResponse({'danger':'File Not Found'})
 
         if 'STOP' in request.POST:
-            OC_LAB.send_now('M84')
+            OC_LAB.send_now('M18')
             return JsonResponse({'danger':'STOP'})
 
 
