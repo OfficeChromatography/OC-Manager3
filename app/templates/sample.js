@@ -51,7 +51,7 @@ $("#id_pressure").change(
     loadresume()
   }
 )
-$("#id_delta_pressure").change(
+$("#id_frequency").change(
   function(){
     console.log('dpre');
     loadresume()
@@ -112,13 +112,25 @@ $("#id_size_y").change(
   }
 );
 
-$("#id_offset_x").change(
+$("#id_offset_left").change(
     function(){
       bandsmain()
       loadresume()
     }
 );
-$("#id_offset_y").change(
+$("#id_offset_right").change(
+  function(){
+    bandsmain()
+    loadresume()
+  }
+);
+$("#id_offset_bottom").change(
+    function(){
+      bandsmain()
+      loadresume()
+    }
+);
+$("#id_offset_top").change(
   function(){
     bandsmain()
     loadresume()
@@ -154,8 +166,10 @@ function bandsmain(){
   plate_x_size = parseFloat($("#id_size_x").val());
   plate_y_size = parseFloat($("#id_size_y").val());
 
-  offset_x_size = parseFloat($("#id_offset_x").val());
-  offset_y_size = parseFloat($("#id_offset_y").val());
+  offset_left_size = parseFloat($("#id_offset_left").val());
+  offset_right_size = parseFloat($("#id_offset_right").val());
+  offset_top_size = parseFloat($("#id_offset_top").val());
+  offset_bottom_size = parseFloat($("#id_offset_bottom").val());
 
   gap_size = parseFloat($("#id_gap").val());
   number_bands = parseFloat($("#id_value").val());
@@ -165,12 +179,12 @@ function bandsmain(){
   property = $("#id_main_property").val();
 
   // Check if theres missing parameters
-  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_x_size)||isNaN(offset_y_size)||isNaN(gap_size)||isNaN(band_height))
+  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(gap_size)||isNaN(band_height))
 
   if(theres_error('#id_parameter_error',missing_parameter)){return}
 
   // Calculate the Working Area [x,y]
-  working_area = nbands_working_area(plate_x_size,offset_x_size,plate_y_size,offset_y_size)
+  working_area = nbands_working_area(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size)
 
   // Check if its not posible to calculate the wa
   if(theres_error('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
@@ -201,17 +215,17 @@ function bandsmain(){
   for(i=0;i<number_bands;i++){
     newdata = []
     if(i==0){
-      newdata[0]={y:offset_y_size,x:offset_x_size}
-      newdata[1]={y:offset_y_size+band_height,x:offset_x_size}
-      newdata[2]={y:offset_y_size+band_height,x:band_size+offset_x_size}
-      newdata[3]={y:offset_y_size,x:band_size+offset_x_size}
+      newdata[0]={y:offset_bottom_size,x:offset_left_size}
+      newdata[1]={y:offset_bottom_size+band_height,x:offset_left_size}
+      newdata[2]={y:offset_bottom_size+band_height,x:band_size+offset_left_size}
+      newdata[3]={y:offset_bottom_size,x:band_size+offset_left_size}
       newdata[4]=newdata[0]
     }
     else{
-      newdata[0]={y:offset_y_size,x:i*(band_size+gap_size)+offset_x_size}
-      newdata[1]={y:offset_y_size+band_height,x:i*(band_size+gap_size)+offset_x_size}
-      newdata[2]={y:offset_y_size+band_height,x:(i+1)*band_size+(gap_size*i)+offset_x_size}
-      newdata[3]={y:offset_y_size,x:(i+1)*band_size+(gap_size*i)+offset_x_size}
+      newdata[0]={y:offset_bottom_size,x:i*(band_size+gap_size)+offset_left_size}
+      newdata[1]={y:offset_bottom_size+band_height,x:i*(band_size+gap_size)+offset_left_size}
+      newdata[2]={y:offset_bottom_size+band_height,x:(i+1)*band_size+(gap_size*i)+offset_left_size}
+      newdata[3]={y:offset_bottom_size,x:(i+1)*band_size+(gap_size*i)+offset_left_size}
       newdata[4]=newdata[0]
     }
     addData(plotPreview,i,'black', newdata)
@@ -238,8 +252,8 @@ function addData(chart, label, color, data) {
 }
 
 //Calculates the Working Area
-function nbands_working_area(plate_x_size,offset_x_size,plate_y_size,offset_y_size){
-  working_area = [plate_x_size-2*offset_x_size,plate_y_size-2*offset_y_size]
+function nbands_working_area(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size){
+  working_area = [plate_x_size-offset_left_size-offset_right_size,plate_y_size-offset_top_size-offset_bottom_size]
   if(working_area[0] <= 0 || working_area[1] <= 0 || isNaN(working_area[0]) || isNaN(working_area[1])){
     return [NaN,NaN];
   }
@@ -283,7 +297,7 @@ function loadresume(){
   $('#motorspeed_resume').text($("#id_motor_speed").val())
   $('#pressure_resume').text($("#id_pressure").val()+','+$("#id_delta_pressure").val())
   $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
-  $('#offsets_resume').text($("#id_offset_x").val()+','+$("#id_offset_y").val())
+  $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
   $('#band_properties_resume').text($("#id_main_property option:selected").text())
   $('#n_bands_resume').text($("#id_value").val())
   $('#length_resume').text($("#id_value").val())
@@ -417,8 +431,10 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_size_x").val(data.size_x)
   $("#id_size_y").val(data.size_y)
 
-  $("#id_offset_x").val(data.offset_x)
-  $("#id_offset_y").val(data.offset_y)
+  $("#id_offset_left").val(data.offset_left)
+  $("#id_offset_right").val(data.offset_right)
+  $("#id_offset_top").val(data.offset_top)
+  $("#id_offset_bottom").val(data.offset_bottom)
 
   $("#id_main_property").val(data.main_property)
   $("#id_value").val(data.value)

@@ -142,8 +142,6 @@ class CleanControl(View):
                 data.update({'time_left':clean.time_left})
                 return  JsonResponse(data)
 
-
-
 class GcodeEditor(View):
 
     def get(self, request):
@@ -172,7 +170,6 @@ class GcodeEditor(View):
                         'success':'File opened!'}
             return JsonResponse(response)
 
-
         return render(
             request,
             "./gcodeeditor.html",
@@ -180,7 +177,8 @@ class GcodeEditor(View):
 
 
     def post(self, request):
-        print(request.POST)
+
+        # SAVE FILE
         if 'SAVE' in request.POST:
 
             filename = request.POST.get('name')
@@ -205,9 +203,22 @@ class GcodeEditor(View):
                 gcode.save()
                 return JsonResponse({'success':'File Saved!'})
 
+        # REMOVE FILE
         if 'REMOVE' in request.POST:
+            filename = request.POST.get('name')
+            if not filename:
+                return JsonResponse({'warning':'Choose a file!'})
+
+            try:
+                file = GcodeFile.objects.get(filename=filename,uploader=request.user)
+                file.delete()
+            except:
+                return JsonResponse({'warning':'Something went wrong!'})
+
+
             return JsonResponse({'success':'File removed!'})
 
+        # RUN FILE
         if 'START' in request.POST:
             filename = request.POST.get('name')
             if not filename:
@@ -223,9 +234,11 @@ class GcodeEditor(View):
             except DoesNotExist:
                 return JsonResponse({'danger':'File Not Found'})
 
+        # STOP FILE
         if 'STOP' in request.POST:
             OC_LAB.send_now('M18')
             return JsonResponse({'danger':'STOP'})
+
 
 
 def simple_move_Gcode_gen(request):

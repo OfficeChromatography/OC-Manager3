@@ -45,14 +45,14 @@ class Sample(FormView):
 class SampleAppPlay(View):
     def post(self, request):
         # Treatment for play button
+
         if 'START' in request.POST:
             sample_application_form  =   SampleApplication_Form(request.POST)
             plate_properties_form    =   PlateProperties_Form(request.POST)
             band_settings_form       =   BandSettings_Form(request.POST)
             movement_settings_form   =   MovementSettings_Form(request.POST)
             pressure_settings_form   =   PressureSettings_Form(request.POST)
-            # f = SampleAppForm(request.POST)
-            # if f.is_valid():
+
             if sample_application_form.is_valid():
                 file_name = sample_application_form.cleaned_data['file_name']
             else:
@@ -61,8 +61,11 @@ class SampleAppPlay(View):
             if plate_properties_form.is_valid():
                 size_x = int(plate_properties_form.cleaned_data['size_x'])
                 size_y = int(plate_properties_form.cleaned_data['size_y'])
-                offset_x = int(plate_properties_form.cleaned_data['offset_x'])
-                offset_y = int(plate_properties_form.cleaned_data['offset_y'])
+                offset_right = int(plate_properties_form.cleaned_data['offset_right'])
+                offset_left = int(plate_properties_form.cleaned_data['offset_left'])
+                offset_top = int(plate_properties_form.cleaned_data['offset_top'])
+                offset_bottom = int(plate_properties_form.cleaned_data['offset_bottom'])
+
             else:
                 print('plate_properties_form')
 
@@ -88,7 +91,7 @@ class SampleAppPlay(View):
                 print('pressure_settings_form')
 
 
-            working_area = [size_x-2*offset_x,size_y-2*offset_y]
+            working_area = [size_x-offset_left-offset_right,size_y-offset_top-offset_bottom]
 
 
             if main_property==1:
@@ -106,9 +109,9 @@ class SampleAppPlay(View):
                 for i in range(0,n_bands):
                     applicationline=[]
                     current_length=0
-                    zeros=(i*(length+gap))+offset_x
+                    zeros=(i*(length+gap))+offset_left
                     while current_length<=length:
-                        applicationline.append([offset_y+current_height, current_length+zeros])
+                        applicationline.append([offset_bottom+current_height, current_length+zeros])
                         current_length+=delta_x
                     applicationsurface.append(applicationline)
                 current_height+=delta_y

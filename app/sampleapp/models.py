@@ -6,8 +6,11 @@ from django.contrib.auth import get_user_model
 class PlateProperties_Db(models.Model):
     size_x = models.DecimalField(decimal_places=0, max_digits=6, null=True)
     size_y = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_x = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_y = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+    offset_left = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+    offset_right = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+    offset_top = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+    offset_bottom = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+
 
 class BandSettings_Db(models.Model):
     main_property = models.DecimalField(null=True,decimal_places=0, max_digits=6)

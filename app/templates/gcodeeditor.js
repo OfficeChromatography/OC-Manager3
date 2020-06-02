@@ -58,6 +58,17 @@ $('#stopbttn').on('click', function (e) {
   })
 })
 
+$('#removebttn').on('click', function (e) {
+  event.preventDefault()
+  $endpoint = window.location.origin+'/gcode-editor/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   '&REMOVE&name='+$('#filename').val(),
+  success: removeFileMethodSuccess,
+  error: removeFileMethodError,
+  })
+})
 // Functions after ajax call
 function loadfileMethodSuccess(data, textStatus, jqXHR){
   editor.setValue(data.text);
@@ -78,6 +89,11 @@ function stopExecMethodSuccess(data, textStatus, jqXHR){
   alertManager(data)
 }
 function stopExecMethodError(jqXHR, textStatus, errorThrown){}
+function removeFileMethodSuccess(data, textStatus, jqXHR){
+  alertManager(data)
+  loadlistofgcodes()
+}
+function removeFileMethodError(jqXHR, textStatus, errorThrown){}
 function alertManager(data){
   if (data.primary){
     alertAnimation('primary',data.primary)

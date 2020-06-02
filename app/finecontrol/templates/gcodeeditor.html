@@ -64,12 +64,25 @@
         <!-- /.container-fluid -->
         <div class="card-group row h-100">
           <div class="col-lg-6">
-
+            <div id='alert' class="alert alert-dismissible collapse" role="alert"></div>
             <div class="card shadow h-100">
               <div class="card-header py-3">
                 <div class="d-flex flex-row align-items-center">
                   <h6 class="m-0 font-weight-bold text-primary">Control</h6>
-                  <div id='alert' class="alert alert-dismissible collapse flex-grow-1 mb-0 ml-4" role="alert"></div>
+
+                  <div class="input-group ml-4">
+                    <div class="input-group-prepend">
+                      <div class="btn btn-primary btn-icon-split disabled" disabled onclick="erase_upload()" id="erase_upload">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-trash-alt"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="custom-file">
+                      <input type="file" class="form-control custom-file-input" name="GFile" id='GFile' aria-describedby="inputGroupFileAddon01">
+                      <label class="custom-file-label" id='upload_label' for="GFile">Choose file</label>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="card-header p-2">
@@ -90,21 +103,19 @@
                 </div>
               </div>
               <div class="card-footer text-muted">
-              <div class="input-group">
                 <div class="input-group">
                   <button class="btn btn-outline-success" id='startbttn' type="button">Start</button>
                   <button class="btn btn-outline-secondary mx-2" id='stopbttn' type="button">Stop</button>
                 </div>
               </div>
             </div>
-            </div>
           </div>
           <div class="col-lg-6 pt-3 pt-lg-0">
-            <div class="card shadow">
-              <div class="card-body">
-                <div id="editor"></div>
-              </div>
-            </div>
+            <!-- <div class="card shadow">
+              <div class="card-body"> -->
+                <div id="editor" class="my-3 my-lg-0"></div>
+              <!-- </div>
+            </div> -->
 
           <script src="{% static 'src/ace.js' %}" type="text/javascript" charset="utf-8"></script>
           <script>

@@ -25,18 +25,22 @@ class SampleApplication_Form(forms.ModelForm):
 class PlateProperties_Form(forms.ModelForm):
     class Meta:
         model = PlateProperties_Db
-        fields = ['size_x','size_y','offset_x','offset_y']
+        fields = ['size_x','size_y','offset_left','offset_right','offset_top','offset_bottom']
         widgets = {
             'size_y' : forms.NumberInput(attrs={'class': 'form-control'}),
             'size_x' : forms.NumberInput(attrs={'class': 'form-control'}),
-            'offset_x' : forms.NumberInput(attrs={'class': 'form-control'}),
-            'offset_y' : forms.NumberInput(attrs={'class': 'form-control'}),
+            'offset_left' : forms.NumberInput(attrs={'class': 'form-control'}),
+            'offset_right' : forms.NumberInput(attrs={'class': 'form-control'}),
+            'offset_top' : forms.NumberInput(attrs={'class': 'form-control'}),
+            'offset_bottom' : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'size_y':       _('Y Size'),
-            'size_x':       _('X Size'),
-            'offset_x':     _('X Offset'),
-            'offset_y':     _('Y Offset'),
+            'size_y':           _('Y Size'),
+            'size_x':           _('X Size'),
+            'offset_left':      _('Left'),
+            'offset_right':     _('Right'),
+            'offset_top':       _('Top'),
+            'offset_bottom':    _('Bottom'),
         }
 
 class BandSettings_Form(forms.ModelForm):
