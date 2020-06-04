@@ -173,58 +173,6 @@
                   </form>
                 </div>
               </div>
-              <!-- Upload G-Code -->
-              <div class="card shadow mb-4 ">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Upload G-Code</h6>
-                </div>
-                <div class="card-body" >
-                    <form class="form" method="post" enctype='multipart/form-data'>{% csrf_token %}
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <button class="btn btn-primary btn-icon-split" disabled type='submit' id="play_upload">
-                            <span class="icon text-white-50">
-                              <i class="fas fa-play"></i>
-                            </span>
-                          </button>
-                        </div>
-                        <div class="input-group-prepend">
-                          <div class="btn btn-primary btn-icon-split disabled" disabled onclick="erase_upload()" id="erase_upload">
-                            <span class="icon text-white-50">
-                              <i class="fas fa-trash-alt"></i>
-                            </span>
-                          </div>
-                        </div>
-                        <div class="custom-file">
-                          <input type="file" class="form-control custom-file-input" name="GFile" id='GFile' aria-describedby="inputGroupFileAddon01">
-                          <label class="custom-file-label" id='upload_label' for="GFile">Choose file</label>
-                        </div>
-                      </div>
-                    </form>
-                </div>
-                {% if gcode_url %}
-                <div class="card-footer text-muted font-italic font-weight-bold">
-                  <table class="table table-borderless table-sm m-0 p-0">
-                    <thead>
-                      <tr>
-                        <th scope="col">URL:{{gcode_url}}</th>
-                        <th scope="col">File:   {{gcode_filename}}</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-                {% else %}
-                <div class="card-footer text-muted font-italic font-weight-bold">
-                  <table class="table table-borderless table-sm m-0 p-0">
-                    <thead>
-                      <tr>
-                        <th id='localpath' scope="col">Upload Something</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-                {% endif %}
-              </div>
             </div>
             <div class="col-lg-6 mb-4" style="min-height:400px">
               <div class="card border-left-success shadow h-100 pt-2">

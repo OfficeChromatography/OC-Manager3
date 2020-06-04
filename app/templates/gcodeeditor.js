@@ -69,7 +69,44 @@ $('#removebttn').on('click', function (e) {
   error: removeFileMethodError,
   })
 })
+
+$('#removefilebttn').on('click', function (e) {
+  $('#file').next('.custom-file-label').html('');
+  $('#file').val('')
+  $('#sizesfile').html('')
+})
+
+$("#uploadbttn").on('click' ,function() {
+    var fd = new FormData();
+    fd.append('UPLOAD','');
+    var files = $('#file')[0].files[0];
+    fd.append('file', files);
+    $.ajax({
+        method: 'POST',
+        url: window.location.origin+'/gcode-editor/',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: uploadfileMethodSuccess,
+        error: uploadfileMethodError,
+    });
+});
+
+
+$('#file').on('change',function(e){
+                //get the file name
+                var fileName = e.target.files[0];
+                $('#sizesfile').html('Size: '+ Math.round(fileName.size/1000) + ' Kbytes')
+                //replace the "Choose a file" label
+                $(this).next('.custom-file-label').html(fileName.name);
+            })
+
 // Functions after ajax call
+function uploadfileMethodSuccess(data, textStatus, jqXHR){
+  alertManager(data)
+  loadlistofgcodes()
+}
+function uploadfileMethodError(jqXHR, textStatus, errorThrown){}
 function loadfileMethodSuccess(data, textStatus, jqXHR){
   editor.setValue(data.text);
   $('#filename').val(data.filename)

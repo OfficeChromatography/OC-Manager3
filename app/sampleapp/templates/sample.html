@@ -65,9 +65,12 @@
               <!-- Settings Board -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Settings</h6>
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Settings</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#settingscontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body show" id='settingscontent'>
                   <div class="container">
                     <div class="row">
                       <div class="col">
@@ -118,6 +121,15 @@
                               </div>
                             </div>
                           </div>
+                          <div class="form-group row">
+                            <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.temperature.label}}</label>
+                              {{PressureSettings_Form.temperature}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">°C</span>
+                              </div>
+                            </div>
+                          </div>
                         </form>
                       </div>
                     </div>
@@ -127,9 +139,12 @@
               <!-- Plate Preview -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#platepreviewarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body show" id='platepreviewarea'>
                   <div class="container">
                     <div class="row">
                       <div class="col">
@@ -144,12 +159,13 @@
               <!-- Plate Design Board -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <div class="d-flex flex-row ">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Parameters</h6>
-                    <button id='hommingbttn' name='start' class="btn btn-primary control-bttn"><i class="fas fa-home"></i></button>
+                    <button id='hommingbttn' name='start' class="btn btn-link"><i class="fas fa-home"></i></button>
+                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#parametersarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body show" id='parametersarea'>
                   <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
                     Complete it!
                   </div>
@@ -239,15 +255,6 @@
                               </div>
                             </div>
                           </div>
-                          <!-- <div class="form-group mb-1 row" id='bandlengthform' style="display:none">
-                            <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{SampleAppForm.length.label}}</label>
-                              {{SampleAppForm.length}}
-                              <div class="input-group-append">
-                                <span class="input-group-text">[mm]</span>
-                              </div>
-                            </div>
-                          </div> -->
                           <div class="form-group mb-1 row">
                             <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.height.label}}</label>
@@ -270,12 +277,38 @@
                   </div>
                 </div>
               </div>
+              <!-- Concentrations Board -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Band Descriptions</h6>
+                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#banddescritionarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
+                </div>
+                <div class="card-body show" id='banddescritionarea'>
+                  <table class="table m-0" id='concentrationtable'>
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Sample</th>
+                        <th scope="col">Solvent</th>
+                        <th scope="col">Concentration</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
               <!-- Save and Load -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Save and Load</h6>
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Save and Load</h6>
+                    <button id='minimize-saveandload' class="btn btn-link" data-toggle="collapse" data-target="#saveandloadarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body show" id='saveandloadarea'>
                         <!-- Editable table -->
                   <form class="resume-form" id='saveform' method="post">{% csrf_token %}
                     <div class="row">
@@ -298,8 +331,8 @@
                               <td>[mm/m]</td>
                             </tr>
                             <tr>
-                              <th scope="row">Pressure</th>
-                              <td class='val'  id='pressure_resume'>{{SampleApplicationForm.pressure}}</td>
+                              <th scope="row">App const</th>
+                              <td class='val'  id='appconst_resume'>{{SampleApplicationForm.pressure}}</td>
                               <td>[bar, Hz]</td>
                             </tr>
                             <tr>

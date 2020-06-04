@@ -231,6 +231,17 @@ function bandsmain(){
     addData(plotPreview,i,'black', newdata)
   }
   plotPreview.update();
+  banddescrition(number_bands);
+}
+
+function banddescrition(number_row){
+  number_row = parseInt(number_row)
+  var table = document.getElementById("concentrationtable").getElementsByTagName('tbody')[0];
+  var row =[]
+  for (i = 0; i < number_row; i++) {
+    row[i] = table.insertRow(i);
+    row[i].innerHTML=i
+  }
 }
 
 function lenghtcalc(){}
@@ -295,7 +306,7 @@ function theres_error(error_id, bolean_exp){
 
 function loadresume(){
   $('#motorspeed_resume').text($("#id_motor_speed").val())
-  $('#pressure_resume').text($("#id_pressure").val()+','+$("#id_delta_pressure").val())
+  $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
   $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
   $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
   $('#band_properties_resume').text($("#id_main_property option:selected").text())
@@ -337,7 +348,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
   $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
   method: 'POST',

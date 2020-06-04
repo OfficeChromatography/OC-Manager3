@@ -45,7 +45,6 @@ class Sample(FormView):
 class SampleAppPlay(View):
     def post(self, request):
         # Treatment for play button
-
         if 'START' in request.POST:
             sample_application_form  =   SampleApplication_Form(request.POST)
             plate_properties_form    =   PlateProperties_Form(request.POST)
@@ -56,7 +55,7 @@ class SampleAppPlay(View):
             if sample_application_form.is_valid():
                 file_name = sample_application_form.cleaned_data['file_name']
             else:
-                print('sample_application_form')
+                print('sample_application_form.errors')
 
             if plate_properties_form.is_valid():
                 size_x = int(plate_properties_form.cleaned_data['size_x'])
@@ -87,6 +86,7 @@ class SampleAppPlay(View):
             if pressure_settings_form.is_valid():
                 pressure = int(pressure_settings_form.cleaned_data['pressure'])
                 frequency = int(pressure_settings_form.cleaned_data['frequency'])
+                temperature = int(pressure_settings_form.cleaned_data['temperature'])
             else:
                 print('pressure_settings_form')
 
@@ -117,7 +117,7 @@ class SampleAppPlay(View):
                 current_height+=delta_y
 
             # Creates the Gcode for the app
-            gcode = GcodeGen(applicationsurface, motor_speed, frequency)
+            gcode = GcodeGen(applicationsurface, motor_speed, frequency, temperature)
 
             # Save it in a file
             f = open("file.gcode", "w+")
@@ -210,8 +210,8 @@ class SampleAppSaveAndLoad(View):
         # print(sample_application_conf)
         return JsonResponse(sample_application_conf)
 
-def GcodeGen(listoflines, speed, frequency):
-    gcode=['G94 P400']
+def GcodeGen(listoflines, speed, frequency, temperature):
+    gcode=[f'M190 R{temperature}\n'+'G94 P400']
     for listofpoints in listoflines:
         for point in listofpoints:
             gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)

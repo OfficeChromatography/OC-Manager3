@@ -71,24 +71,6 @@ class MotorControl(View):
                 form['commandsend'].send()
                 return JsonResponse({})
 
-        if request.FILES['GFile']:
-            # Upload the Gcode file
-            uploaded_file = request.FILES['GFile']
-            if 'gcode' in uploaded_file.content_type:
-                fs = FileSystemStorage()
-                new_name = fs.save("gfiles/"+uploaded_file.name, uploaded_file)
-
-                gcode = [code_line.strip() for code_line in open(f'{fs.location}/{new_name}')]
-                light_gcode = gcoder.LightGCode(gcode)
-                OC_LAB.startprint(light_gcode)
-                while OC_LAB.printing:
-                    time.sleep(1)
-
-                return render(
-                        request,
-                        "./motorcontrol.html",
-                        form)
-
 class PumpControl(View):
 
     def get(self, request):
@@ -161,7 +143,6 @@ class GcodeEditor(View):
 
 
             #Open the file
-            print(gcodefile[0].filename)
             with open(gcodefile[0].gcode.path,'r') as f:
                 text = f.read()
 
@@ -177,17 +158,49 @@ class GcodeEditor(View):
 
 
     def post(self, request):
+        print(request.POST)
+        if 'UPLOAD' in request.POST:
+            if request.FILES['file']:
+                uploaded_file = request.FILES['file']
+
+                if GcodeFile.objects.filter(filename=uploaded_file,uploader=request.user):
+                    return JsonResponse({'danger':'Filename already exist, change it!'})
+
+                if 'gcode' in uploaded_file.content_type:
+                    fs = FileSystemStorage('media/gfiles/')
+                    new_name = fs.save(uploaded_file.name, uploaded_file)
+
+                    gcode = GcodeFile()
+                    gcode.filename = uploaded_file.name;
+                    gcode.gcode = fs.location+'/'+new_name;
+                    gcode.gcode_url = fs.url(new_name)
+                    gcode.uploader = request.user
+                    gcode.save()
+                    return JsonResponse({'success':'File Saved!'})
+                else:
+                    print('entro al else')
+                    return JsonResponse({'danger':'Invalid File'})
+            else:
+                return JsonResponse({'danger':'Please select a File'})
+
 
         # SAVE FILE
         if 'SAVE' in request.POST:
 
             filename = request.POST.get('name')
             text = request.POST.get('text')
-
-            if GcodeFile.objects.filter(filename=filename):
-                return JsonResponse({'danger':'Filename already exist'})
-
             fs = FileSystemStorage('media/gfiles/')
+            gcodefile = GcodeFile.objects.filter(uploader=request.user,filename=filename)
+
+            # if the file exist then edit
+            if gcodefile:
+                with open(gcodefile[0].gcode.path,'a+') as f:
+                    myfile = File(f)
+                    myfile.write(text)
+                    new_name = fs.save(filename+'.gcode',content=myfile)
+                return JsonResponse({'info':f'{filename} edited'})
+
+
             # Create the file
             with open(f'last.gcode','w+') as f:
                 myfile = File(f)
