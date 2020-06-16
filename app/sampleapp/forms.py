@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import PlateProperties_Db, SampleApplication_Db, BandSettings_Db, MovementSettings_Db, PressureSettings_Db
+from .models import PlateProperties_Db, SampleApplication_Db, BandSettings_Db, MovementSettings_Db, PressureSettings_Db, BandsComponents_Db
 PROP_CHOICES =(
     ("1", "N Bands"),
     ("2", "Lenght"),
@@ -18,7 +18,7 @@ class SampleApplication_Form(forms.ModelForm):
         }
         error_messages = {
             'file_name': {
-                'max_length': _("This writer's name is too long."),
+                'max_length': _("This name is too long."),
             },
         }
 
@@ -80,7 +80,29 @@ class PressureSettings_Form(forms.ModelForm):
         model = PressureSettings_Db
         fields = ['pressure','frequency', 'temperature']
         widgets = {
-            'pressure'         : forms.NumberInput(attrs={'class': 'form-control'}),
-            'frequency'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'pressure'      : forms.NumberInput(attrs={'class': 'form-control'}),
+            'frequency'     : forms.NumberInput(attrs={'class': 'form-control'}),
             'temperature'   : forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+class BandsComponents_Form(forms.ModelForm):
+    class Meta:
+        model = BandsComponents_Db
+        fields = ['band_number','description', 'volume', 'type']
+        exclude = ['sample_application']
+
+    def clean_band_number(self):
+        band_number = self.cleaned_data.get("band_number")
+        return band_number
+
+    def clean_description(self):
+        description = self.cleaned_data.get("description")
+        return description
+
+    def clean_volume(self):
+        volume = self.cleaned_data.get('volume')
+        return volume
+
+    def clean_type(self):
+        type = self.cleaned_data.get('type')
+        return type

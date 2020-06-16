@@ -37,7 +37,7 @@ var plotPreview = new Chart(ctx, {
     }
    },
 });
-
+var datatable
 // Execute every time something happens wi
 $("#id_motor_speed").change(
   function(){
@@ -235,12 +235,19 @@ function bandsmain(){
 }
 
 function banddescrition(number_row){
+  let newTr1 = `
+  <tr class="hide">
+  <td class="pt-3-half" contenteditable="true">`;
+  let newTr2 = `</td>
+  <td class="pt-3-half" contenteditable="true"></td>
+  <td class="pt-3-half" contenteditable="true"></td>
+  <td class="pt-3-half" contenteditable="true"></td>
+  </tr>`
+  $('#tbody_band').empty()
+  console.log(number_row);
   number_row = parseInt(number_row)
-  var table = document.getElementById("concentrationtable").getElementsByTagName('tbody')[0];
-  var row =[]
-  for (i = 0; i < number_row; i++) {
-    row[i] = table.insertRow(i);
-    row[i].innerHTML=i
+  for(i=0;i<number_row;i++){
+    $('#tbody_band').append(newTr1+(i+1)+newTr2);
   }
 }
 
@@ -317,6 +324,21 @@ function loadresume(){
   $('#gap_resume').text($("#id_gap").val())
 }
 
+function loadtable(band){
+  console.log(band);
+  var newTr1
+  $('#tbody_band').empty()
+  for (i = 0; i < Object.keys(band).length; i++){
+    newTr1 = `
+    <tr class="hide">
+    <td class="pt-3-half" contenteditable="true">`+band[i]["band_number"]+`</td>
+    <td class="pt-3-half" contenteditable="true">`+band[i]["description"]+`</td>
+    <td class="pt-3-half" contenteditable="true">`+band[i]["volume"]+`</td>
+    <td class="pt-3-half" contenteditable="true">`+band[i]["type"]+`</td>
+    </tr>`;
+    $('#tbody_band').append(newTr1);
+  }
+}
 
 $('#stopbttn').on('click', function (e) {
   event.preventDefault()
@@ -361,6 +383,7 @@ $('#startbttn').on('click', function (e) {
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
   $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
+  $formData = $formData.concat(gettablevalues())
   $endpoint = window.location.origin+'/samplesave/'
   $.ajax({
   method: 'POST',
@@ -430,11 +453,11 @@ function startMethodSuccess(data, textStatus, jqXHR){
 function startMethodError(jqXHR, textStatus, errorThrown){}
 
 function loadMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
   // Load all the fields with the ones get in the database
   $("#id_motor_speed").val(data.motor_speed)
   $("#id_pressure").val(data.pressure)
-  $("#id_delta_pressure").val(data.delta_pressure)
+  $("#id_frequency").val(data.frequency)
+  $("#id_temperature").val(data.temperature)
   $("#id_delta_y").val(data.delta_y)
   $("#id_delta_x").val(data.delta_x)
 
@@ -455,6 +478,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $( "#id_value" ).trigger( "change" );
   $('#id_load_sucess').html(data.file_name+' successfully load!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
+  loadtable(data['bands'])
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -478,3 +502,45 @@ function saveMethodError(jqXHR, textStatus, errorThrown){
   $('#id_save_error').html(data.error)
   $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
+
+
+// TABLE FUNCTIONS
+const $tableID = $('#table');
+const $BTN = $('#export-btn');
+const $EXPORT = $('#export');
+var tablevalues
+
+// A few jQuery helpers for exporting only
+jQuery.fn.pop = [].pop;
+jQuery.fn.shift = [].shift;
+
+function gettablevalues(){
+
+ const $rows = $tableID.find('tr:not(:hidden)');
+ const headers = [];
+ const data = [];
+
+ // Get the headers (add special header logic here)
+ $($rows.shift()).find('th:not(:empty)').each(function () {
+
+   headers.push($(this).text().toLowerCase());
+ });
+
+ // Turn all existing rows into a loopable array
+ $rows.each(function () {
+   const $td = $(this).find('td');
+   const h = {};
+
+   // Use the headers from earlier to name our hash keys
+   headers.forEach((header, i) => {
+
+     h[header] = $td.eq(i).text();
+   });
+
+   data.push(h);
+ });
+
+ // Output the result
+ tablevalues = '&table='+JSON.stringify(data)
+ return tablevalues
+};

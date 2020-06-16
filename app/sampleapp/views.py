@@ -2,13 +2,14 @@ from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import SampleApplication_Form, PlateProperties_Form, BandSettings_Form, MovementSettings_Form, PressureSettings_Form
-from .models import SampleApplication_Db, BandSettings_Db, PlateProperties_Db, MovementSettings_Db, PressureSettings_Db, SampleApplication_Db
+from .forms import SampleApplication_Form, PlateProperties_Form, BandSettings_Form, MovementSettings_Form, PressureSettings_Form, BandsComponents_Form
+from .models import SampleApplication_Db, BandSettings_Db, PlateProperties_Db, MovementSettings_Db, PressureSettings_Db, SampleApplication_Db, BandsComponents_Db
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 # Create your views here.
 from printrun import printcore, gcoder
+import json
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -135,16 +136,23 @@ class SampleAppPlay(View):
             return JsonResponse({'message':'stopped'})
         if 'PAUSE' in request.POST:
             print(request.POST)
+            OC_LAB.send_now('M76')
             return JsonResponse({'message':'paused'})
 
 class SampleAppSaveAndLoad(View):
     def post(self, request):
+        print(request.POST)
         sample_application_form  =   SampleApplication_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
         band_settings_form       =   BandSettings_Form(request.POST)
         movement_settings_form   =   MovementSettings_Form(request.POST)
         pressure_settings_form   =   PressureSettings_Form(request.POST)
+        table = request.POST.get('table')
+        # print(table)
+        data = json.loads(table)
 
+
+        # print(data)
 
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
@@ -180,15 +188,31 @@ class SampleAppSaveAndLoad(View):
             if len(in_db)>0:
                 return JsonResponse({'error':'File Name exist!'})
             else:
-                sample_application_object = sample_application_form.save(commit=False)
-                sample_application_object.auth = request.user
-                sample_application_object.movement_settings = movement_settings_object
-                sample_application_object.pressure_settings = pressure_settings_object
-                sample_application_object.plate_properties = plate_properties_object
-                sample_application_object.band_settings = band_settings_object
-                print(pressure_settings_object)
-                sample_application_object.save()
+                sample_application_instance = sample_application_form.save(commit=False)
+                sample_application_instance.auth = request.user
+                sample_application_instance.movement_settings = movement_settings_object
+                sample_application_instance.pressure_settings = pressure_settings_object
+                sample_application_instance.plate_properties = plate_properties_object
+                sample_application_instance.band_settings = band_settings_object
+                new_sample_application=sample_application_instance.save()
+
+
+                for i in data:
+                    # Format data
+                    i['band_number'] = i['band']
+                    i['volume'] = i['volume (ul)']
+
+                    bands_components_form = BandsComponents_Form(i)
+
+                    if bands_components_form.is_valid():
+                        bands_components_instance=bands_components_form.save(commit=False)
+                        bands_components_instance.sample_application = sample_application_instance
+                        bands_components_instance.save()
+                    else:
+                        print(bands_components_form.errors)
+                        JsonResponse({'error':bands_components_form.errors})
                 return JsonResponse({'message':f'The File {filename} was saved!'})
+
         else:
             return JsonResponse({'error':'Please fill the filename!'})
 
@@ -201,7 +225,15 @@ class SampleAppSaveAndLoad(View):
         band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
         movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
-        #
+
+        bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
+        
+        bands=dict()
+        for i, band in enumerate(bands_components):
+            bands[i]=model_to_dict(band)
+
+        bands = {'bands':bands}
+        sample_application_conf.update(bands)
         sample_application_conf.update(plate_properties_conf)
         sample_application_conf.update(band_settings_conf)
         sample_application_conf.update(movement_settings_conf)

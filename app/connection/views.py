@@ -34,6 +34,7 @@ class Connection_test(View):
 
     def post(self, request):
         # Steps follow after a ConnectionRequest is Send (Connection Form)
+
         if 'oc_lab' in request.POST:
             connection_form_instance = ConnectionForm(request.POST, user=request.user)
             if connection_form_instance.is_valid():
@@ -45,16 +46,21 @@ class Connection_test(View):
                 connection_form_instance.save()
             else:
                 print(connection_form_instance.errors)
+                data = {
+                    'connected':False,
+                    'device': null,
+                    'baudrate': null,
+                }
             return JsonResponse({**state, **data})
 
-        # Steps follow after a message is Send (Monitor send Form)
+        # Steps follow after a message was sent (Monitor send Form)
         if 'chattext' in request.POST:
             form['commandsend'] = ChatForm(request.POST)
             if form['commandsend'].is_valid():
                 form['commandsend'].send()
             return JsonResponse({})
 
-# EndPoint to Know if theres a current connection to an OC-Lab
+# EndPoint to Know if theres a current connection with an OC-Lab
 class IsConnected(View):
     def get(self, request):
         info={}

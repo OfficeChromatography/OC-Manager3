@@ -34,11 +34,11 @@ function isConnectedEndpointRequest(){
 }
 function isConnectedEndpointSucess(data, textStatus, jqXHR){
   if(data['connected']==true){
-    console.log('ESTA CONECTADO');
+    console.log('It is connected');
     monitorEndpointRequest();
   }
   else{
-    console.log('no esta conectado');
+    console.log('It is not connected');
   }
 }
 function isConnectedEndpointError(jqXHR, textStatus, errorThrown){}

@@ -63,3 +63,9 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+#Gcodes
+.gcode
+
+#Media Files
+/media

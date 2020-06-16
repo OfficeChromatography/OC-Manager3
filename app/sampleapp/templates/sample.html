@@ -285,20 +285,23 @@
                     <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#banddescritionarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show" id='banddescritionarea'>
-                  <table class="table m-0" id='concentrationtable'>
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Sample</th>
-                        <th scope="col">Solvent</th>
-                        <th scope="col">Concentration</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
+                <div class="card-body">
+                    <div id="table" class="table-editable">
+                      <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Band</th>
+                            <th class="text-center">Description</th>
+                            <th class="text-center">Volume (uL)</th>
+                            <th class="text-center">Type</th>
+                          </tr>
+                        </thead>
+                        <tbody id='tbody_band'>
+                        </tbody>
+                      </table>
+                      <button id='export-btn'><i class="far fa-window-minimize"></i></button>
+                    </div>
+                  </div>
               </div>
               <!-- Save and Load -->
               <div class="card shadow mb-4 ">

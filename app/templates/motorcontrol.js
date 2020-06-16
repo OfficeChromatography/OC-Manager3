@@ -42,29 +42,7 @@ function scrolldown(){
     document.getElementById('id_chattext').focus();
 }
 
-// Upload form
-document.querySelector('.custom-file-input').addEventListener('change',function(e){
-  var fileName = document.getElementById("GFile").files[0]
-  document.getElementById('upload_label').innerHTML = fileName.name
-  document.getElementById('localpath').innerHTML = 'Size: '+ Math.round(fileName.size/1000) + ' Kbytes'
 
-
-  // Enable the buttons son you can run or erase empty file
-  document.getElementById('play_upload').disabled = false;
-  document.getElementById('erase_upload').disabled = false;
-  document.getElementById('erase_upload').classList.remove("disabled");
-})
-function erase_upload(){
-  document.getElementById('GFile').value = "";
-  document.getElementById('upload_label').innerHTML ='Choose file'
-
-  // Disable the buttons son you can not run or erase empty file
-  document.getElementById('play_upload').disabled = true
-  document.getElementById('erase_upload').disabled = true;
-  document.getElementById('erase_upload').classList.add("disabled");
-}
-
-// Buttons move
 $(".move-form").submit(function(event){
   button_pressed = document.activeElement.id
   event.preventDefault()

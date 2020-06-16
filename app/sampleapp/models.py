@@ -35,3 +35,10 @@ class SampleApplication_Db(models.Model):
     pressure_settings = models.OneToOneField(PressureSettings_Db, null=True, on_delete=models.CASCADE)
     plate_properties = models.OneToOneField(PlateProperties_Db, null=True, on_delete=models.CASCADE)
     band_settings = models.OneToOneField(BandSettings_Db, null=True, on_delete=models.CASCADE)
+
+class BandsComponents_Db(models.Model):
+    sample_application = models.ForeignKey(SampleApplication_Db, on_delete=models.CASCADE, blank=True, null=True,)
+    band_number = models.DecimalField(decimal_places=0, max_digits=3, null=True, blank=True)
+    description = models.CharField(null=True, max_length=120, blank=True)
+    volume = models.DecimalField(decimal_places=3, max_digits=6, null=True, blank=True)
+    type = models.CharField(null=True, max_length=120, blank=True)

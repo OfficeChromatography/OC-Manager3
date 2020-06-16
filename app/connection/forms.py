@@ -67,7 +67,6 @@ class ConnectionForm(forms.ModelForm):
         self.update()
 
     # Connect to the Arduino and wait for response also save the response in the DB
-
     def update(self):
         self.devices = DevicesConnected()
         if not self.devices:

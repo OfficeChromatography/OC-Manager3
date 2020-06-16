@@ -64,6 +64,7 @@ class MotorControl(View):
             return JsonResponse({})
 
         if 'speedrange' in request.POST:
+            print(request.POST)
             # Converts the request into a valid gcode
             gcode = simple_move_Gcode_gen(request)
             form['commandsend'] = ChatForm({'chattext': gcode})
@@ -158,7 +159,7 @@ class GcodeEditor(View):
 
 
     def post(self, request):
-        print(request.POST)
+        # print(request.POST)
         if 'UPLOAD' in request.POST:
             if request.FILES['file']:
                 uploaded_file = request.FILES['file']
@@ -194,7 +195,7 @@ class GcodeEditor(View):
 
             # if the file exist then edit
             if gcodefile:
-                with open(gcodefile[0].gcode.path,'a+') as f:
+                with open(gcodefile[0].gcode.path,'w+') as f:
                     myfile = File(f)
                     myfile.write(text)
                     new_name = fs.save(filename+'.gcode',content=myfile)
