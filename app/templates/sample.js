@@ -237,7 +237,7 @@ function bandsmain(){
 function banddescrition(number_row){
   let newTr1 = `
   <tr class="hide">
-  <td class="pt-3-half" contenteditable="true">`;
+  <td class="pt-3-half">`;
   let newTr2 = `</td>
   <td class="pt-3-half" contenteditable="true"></td>
   <td class="pt-3-half" contenteditable="true"></td>
@@ -331,7 +331,7 @@ function loadtable(band){
   for (i = 0; i < Object.keys(band).length; i++){
     newTr1 = `
     <tr class="hide">
-    <td class="pt-3-half" contenteditable="true">`+band[i]["band_number"]+`</td>
+    <td class="pt-3-half">`+band[i]["band_number"]+`</td>
     <td class="pt-3-half" contenteditable="true">`+band[i]["description"]+`</td>
     <td class="pt-3-half" contenteditable="true">`+band[i]["volume"]+`</td>
     <td class="pt-3-half" contenteditable="true">`+band[i]["type"]+`</td>
