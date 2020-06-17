@@ -80,9 +80,9 @@ class PressureSettings_Form(forms.ModelForm):
         model = PressureSettings_Db
         fields = ['pressure','frequency', 'temperature']
         widgets = {
-            'pressure'      : forms.NumberInput(attrs={'class': 'form-control'}),
-            'frequency'     : forms.NumberInput(attrs={'class': 'form-control'}),
-            'temperature'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'pressure'              : forms.NumberInput(attrs={'class': 'form-control'}),
+            'frequency'             : forms.NumberInput(attrs={'class': 'form-control'}),
+            'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 class BandsComponents_Form(forms.ModelForm):

@@ -4,29 +4,29 @@ from django.contrib.auth import get_user_model
 # documentation. Mostly just the "class serial.Serial" parameters
 
 class PlateProperties_Db(models.Model):
-    size_x = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    size_y = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_left = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_right = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_top = models.DecimalField(decimal_places=0, max_digits=6, null=True)
-    offset_bottom = models.DecimalField(decimal_places=0, max_digits=6, null=True)
+    size_x = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    size_y = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_left = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_right = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_top = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_bottom = models.DecimalField(decimal_places=2, max_digits=5, null=True)
 
 
 class BandSettings_Db(models.Model):
     main_property = models.DecimalField(null=True,decimal_places=0, max_digits=6)
-    value = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    height = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    gap = models.DecimalField(null=True, decimal_places=0, max_digits=6)
+    value = models.DecimalField(null=True, decimal_places=2, max_digits=5)
+    height = models.DecimalField(null=True, decimal_places=2, max_digits=5)
+    gap = models.DecimalField(null=True, decimal_places=2, max_digits=5)
 
 class MovementSettings_Db(models.Model):
-    motor_speed = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    delta_x = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    delta_y = models.DecimalField(null=True, decimal_places=0, max_digits=6)
+    motor_speed = models.DecimalField(null=True, decimal_places=0, max_digits=5)
+    delta_x = models.DecimalField(null=True, decimal_places=2, max_digits=5)
+    delta_y = models.DecimalField(null=True, decimal_places=2, max_digits=5)
 
 class PressureSettings_Db(models.Model):
-    pressure = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    frequency = models.DecimalField(null=True, decimal_places=0, max_digits=6)
-    temperature = models.DecimalField(null=True, decimal_places=0, max_digits=6)
+    pressure = models.DecimalField(null=True, decimal_places=1, max_digits=5)
+    frequency = models.DecimalField(null=True, decimal_places=1, max_digits=5)
+    temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
 
 class SampleApplication_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
@@ -40,5 +40,5 @@ class BandsComponents_Db(models.Model):
     sample_application = models.ForeignKey(SampleApplication_Db, on_delete=models.CASCADE, blank=True, null=True,)
     band_number = models.DecimalField(decimal_places=0, max_digits=3, null=True, blank=True)
     description = models.CharField(null=True, max_length=120, blank=True)
-    volume = models.DecimalField(decimal_places=3, max_digits=6, null=True, blank=True)
+    volume = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     type = models.CharField(null=True, max_length=120, blank=True)

@@ -93,10 +93,11 @@ $("#id_main_property").change(
   }
 )
 
+
 $("#id_size_x").change(
   function(){
     console.log('sizex');
-    plotPreview.config.options.scales.xAxes[0].ticks.max = parseInt($(this).val());
+    plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($(this).val());
     plotPreview.update();
     bandsmain()
     loadresume()
@@ -105,7 +106,7 @@ $("#id_size_x").change(
 $("#id_size_y").change(
   function(){
     console.log('sizey');
-    plotPreview.config.options.scales.yAxes[0].ticks.max = parseInt($(this).val());
+    plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($(this).val());
     plotPreview.update();
     bandsmain()
     loadresume()

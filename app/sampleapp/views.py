@@ -10,6 +10,7 @@ from connection.forms import OC_LAB
 # Create your views here.
 from printrun import printcore, gcoder
 import json
+from decimal import *
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -22,8 +23,8 @@ forms = {
 class HommingSetup(View):
     def post(self, request):
         try:
-            x = float(request.POST.get('x'))
-            y = float(request.POST.get('y'))
+            x = Decimal(request.POST.get('x'))
+            y = Decimal(request.POST.get('y'))
 
             # Calculate the movement
             x_mov = 50-(x/2)
@@ -45,49 +46,49 @@ class Sample(FormView):
 
 class SampleAppPlay(View):
     def post(self, request):
+        print(request.POST)
         # Treatment for play button
         if 'START' in request.POST:
-            sample_application_form  =   SampleApplication_Form(request.POST)
             plate_properties_form    =   PlateProperties_Form(request.POST)
             band_settings_form       =   BandSettings_Form(request.POST)
             movement_settings_form   =   MovementSettings_Form(request.POST)
             pressure_settings_form   =   PressureSettings_Form(request.POST)
 
-            if sample_application_form.is_valid():
-                file_name = sample_application_form.cleaned_data['file_name']
-            else:
-                print('sample_application_form.errors')
 
             if plate_properties_form.is_valid():
-                size_x = int(plate_properties_form.cleaned_data['size_x'])
-                size_y = int(plate_properties_form.cleaned_data['size_y'])
-                offset_right = int(plate_properties_form.cleaned_data['offset_right'])
-                offset_left = int(plate_properties_form.cleaned_data['offset_left'])
-                offset_top = int(plate_properties_form.cleaned_data['offset_top'])
-                offset_bottom = int(plate_properties_form.cleaned_data['offset_bottom'])
+                size_x = Decimal(plate_properties_form.cleaned_data['size_x'])
+                size_y = Decimal(plate_properties_form.cleaned_data['size_y'])
+                offset_right = Decimal(plate_properties_form.cleaned_data['offset_right'])
+                offset_left = Decimal(plate_properties_form.cleaned_data['offset_left'])
+                offset_top = Decimal(plate_properties_form.cleaned_data['offset_top'])
+                offset_bottom = Decimal(plate_properties_form.cleaned_data['offset_bottom'])
 
             else:
                 print('plate_properties_form')
 
             if band_settings_form.is_valid():
                 main_property = int(band_settings_form.cleaned_data['main_property'])
-                value = int(band_settings_form.cleaned_data['value'])
-                height = int(band_settings_form.cleaned_data['height'])
-                gap = int(band_settings_form.cleaned_data['gap'])
+                value = Decimal(band_settings_form.cleaned_data['value'])
+                height = Decimal(band_settings_form.cleaned_data['height'])
+                gap = Decimal(band_settings_form.cleaned_data['gap'])
             else:
                 print('band_settings_form')
 
             if movement_settings_form.is_valid():
                 motor_speed = int(movement_settings_form.cleaned_data['motor_speed'])
-                delta_x = int(movement_settings_form.cleaned_data['delta_x'])
-                delta_y = int(movement_settings_form.cleaned_data['delta_y'])
+                delta_x = Decimal(movement_settings_form.cleaned_data['delta_x'])
+                delta_y = Decimal(movement_settings_form.cleaned_data['delta_y'])
+                print(delta_x)
             else:
                 print('movement_settings_form')
 
             if pressure_settings_form.is_valid():
-                pressure = int(pressure_settings_form.cleaned_data['pressure'])
-                frequency = int(pressure_settings_form.cleaned_data['frequency'])
-                temperature = int(pressure_settings_form.cleaned_data['temperature'])
+                pressure = Decimal(pressure_settings_form.cleaned_data['pressure'])
+                frequency = Decimal(pressure_settings_form.cleaned_data['frequency'])
+                try:
+                    temperature = Decimal(pressure_settings_form.cleaned_data['temperature'])
+                except TypeError:
+                    temperature = 0
             else:
                 print('pressure_settings_form')
 
@@ -96,13 +97,13 @@ class SampleAppPlay(View):
 
 
             if main_property==1:
-                n_bands = value
+                n_bands = int(value)
                 number_of_gaps = n_bands - 1;
                 sum_gaps_size = gap*number_of_gaps;
                 length = (working_area[0]-sum_gaps_size)/n_bands
             else:
                 length = value
-                n_bands = math.trunc(working_area[0]/(length+gap))
+                n_bands = int(math.trunc(working_area[0]/(length+gap)))
 
             applicationsurface = []
             current_height = 0
@@ -118,7 +119,7 @@ class SampleAppPlay(View):
                 current_height+=delta_y
 
             # Creates the Gcode for the app
-            gcode = GcodeGen(applicationsurface, motor_speed, frequency, temperature)
+            gcode = GcodeGen(applicationsurface, motor_speed, frequency, temperature, pressure)
 
             # Save it in a file
             f = open("file.gcode", "w+")
@@ -147,12 +148,12 @@ class SampleAppSaveAndLoad(View):
         band_settings_form       =   BandSettings_Form(request.POST)
         movement_settings_form   =   MovementSettings_Form(request.POST)
         pressure_settings_form   =   PressureSettings_Form(request.POST)
+
         table = request.POST.get('table')
-        # print(table)
-        data = json.loads(table)
+        table_data = json.loads(table)
 
 
-        # print(data)
+
 
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
@@ -197,7 +198,7 @@ class SampleAppSaveAndLoad(View):
                 new_sample_application=sample_application_instance.save()
 
 
-                for i in data:
+                for i in table_data:
                     # Format data
                     i['band_number'] = i['band']
                     i['volume'] = i['volume (ul)']
@@ -209,7 +210,6 @@ class SampleAppSaveAndLoad(View):
                         bands_components_instance.sample_application = sample_application_instance
                         bands_components_instance.save()
                     else:
-                        print(bands_components_form.errors)
                         JsonResponse({'error':bands_components_form.errors})
                 return JsonResponse({'message':f'The File {filename} was saved!'})
 
@@ -227,7 +227,7 @@ class SampleAppSaveAndLoad(View):
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
 
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
-        
+
         bands=dict()
         for i, band in enumerate(bands_components):
             bands[i]=model_to_dict(band)
@@ -242,19 +242,35 @@ class SampleAppSaveAndLoad(View):
         # print(sample_application_conf)
         return JsonResponse(sample_application_conf)
 
-def GcodeGen(listoflines, speed, frequency, temperature):
-    gcode=[f'M190 R{temperature}\n'+'G94 P400']
-    for listofpoints in listoflines:
-        for point in listofpoints:
-            gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
-            gcode.append(gline)
-            gcode.append('M400')
-            gcode.append(f'G93 F{frequency} P400')
-            gcode.append('M400')
-        # gcode.append('G94 P300')
-            # gcode += 'M42 P13 S255 \n'
-        # gcode = gcode[:gcode.rfind('M42 P13 S255 \n')]
-        # gcode += 'M42 P13 S0 \n' # End of line
+def GcodeGen(listoflines, speed, frequency, temperature, pressure):
+    gcode=list()
+
+    # No HEATBED CASE
+    if temperature!=0:
+        gcode=[f'M190 R{temperature}']
+
+    # Only MOVEMENT CASE
+    if pressure==0 and frequency==0:
+        gcode.append(f'G94 P{pressure}')
+        for listofpoints in listoflines:
+            for point in listofpoints:
+                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+                gcode.append(gline)
+                gcode.append('M400')
+                
+    # Normal Application
+    else:
+        gcode.append(f'G94 P{pressure}')
+        for listofpoints in listoflines:
+            for point in listofpoints:
+                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+                gcode.append(gline)
+                gcode.append('M400')
+                gcode.append(f'G93 F{frequency} P{pressure}')
+                gcode.append('M400')
+
+
+
     gcode.append('G28')
     return gcode
 
