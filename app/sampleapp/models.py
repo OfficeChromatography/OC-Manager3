@@ -11,7 +11,6 @@ class PlateProperties_Db(models.Model):
     offset_top = models.DecimalField(decimal_places=2, max_digits=5, null=True)
     offset_bottom = models.DecimalField(decimal_places=2, max_digits=5, null=True)
 
-
 class BandSettings_Db(models.Model):
     main_property = models.DecimalField(null=True,decimal_places=0, max_digits=6)
     value = models.DecimalField(null=True, decimal_places=2, max_digits=5)
