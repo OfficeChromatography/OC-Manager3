@@ -60,6 +60,9 @@ class BandSettings_Form(forms.ModelForm):
             'gap'           : _('Gap'),
         }
 
+        def clean_main_property(self):
+            return int(self.main_property)
+
 class MovementSettings_Form(forms.ModelForm):
     class Meta:
         model = MovementSettings_Db
@@ -75,6 +78,11 @@ class MovementSettings_Form(forms.ModelForm):
             'delta_y'     : _('Delta Y'),
         }
 
+        def clean_motor_speed(self):
+            motor_speed = self.motor_speed
+            return int(motor_speed)
+
+
 class PressureSettings_Form(forms.ModelForm):
     class Meta:
         model = PressureSettings_Db
@@ -84,6 +92,11 @@ class PressureSettings_Form(forms.ModelForm):
             'frequency'             : forms.NumberInput(attrs={'class': 'form-control'}),
             'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+        def clean_temperature(self):
+            temperature = self.temperature
+            if not temperature:
+                return 0
 
 class BandsComponents_Form(forms.ModelForm):
     class Meta:

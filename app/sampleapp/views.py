@@ -9,6 +9,7 @@ from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 # Create your views here.
 from printrun import printcore, gcoder
+from types import SimpleNamespace
 import json
 from decimal import *
 
@@ -34,9 +35,6 @@ class HommingSetup(View):
         except ValueError:
             return JsonResponse({'error':'Error check values'})
 
-
-
-
 class Sample(FormView):
     def get(self, request):
         # Send the saved config files
@@ -51,87 +49,16 @@ class SampleAppPlay(View):
             if OC_LAB.paused == True:
                 OC_LAB.resume()
             else:
-                plate_properties_form    =   PlateProperties_Form(request.POST)
-                band_settings_form       =   BandSettings_Form(request.POST)
-                movement_settings_form   =   MovementSettings_Form(request.POST)
-                pressure_settings_form   =   PressureSettings_Form(request.POST)
+                # Run the form validations and return the clean data
+                forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
+                                    band_settings_form       =   BandSettings_Form(request.POST),
+                                    movement_settings_form   =   MovementSettings_Form(request.POST),
+                                    pressure_settings_form   =   PressureSettings_Form(request.POST))
 
-
-                if plate_properties_form.is_valid():
-                    size_x = Decimal(plate_properties_form.cleaned_data['size_x'])
-                    size_y = Decimal(plate_properties_form.cleaned_data['size_y'])
-                    offset_right = Decimal(plate_properties_form.cleaned_data['offset_right'])
-                    offset_left = Decimal(plate_properties_form.cleaned_data['offset_left'])
-                    offset_top = Decimal(plate_properties_form.cleaned_data['offset_top'])
-                    offset_bottom = Decimal(plate_properties_form.cleaned_data['offset_bottom'])
-
-                else:
-                    print('plate_properties_form')
-
-                if band_settings_form.is_valid():
-                    main_property = int(band_settings_form.cleaned_data['main_property'])
-                    value = Decimal(band_settings_form.cleaned_data['value'])
-                    height = Decimal(band_settings_form.cleaned_data['height'])
-                    gap = Decimal(band_settings_form.cleaned_data['gap'])
-                else:
-                    print('band_settings_form')
-
-                if movement_settings_form.is_valid():
-                    motor_speed = int(movement_settings_form.cleaned_data['motor_speed'])
-                    delta_x = Decimal(movement_settings_form.cleaned_data['delta_x'])
-                    delta_y = Decimal(movement_settings_form.cleaned_data['delta_y'])
-                    print(delta_x)
-                else:
-                    print('movement_settings_form')
-
-                if pressure_settings_form.is_valid():
-                    pressure = Decimal(pressure_settings_form.cleaned_data['pressure'])
-                    frequency = Decimal(pressure_settings_form.cleaned_data['frequency'])
-                    try:
-                        temperature = Decimal(pressure_settings_form.cleaned_data['temperature'])
-                    except TypeError:
-                        temperature = 0
-                else:
-                    print('pressure_settings_form')
-
-
-                working_area = [size_x-offset_left-offset_right,size_y-offset_top-offset_bottom]
-
-
-                if main_property==1:
-                    n_bands = int(value)
-                    number_of_gaps = n_bands - 1;
-                    sum_gaps_size = gap*number_of_gaps;
-                    length = (working_area[0]-sum_gaps_size)/n_bands
-                else:
-                    length = value
-                    n_bands = int(math.trunc(working_area[0]/(length+gap)))
-
-                applicationsurface = []
-                current_height = 0
-                while current_height <= height:
-                    for i in range(0,n_bands):
-                        applicationline=[]
-                        current_length=0
-                        zeros=(i*(length+gap))+offset_left
-                        while current_length<=length:
-                            applicationline.append([offset_bottom+current_height, current_length+zeros])
-                            current_length+=delta_x
-                        applicationsurface.append(applicationline)
-                    current_height+=delta_y
-
-                # Creates the Gcode for the app
-                gcode = GcodeGen(applicationsurface, motor_speed, frequency, temperature, pressure)
-
-                # Save it in a file
-                f = open("file.gcode", "w+")
-                for i in gcode:
-                    f.write(i+'\n')
-                f.close()
-
-                # Open from the file and startprint
-                gcode1 = [code_line.strip() for code_line in open("file.gcode")]
-                light_gcode = gcoder.LightGCode(gcode1)
+                # With the data, gcode is generated
+                gcode = calculate(forms_data)
+                # Printrun
+                light_gcode = gcoder.LightGCode(gcode)
                 OC_LAB.startprint(light_gcode)
                 return JsonResponse({'error':'f.errors'})
         if 'STOP' in request.POST:
@@ -238,17 +165,54 @@ class SampleAppSaveAndLoad(View):
         sample_application_conf.update(pressure_settings_conf)
         # print(sample_application_conf)
         return JsonResponse(sample_application_conf)
-
-
 # AUX Functions
+
+def data_validations(**kwargs):
+    # Iterate each form and run validations
+    forms_data = {}
+    for key_form, form in kwargs.items():
+        if form.is_valid():
+            forms_data.update(form.cleaned_data)
+        else:
+            print(f'Error on {key_form}')
+            return
+    return forms_data
+
+def calculate(data):
+    data = SimpleNamespace(**data)
+
+    working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
+
+    if data.main_property==1:
+        n_bands = int(data.value)
+        number_of_gaps = n_bands - 1;
+        sum_gaps_size = data.gap*number_of_gaps;
+        length = (working_area[0]-sum_gaps_size)/n_bands
+    else:
+        length = data.value
+        n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
+
+    applicationsurface = []
+    current_height = 0
+    while current_height <= data.height:
+        for i in range(0,n_bands):
+            applicationline=[]
+            current_length=0
+            zeros=(i*(length+data.gap))+data.offset_left
+            while current_length<=length:
+                applicationline.append([data.offset_bottom+current_height, current_length+zeros])
+                current_length+=data.delta_x
+            applicationsurface.append(applicationline)
+        current_height+=data.delta_y
+
+    # Creates the Gcode for the application and return it
+    return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure)
 
 def GcodeGen(listoflines, speed, frequency, temperature, pressure):
     gcode=list()
-
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
-
     # Only MOVEMENT CASE
     if pressure==0 and frequency==0:
         gcode.append(f'G94 P{pressure}')
@@ -268,9 +232,6 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
                 gcode.append('M400')
                 gcode.append(f'G93 F{frequency} P{pressure}')
                 gcode.append('M400')
-
-
-
     gcode.append('G28')
     return gcode
 
