@@ -271,7 +271,7 @@ class UserControlsForm(forms.ModelForm):
 
     color_effects_cbcr = forms.DecimalField(label='Color Effect CbCr',
                             required=False,
-                            max_digits=3,
+                            max_digits=5,
                             decimal_places=0,
                             max_value=65535,
                             min_value=0,
