@@ -17,11 +17,11 @@ AWB_MODES = (('0', 'off'),
 AUTO_EXPOSURE = (('0', 'off'),
                 ('1', 'auto'))
 
-ISO_SENSITIVITY =   ((0,0),
-                    (1,100000),
-                    (2,200000),
-                    (3,400000),
-                    (4,900000))
+ISO_SENSITIVITY =   ((0,'0'),
+                    (1,'100000'),
+                    (2,'200000'),
+                    (3,'400000'),
+                    (4,'900000'))
 
 ISO_SENSITIVITY_AUTO =  ((0,'Manual'),
                         (1,'Auto'))

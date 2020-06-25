@@ -15,15 +15,15 @@ AWB_MODES = (('0', 'off'),
 AUTO_EXPOSURE = (('0', 'off'),
                 ('1', 'auto'))
 
-ISO_SENSITIVITY =   ((0,0),
-                    (1,100000),
-                    (2,200000),
-                    (3,400000),
-                    (4,900000))
+ISO_SENSITIVITY =   (('0',0),
+                    ('1',100000),
+                    ('2',200000),
+                    ('3',400000),
+                    ('4',900000))
 
-ISO_SENSITIVITY_AUTO =  ((0,'Manual'),
-                        (1,'Auto'))
-FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
+ISO_SENSITIVITY_AUTO =  (('0','Manual'),
+                        ('1','Auto'))
+FORMATS = (('0','YU12'),    # (Planar YUV 4:2:0)
             (1,'YUYV'),    # (YUYV 4:2:2)
             (2,'RGB3'),    # (24-bit RGB 8-8-8)
             (3,'JPEG'),    # (JFIF JPEG, compressed)
@@ -36,7 +36,7 @@ FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
             (10,'BGR3'),   # (24-bit BGR 8-8-8)
             (11,'YV12'),   # (Planar YVU 4:2:0)
             (12,'NV21'),   # (Y/CrCb 4:2:0)
-            (13,'BGR4'))   # (32-bit BGRA/X 8-8-8-8))
+            ('13','BGR4'))   # (32-bit BGRA/X 8-8-8-8))
 
 
 IMAGE_EFFECTS = (('0', 'none'),
@@ -76,27 +76,27 @@ ROTATION = (('0','0'),
 ('2','180'),
 ('3','270'))
 
-EXPOSURE_METERING_MODES = ((0,'Averange'),(1,'Center Weighted'),(2,'Averange'))
+EXPOSURE_METERING_MODES = (('0','Averange'),('1','Center Weighted'),('2','Averange'))
 
-SCENE_MODE = ((0,'None'),(8,'Night'),(11,'Sports'))
+SCENE_MODE = (('0','None'),('8','Night'),('11','Sports'))
 
-POWER_LINE_FREQUENCY = ((0,'Disable'),(1,'50 Hz'),(2,'60 Hz'),(3,'Auto'))
+POWER_LINE_FREQUENCY = (('0','Disable'),('1','50 Hz'),('2','60 Hz'),('3','Auto'))
 
-COLOR_EFFECT = {(0,'None'),
-                (1,'Black & White'),
-                (2,'Sepia'),
-                (3,'Negative'),
-                (4,'Emboss'),
-                (5,'Sketch'),
-                (6,'Sky Blue'),
-                (7,'Grass Green'),
-                (8,'Skin Whiten'),
-                (9,'Vivid'),
-                (10,'Aqua'),
-                (11,'Art Freeze'),
-                (12,'Silhouette'),
-                (13,'Solarization'),
-                (14,'Set Cb/Cr'),
+COLOR_EFFECT = {('0','None'),
+                ('1','Black & White'),
+                ('2','Sepia'),
+                ('3','Negative'),
+                ('4','Emboss'),
+                ('5','Sketch'),
+                ('6','Sky Blue'),
+                ('7','Grass Green'),
+                ('8','Skin Whiten'),
+                ('9','Vivid'),
+                ('10','Aqua'),
+                ('11','Art Freeze'),
+                ('12','Silhouette'),
+                ('13','Solarization'),
+                ('14','Set Cb/Cr'),
                 }
 # class PhotoShootPropertiesModel(model.Model):
 #     name = models.CharField(max_length=180)
