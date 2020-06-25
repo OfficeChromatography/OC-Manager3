@@ -76,7 +76,7 @@ ROTATION = (('0','0'),
 ('2','180'),
 ('3','270'))
 
-EXPOSURE_METERING_MODES = (('0','Averange'),('1','Center Weighted'),('2','Averange'))
+EXPOSURE_METERING_MODES = (('0','Averange'),('1','Center Weighted'),('2','Spot'))
 
 SCENE_MODE = (('0','None'),('8','Night'),('11','Sports'))
 
