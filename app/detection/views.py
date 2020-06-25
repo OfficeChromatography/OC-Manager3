@@ -10,6 +10,7 @@ import time
 import subprocess
 from types import SimpleNamespace
 
+
 INITIALS = {'brightness': 50,
             'contrast': 0,
             'saturation': 0,
@@ -86,7 +87,7 @@ class Capture_View(View):
             return JsonResponse({'success':'File saved!'})
 
         if 'REMOVE' in request.POST:
-            print(request.POST)
+            # print(request.POST)
             filename = request.POST.get('filename')
             try:
                 file = Images_Db.objects.get(filename=filename,uploader=request.user)
@@ -127,7 +128,8 @@ class Capture_View(View):
 
                 # set resolution
                 subprocess.run([f'v4l2-ctl --set-fmt-video=width={width}',f'height={height}'],stdout=subprocess.DEVNULL, shell=True)
-
+                # set pixelformat
+                subprocess.call(['v4l2-ctl','--set-fmt-video',f'pixelformat={pixelformat}'],stdout=subprocess.DEVNULL, shell=True)
                 for key, value in conf.items():
                     try:
                         subprocess.run([f'v4l2-ctl -d /dev/video0 -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
@@ -135,16 +137,16 @@ class Capture_View(View):
                         print('Error trying to configure. Wrong Camera?')
 
                 # Take picture
-                subprocess.call('pwd',shell=True)
-                subprocess.call(['v4l2-ctl','--stream-mmap','--stream-count=1','--stream-skip=3','--stream-to='+'./'+STATIC_ROOT+'/best.jpeg'])
+                pixelformat=pixelformat.lower()
+                subprocess.call(['v4l2-ctl','--stream-mmap','--stream-count=1','--stream-skip=3','--stream-to='+'./'+STATIC_ROOT+'/best.'+pixelformat])
 
 
                 fs = FileSystemStorage()
-                photo = '.'+STATIC_ROOT+'/best.jpeg'
+                photo = '.'+STATIC_ROOT+'/best.'+pixelformat
 
                 with open(photo, 'rb') as f:
-                    new_name = fs.save('best.jpeg', File(f))
-                    # print(fs.url(name))
+                    new_name = fs.save('best.'+pixelformat, File(f))
+                    print(fs.url(new_name))
                     data = {
                         'url':request.META['HTTP_ORIGIN']+fs.url(new_name)
                     }
