@@ -54,162 +54,145 @@
           <h1 class="h3 mb-4 text-gray-800">Capture Plate</h1>
           <div class="card-group row">
             <div class="col-lg-6">
-              <!-- Plate Preview -->
+              <!-- PLATE PREVIEW -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                    <button id='minimize-settings' class="btn btn-link invisible" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
                 </div>
-                <div class="card-body align-items-center d-flex justify-content-center" style="display: none;" id='card_image_body'>
-                  <img src={{url}} alt="" style="width:50%">
+                <div class="card-body d-flex flex-column" id='card_image_body'>
+                  <img id='image_id' class="align-self-center" src={{url}} alt="" style="width:50%">
+                  <hr>
+                  <div class="input-group px-2">
+                    <div class="input-group-prepend">
+                      <button id='savebttn' class="btn btn-outline-success" type="button">Save</button>
+                      <button id='removebttn' class="btn btn-outline-danger" type="button">Remove</button>
+                    </div>
+                    <input id='filename' type="text" class="form-control" placeholder="Name" aria-label="" >
+                  </div>
+                  <div class="list-group p-3" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
+                    {% for list in list_load %}
+                        <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.filename }}</a>
+                    {% endfor %}
+                  </div>
                 </div>
-                <hr>
+              </div>
+              <!-- USER CONTROL -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">User Controls</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#usercontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
+                </div>
+                <div class="card-body show" id='usercontrolcontent'>
+                  <form id="userControlsForm">
+                    <div class="form-group row">
+                      <div class="col">
+                        {{ UserControlsForm.brightness.label }}
+                        {{ UserControlsForm.brightness }}
+                        {{ UserControlsForm.contrast.label }}
+                        {{ UserControlsForm.contrast }}
+                        {{ UserControlsForm.saturation.label }}
+                        {{ UserControlsForm.saturation }}
+                        {{ UserControlsForm.sharpness.label }}
+                        {{ UserControlsForm.sharpness }}
+                        {{ UserControlsForm.red_balance.label }}
+                        {{ UserControlsForm.red_balance }}
+                        {{ UserControlsForm.blue_balance.label }}
+                        {{ UserControlsForm.blue_balance }}
+                      </div>
+                      <div class="col">
+                        {{ UserControlsForm.color_effects.label }}
+                        {{ UserControlsForm.color_effects }}
+                        {{ UserControlsForm.color_effects_cbcr.label }}
+                        {{ UserControlsForm.color_effects_cbcr }}
+                        {{ UserControlsForm.horizontal_flip.label }}
+                        {{ UserControlsForm.horizontal_flip }}
+                        {{ UserControlsForm.vertical_flip.label }}
+                        {{ UserControlsForm.vertical_flip }}
+                        {{ UserControlsForm.rotate.label }}
+                        {{ UserControlsForm.rotate }}
+                        {{ UserControlsForm.power_line_frequency.label }}
+                        {{ UserControlsForm.power_line_frequency }}
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
             <div class="col-lg-6">
+              <!-- CAMERA CONTROL -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Parameters</h6>
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Camera Controls</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#cameracontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <form method="POST"> {% csrf_token %}
-                    <p><b>Shoot</b><hr/><p>
-                    <div class="form-row">
-                      <div class="col-6">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.resolution.label}}</span>
-                          </div>
-                        {{form.resolution}}
-                        </div>
+                <div class="card-body show" id='cameracontrolcontent'>
+                  <form id="cameraControlsForm">
+                    <div class="form-group row">
+                      <div class="col">
+                        {{ CameraControlsForm.auto_exposure.label }}
+                        {{ CameraControlsForm.auto_exposure }}
+                        {{ CameraControlsForm.exposure_dynamic_framerate.label }}
+                        {{ CameraControlsForm.exposure_dynamic_framerate }}
+                        {{ CameraControlsForm.auto_exposure_bias.label }}
+                        {{ CameraControlsForm.auto_exposure_bias }}
+                        {{ CameraControlsForm.exposure_time_absolute.label }}
+                        {{ CameraControlsForm.exposure_time_absolute }}
+                        {{ CameraControlsForm.exposure_metering_mode.label }}
+                        {{ CameraControlsForm.exposure_metering_mode }}
                       </div>
-                      <div class="col-6">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.framerate.label}}</span>
-                          </div>
-                        {{form.framerate}}
-                        <div class="input-group-append">
-                          <span class="input-group-text">fps</span>
-                        </div>
-                        </div>
+                      <div class="col">
+                        {{ CameraControlsForm.white_balance_auto_preset.label }}
+                        {{ CameraControlsForm.white_balance_auto_preset }}
+                        {{ CameraControlsForm.scene_mode.label }}
+                        {{ CameraControlsForm.scene_mode }}
+                        {{ CameraControlsForm.image_stabilization.label }}
+                        {{ CameraControlsForm.image_stabilization }}
+                        {{ CameraControlsForm.iso_sensitivity_auto.label }}
+                        {{ CameraControlsForm.iso_sensitivity_auto }}
+                        {{ CameraControlsForm.iso_sensitivity.label }}
+                        {{ CameraControlsForm.iso_sensitivity }}
                       </div>
                     </div>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.shutter_speed.label}}</span>
-                          </div>
-                          {{form.shutter_speed}}
-                          <div class="input-group-append">
-                            <span class="input-group-text">us</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.pixelformat.label}}</span>
-                          </div>
-                        {{form.pixelformat}}
-                        </div>
-                      </div>
-                    </div>
-                    <p class="mt-4"><b>Color</b><hr/><p>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.brightness.label}}</span>
-                          </div>
-                        {{form.brightness}}
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.contrast.label}}</span>
-                          </div>
-                        {{form.contrast}}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.saturation.label}}</span>
-                          </div>
-                        {{form.saturation}}
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.sharpness.label}}</span>
-                          </div>
-                        {{form.sharpness}}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.blue_balance.label}}</span>
-                          </div>
-                        {{form.blue_balance}}
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.red_balance.label}}</span>
-                          </div>
-                        {{form.red_balance}}
-                        </div>
-                      </div>
-                    </div>
-                    <p class="mt-4"><b>Camera Control</b><hr/><p>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.auto_exposure.label}}</span>
-                          </div>
-                        {{form.auto_exposure}}
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.exposure_time_absolute.label}}</span>
-                          </div>
-                        {{form.exposure_time_absolute}}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.iso_sensitivity_auto.label}}</span>
-                          </div>
-                        {{form.iso_sensitivity_auto}}
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="input-group mb-1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">{{form.iso_sensitivity.label}}</span>
-                          </div>
-                        {{form.iso_sensitivity}}
-                        </div>
-                      </div>
-                    </div>
-                    <hr/>
-                    <button type="submit" class="btn btn-primary">Shoot</button>
                   </form>
+                </div>
+              </div>
+              <!-- FORMAT CONTROL -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Format Controls</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#formatcontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
+                </div>
+                <div class="card-body show" id='formatcontrolcontent'>
+                  <form id="codecControlsForm">
+                    {% for fields in FormatControlsForm %}
+                        {{ fields.label }}
+                        {{ fields }}
+                    {% endfor %}
+                    <div class="d-flex justify-content-center m-2">
+                      <button id='shootbttn' class="btn btn-primary">Take Photo!</button>
+                    </div>
+                  </div>
+                  </form>
+                </div>
+
+              <!-- LED CONTROL -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">LEDs Controls</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#ledcontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
+                </div>
+                <div class="card-body collapse" id='ledcontrolcontent'>
                 </div>
               </div>
             </div>
@@ -259,9 +242,36 @@
 
   <script src="{% static 'topbar.js' %}"></script>
   <script type="text/javascript">
-    $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-    })
+  // using jQuery
+  function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  var csrftoken = getCookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
   </script>
 </body>
 

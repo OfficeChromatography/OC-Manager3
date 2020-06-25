@@ -1,11 +1,8 @@
 from django import forms
+from django.forms import ModelForm
+from .models import CameraControls_Db, UserControls_Db
 from django.contrib.auth.models import User
-# try:
-#     from picamera import PiCamera
-#     AWB_MODES = PiCamera.AWB_MODES
-#     # EXPOSURE_MODES
-#     # IMAGE_EFFECTS
-# except OSError:
+
 AWB_MODES = (('0', 'off'),
             ('1', 'auto'),
             ('2', 'sunlight'),
@@ -67,19 +64,34 @@ IMAGE_EFFECTS = (('0', 'none'),
                 ('23', 'deinterlace1'),
                 ('24', 'deinterlace2'))
 
-ISO = (('0','Auto'),
-('1','100'),
-('2','200'),
-('3','320'),
-('4','400'),
-('5','500'),
-('6','640'),
-('7','800'))
-
 ROTATION = (('0','0'),
 ('1','90'),
 ('2','180'),
 ('3','270'))
+
+EXPOSURE_METERING_MODES = ((0,'Averange'),(1,'Center Weighted'),(2,'Spot'))
+
+SCENE_MODE = ((0,'None'),(8,'Night'),(11,'Sports'))
+
+POWER_LINE_FREQUENCY = ((0,'Disable'),(1,'50 Hz'),(2,'60 Hz'),(3,'Auto'))
+
+COLOR_EFFECT = {(0,'None'),
+                (1,'Black & White'),
+                (2,'Sepia'),
+                (3,'Negative'),
+                (4,'Emboss'),
+                (5,'Sketch'),
+                (6,'Sky Blue'),
+                (7,'Grass Green'),
+                (8,'Skin Whiten'),
+                (9,'Vivid'),
+                (10,'Aqua'),
+                (11,'Art Freeze'),
+                (12,'Silhouette'),
+                (13,'Solarization'),
+                (14,'Set Cb/Cr'),
+                }
+
 
 class SaveShot(forms.Form):
     name = forms.CharField(label='Name',
@@ -97,33 +109,117 @@ class SaveShot(forms.Form):
                                             )
                                         )
 
-class ShootConfigurationForm(forms.Form):
-    # User Controls
-    #
-                   #   brightness 0x00980900 (int)    : min=0 max=100 step=1 default=50 value=50 flags=slider
-                   #     contrast 0x00980901 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
-                   #   saturation 0x00980902 (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
-                   #  red_balance 0x0098090e (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
-                   # blue_balance 0x0098090f (int)    : min=1 max=7999 step=1 default=1000 value=1000 flags=slider
-                   # sharpness 0x0098091b (int)    : min=-100 max=100 step=1 default=0 value=0 flags=slider
+class CameraControlsForm(forms.ModelForm):
+    # Camera Controls
+        class Meta:
+            model = CameraControls_Db
 
-    #             horizontal_flip 0x00980914 (bool)   : default=0 value=0
-    #               vertical_flip 0x00980915 (bool)   : default=0 value=0
-    #        power_line_frequency 0x00980918 (menu)   : min=0 max=3 default=1 value=1
+            fields =[   'auto_exposure',
+                        'exposure_dynamic_framerate',
+                        'auto_exposure_bias',
+                        'exposure_time_absolute',
+                        'exposure_metering_mode',
+                        'white_balance_auto_preset',
+                        'image_stabilization',
+                        'iso_sensitivity_auto',
+                        'iso_sensitivity',
+                        'scene_mode']
+            widgets = {
+                        'auto_exposure':                forms.Select(attrs={'class': 'form-control'}),
+                        'exposure_dynamic_framerate':   forms.NullBooleanSelect(attrs={'class': 'form-control'}),
+                        'white_balance_auto_preset':    forms.Select(attrs={'class': 'form-control'}),
+                        'image_stabilization':          forms.NullBooleanSelect(attrs={'class': 'form-control'}),
+                        'iso_sensitivity':              forms.Select(attrs={'class': 'form-control'}),
+                        'iso_sensitivity_auto':         forms.Select(attrs={'class': 'form-control'}),
+                        'exposure_metering_mode':       forms.Select(attrs={'class': 'form-control'}),
+                        'scene_mode':                   forms.Select(attrs={'class': 'form-control'}),
+            }
+            labels = {
+                        'auto_exposure':                _('Auto Exposure:'),
+                        'exposure_dynamic_framerate':   _('Exposure Dynamic FR:'),
+                        'auto_exposure_bias':           _('Auto Exposure Bias'),
+                        'white_balance_auto_preset':    _('WB Preset'),
+                        'image_stabilization':          _('Image Stabilization'),
+                        'iso_sensitivity':              _('ISO'),
+                        'iso_sensitivity_auto':         _('ISO Auto'),
+                        'exposure_metering_mode':       _('Exposure Metering Mode'),
+                        'scene_mode':                   _('Scene Mode'),
+            }
 
-    #               color_effects 0x0098091f (menu)   : min=0 max=15 default=0 value=0
-    #                      rotate 0x00980922 (int)    : min=0 max=360 step=90 default=0 value=0 flags=modify-layout
-    #          color_effects_cbcr 0x0098092a (int)    : min=0 max=65535 step=1 default=32896 value=32896
+
+        auto_exposure_bias = forms.DecimalField(label='Auto Exposure Bias',
+                                required=False,
+                                max_digits=2,
+                                decimal_places=0,
+                                max_value=24,
+                                min_value=0,
+                                widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'12', 'class':'form-control'}))
+
+        exposure_time_absolute = forms.DecimalField(label='Absolute Exposure Time',
+                                required=False,
+                                max_digits=5,
+                                decimal_places=0,
+                                max_value=10000,
+                                min_value=1,
+                                widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'1000', 'class':'form-control'}))
 
 
-# USER CONTROLS:
+        def clean_auto_exposure(self):
+            auto_exposure = self.cleaned_data['auto_exposure']
+            if auto_exposure:
+                auto_exposure = int(auto_exposure)
+            if not auto_exposure:
+                auto_exposure = 0
+            return auto_exposure
+
+        def clean_exposure_time_absolute(self):
+            exposure_time_absolute = self.cleaned_data['exposure_time_absolute']
+            if exposure_time_absolute:
+                exposure_time_absolute = int(exposure_time_absolute)
+            if not exposure_time_absolute:
+                exposure_time_absolute = 1000
+            return exposure_time_absolute
+
+class UserControlsForm(forms.ModelForm):
+    class Meta:
+        model = UserControls_Db
+        fields = [
+                     'brightness',
+                       'contrast',
+                     'saturation',
+                    'red_balance',
+                   'blue_balance',
+                'horizontal_flip',
+                  'vertical_flip',
+           'power_line_frequency',
+                      'sharpness',
+                  'color_effects',
+                         'rotate',
+             'color_effects_cbcr',
+
+        ]
+        widgets = {
+               'horizontal_flip':   forms.NullBooleanSelect(attrs={'class': 'form-control'}),
+                 'vertical_flip':   forms.NullBooleanSelect(attrs={'class': 'form-control'}),
+          'power_line_frequency':   forms.Select(attrs={'class': 'form-control'}),
+                 'color_effects':   forms.Select(attrs={'class': 'form-control'}),
+                    }
+        labels = {
+                'horizontal_flip':          _('Horizontal Flip:'),
+                'vertical_flip':            _('Vertical Flip:'),
+                'power_line_frequency':     _('Power Line Frequency:'),
+                'color_effects':            _('Color Effect:'),
+                }
+
+
+
     brightness = forms.DecimalField(label='Brightness',
                             required=False,
                             max_digits=3,
                             decimal_places=0,
                             max_value=100,
                             min_value=0,
-                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'50', 'class':'form-control'}))
+                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'1000', 'class':'form-control'}))
 
     contrast = forms.DecimalField(label='Contrast',
                             required=False,
@@ -165,113 +261,21 @@ class ShootConfigurationForm(forms.Form):
                             min_value=-100,
                             widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}))
 
-# Camera Controls
-#
-            #                   auto_exposure 0x009a0901 (menu)   : min=0 max=3 default=0 value=0
-            #          exposure_time_absolute 0x009a0902 (int)    : min=1 max=10000 step=1 default=1000 value=1000
-#      exposure_dynamic_framerate 0x009a0903 (bool)   : default=0 value=0
-#              auto_exposure_bias 0x009a0913 (intmenu): min=0 max=24 default=12 value=12
-#       white_balance_auto_preset 0x009a0914 (menu)   : min=0 max=10 default=1 value=1
-#             image_stabilization 0x009a0916 (bool)   : default=0 value=0
-    #                 iso_sensitivity 0x009a0917 (intmenu): min=0 max=4 default=0 value=0
-    #            iso_sensitivity_auto 0x009a0918 (menu)   : min=0 max=1 default=1 value=1
-#          exposure_metering_mode 0x009a0919 (menu)   : min=0 max=2 default=0 value=0
-#                      scene_mode 0x009a091a (menu)   : min=0 max=13 default=0 value=0
-
-
-
-# Camera Controls
-
-    auto_exposure = forms.ChoiceField(label='Auto Exposure', choices = AUTO_EXPOSURE, widget=forms.Select(attrs={'class':'form-control'}))
-
-    exposure_time_absolute = forms.DecimalField(label='Absolute Exposure Time',
+    rotate = forms.DecimalField(label='Rotate',
                             required=False,
-                            max_digits=5,
+                            max_digits=3,
                             decimal_places=0,
-                            max_value=10000,
-                            min_value=1,
-                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'50', 'class':'form-control'}))
+                            max_value=360,
+                            min_value=0,
+                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'step':'90' ,'class':'form-control'}))
 
-    iso_sensitivity = forms.ChoiceField(label='ISO Sensitivity', choices = ISO_SENSITIVITY, widget=forms.Select(attrs={'class':'form-control'}))
-
-    iso_sensitivity_auto = forms.ChoiceField(label='ISO Sensitivity auto', choices = ISO_SENSITIVITY_AUTO, widget=forms.Select(attrs={'class':'form-control'}))
-
-# Frame_Controls
-
-    resolution = forms.CharField(label='Resolution',
-                    required=False,
-                    max_length = 9,
-                    widget=forms.TextInput(
-                                        attrs={
-                                                'size': '9',
-                                                'placeholder':'WIDTHxHEIGHT',
-                                                'class':'form-control',
-                                                'data-toggle':"tooltip",
-                                                'data-placement':'top',
-                                                'title':"def. 1024x1024",
-                                                }
-                                            )
-                                        )
-
-    framerate = forms.DecimalField(label='Framerate',
-                    max_digits=3,
-                    required=False,
-                    decimal_places=1,
-                    max_value=90,
-                    min_value=1,
-                    widget=forms.NumberInput(
-                                        attrs={
-                                                'class':'form-control',
-                                                'data-toggle':'tooltip',
-                                                'data-placement':'top',
-                                                'placeholder':'1.0',
-                                                }
-                                            )
-                                        )
-
-    pixelformat = forms.ChoiceField(label='Formats', choices = FORMATS, widget=forms.Select(attrs={'class':'form-control'}))
-
-
-
-
-
-
-
-
-
-    # hue = forms.DecimalField(label='HUE',
-    #                         required=False,
-    #                         max_digits=4,
-    #                         decimal_places=0,
-    #                         max_value=2000,
-    #                         min_value=-2000,
-    #                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'50', 'class':'form-control'}))
-    #
-    # gain = forms.DecimalField(label='Gain',
-    #                         required=False,
-    #                         max_digits=1,
-    #                         decimal_places=0,
-    #                         max_value=8,
-    #                         min_value=1,
-    #                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'50', 'class':'form-control'}))
-    #
-    # exposure = forms.DecimalField(label='Exposure',
-    #                         required=False,
-    #                         max_digits=4,
-    #                         decimal_places=0,
-    #                         max_value=1000,
-    #                         min_value=-1000,
-    #                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'50', 'class':'form-control'}))
-    #
-    # def clean_shutter_speed(self):
-    #     shutter_speed = self.cleaned_data['shutter_speed']
-    #     if not shutter_speed:
-    #         shutter_speed = 1.0
-    #     else:
-    #         framerate = self.clean_framerate()
-    #         if shutter_speed > (1000000/framerate):
-    #             raise forms.ValidationError("Invalid Format. Should be less than 1/framerate")
-    #     return float(shutter_speed)
+    color_effects_cbcr = forms.DecimalField(label='Color Effect CbCr',
+                            required=False,
+                            max_digits=3,
+                            decimal_places=0,
+                            max_value=65535,
+                            min_value=0,
+                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'32896', 'class':'form-control'}))
 
     def clean_brightness(self):
         brightness = self.cleaned_data['brightness']
@@ -321,37 +325,28 @@ class ShootConfigurationForm(forms.Form):
             sharpness = 0
         return sharpness
 
-    def clean_auto_exposure(self):
-        auto_exposure = self.cleaned_data['auto_exposure']
-        if auto_exposure:
-            auto_exposure = int(auto_exposure)
-        if not auto_exposure:
-            auto_exposure = 0
-        return auto_exposure
 
-    def clean_exposure_time_absolute(self):
-        exposure_time_absolute = self.cleaned_data['exposure_time_absolute']
-        if exposure_time_absolute:
-            exposure_time_absolute = int(exposure_time_absolute)
-        if not exposure_time_absolute:
-            exposure_time_absolute = 1000
-        return exposure_time_absolute
+class ShootConfigurationForm(forms.Form):
 
-    def clean_iso_sensitivity(self):
-        iso_sensitivity = self.cleaned_data['iso_sensitivity']
-        if iso_sensitivity:
-            iso_sensitivity = int(iso_sensitivity)
-        if not iso_sensitivity:
-            iso_sensitivity = 0
-        return iso_sensitivity
+    resolution = forms.CharField(label='Resolution',
+                    required=False,
+                    max_length = 9,
+                    widget=forms.TextInput(
+                                        attrs={
+                                                'size': '9',
+                                                'placeholder':'WIDTHxHEIGHT',
+                                                'class':'form-control',
+                                                'data-toggle':"tooltip",
+                                                'data-placement':'top',
+                                                'title':"def. 1024x1024",
+                                                }
+                                            )
+                                        )
 
-    def clean_iso_sensitivity_auto(self):
-        iso_sensitivity_auto = self.cleaned_data['iso_sensitivity_auto']
-        if iso_sensitivity_auto:
-            iso_sensitivity_auto = int(iso_sensitivity_auto)
-        if not iso_sensitivity_auto:
-            iso_sensitivity_auto = 0
-        return iso_sensitivity_auto
+
+    pixelformat = forms.ChoiceField(label='Formats', choices = FORMATS, widget=forms.Select(attrs={'class':'form-control'}))
+
+
 
     def clean_resolution(self):
         resolution = self.cleaned_data['resolution']
@@ -368,71 +363,9 @@ class ShootConfigurationForm(forms.Form):
             height = 480
         return [width, height]
 
-    def clean_framerate(self):
-        framerate = self.cleaned_data['framerate']
-        if framerate:
-            framerate = float(framerate)
-        if not framerate:
-            framerate = 1.0
-        return framerate
+
 
     def clean_pixelformat(self):
         pixelformat = self.cleaned_data['pixelformat']
         pixelformat = FORMATS[int(pixelformat)][1]
         return pixelformat
-
-
-    # def clean_hue(self):
-    #     hue = self.cleaned_data['hue']
-    #     if hue:
-    #         hue = int(hue)
-    #     if not hue:
-    #         hue = 50
-    #     return hue
-    #
-    # def clean_gain(self):
-    #     gain = self.cleaned_data['gain']
-    #     if gain:
-    #         gain = int(gain)
-    #     if not gain:
-    #         gain = 50
-    #     return gain
-    #
-    # def clean_exposure(self):
-    #     exposure = self.cleaned_data['exposure']
-    #     if exposure:
-    #         exposure = int(exposure)
-    #     if not exposure:
-    #         exposure = 50
-    #     return exposure
-
-
-
-
-
-
-
-
-
-
-            # shutter_speed = 0 automatic / its in us / it is limited by the framrate, MUST set before a extrmely slow framrate \ 1/fps es lo mas lento
-            # shutter_speed = forms.DecimalField(
-            #                     label='Shutter speed',
-            #                     required=False,
-            #                     max_digits=6,
-            #                     decimal_places=0,
-            #                     max_value=30000,
-            #                     min_value=0,
-            #                     widget=forms.NumberInput(
-            #                                     attrs={
-            #                                             'class':'form-control',
-            #                                             'data-toggle':'tooltip',
-            #                                             'data-placement':'top',
-            #                                             'data-html':"true",
-            #                                             'placeholder':'1.0',
-            #                                             'title':"E.g. 33000<br>Less than 1/framerate",
-            #                                             }
-            #                                         )
-            #                                     )
-            # iso = 100~800
-            #iso = forms.ChoiceField(label='ISO', choices = ISO, widget=forms.Select(attrs={'class':'form-control'}))
