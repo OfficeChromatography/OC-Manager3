@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core import serializers
-
+from .forms import CleaningProcessForm
 from .models import GcodeFile
 from printrun import printcore, gcoder
 import time
@@ -16,6 +16,12 @@ import time
 form = {
     'commandsend' : ChatForm()
 }
+
+CLEANINGPROCESS_INITIALS = {'start_frequency':100,
+            'stop_frequency':500,
+            'steps':50,
+            'pressure':200}
+
 
 class Cleaning(object):
 
@@ -25,15 +31,15 @@ class Cleaning(object):
         self.duration = 0
         # self._lastcheck = time.now()
 
-    def dinamic_cleaning(self,fi,fo,step):
+    def dinamic_cleaning(self,fi,fo,step,pressure):
         # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
         # range(start, stop, step)
         self.duration = 0
         f = open("dinamic_clean.gcode", "w+")
-        f.write(f'G94 P400')
+        f.write(f'G94 P{pressure}')
         for i in range(fi,fo+step,step):
             for j in range(1,self.time_window*i+1):
-                f.write(f'G93 F{i} P300'+'\n')
+                f.write(f'G97 F{i} P{pressure}'+'\n')
             f.write('G94 P0\n')
             self.duration += self.time_window
         f.close()
@@ -74,11 +80,17 @@ class MotorControl(View):
 
 class PumpControl(View):
 
+    CLEANINGPROCESS_INITIALS = {'start_frequency':100,
+                'stop_frequency':500,
+                'steps':50,
+                'pressure':200}
+
     def get(self, request):
+        form['CleaningProcessForm'] = CleaningProcessForm(initial=CLEANINGPROCESS_INITIALS)
         return render(
             request,
             "./pumpcontrol.html",
-            {})
+            form)
 
     def post(self, request):
         if 'cycles' in request.POST:
@@ -95,17 +107,24 @@ clean = Cleaning();
 class CleanControl(View):
 
     def post(self, request):
-        if 'process' in request.POST:
+        print(request.POST)
+        if 'PROCESS' in request.POST:
+            clean_param = CleaningProcessForm(request.POST)
 
-            clean.dinamic_cleaning(100,500,50)
+            if clean_param.is_valid():
+                clean_param = clean_param.cleaned_data
+                clean.dinamic_cleaning(clean_param['start_frequency'],clean_param['stop_frequency'],clean_param['steps'],clean_param['pressure'])
 
-            gcode = [code_line.strip() for code_line in open('dinamic_clean.gcode')]
-            light_gcode = gcoder.LightGCode(gcode)
-            OC_LAB.startprint(light_gcode)
+                gcode = [code_line.strip() for code_line in open('dinamic_clean.gcode')]
+                light_gcode = gcoder.LightGCode(gcode)
+                OC_LAB.startprint(light_gcode)
 
-            data= {'message':f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()} sec'}
-            data.update({'duration':clean.duration})
-        return  JsonResponse(data)
+                data= {'message':f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()} sec'}
+                data.update({'duration':clean.duration})
+            else:
+                data = {'message':'ERROR'}
+                print(clean_param.errors)
+            return  JsonResponse(data)
 
     def get(self, request):
         # Check the status
@@ -124,6 +143,13 @@ class CleanControl(View):
                 data.update({'duration':clean.duration})
                 data.update({'time_left':clean.time_left})
                 return  JsonResponse(data)
+
+        if 'STOP' in request.POST:
+            OC_LAB.cancelprint()
+            return JsonResponse({'message':'stopped'})
+        if 'PAUSE' in request.POST:
+            OC_LAB.pause()
+            return JsonResponse({'message':'paused'})
 
 class GcodeEditor(View):
 
@@ -250,7 +276,7 @@ class GcodeEditor(View):
 
         # STOP FILE
         if 'STOP' in request.POST:
-            OC_LAB.send_now('M18')
+            OC_LAB.cancelprint()
             return JsonResponse({'danger':'STOP'})
 
 

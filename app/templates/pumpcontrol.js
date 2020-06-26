@@ -4,10 +4,9 @@ function sliderChange(val,id){
 }
 
 // Cleaning EndPoint
-$('#id_clean').on('click', function (e) {
+$('#cleanbttn').on('click', function (e) {
   event.preventDefault()
-  //
-  $formData = 'process'
+  $formData = 'PROCESS&'+$('#cleaningprocessform').serialize()
   $endpoint = window.location.origin+'/cleanprocess/'
   $.ajax({
   method: 'POST',
@@ -17,14 +16,56 @@ $('#id_clean').on('click', function (e) {
   error: cleanMethodError,
   })
 })
+$('#stopbttn').on('click', function (e) {
+  event.preventDefault()
+  //
+  $formData = 'STOP&'
+  $endpoint = window.location.origin+'/sampleapp/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: stopMethodSuccess,
+  error: stopMethodError,
+  })
+})
+$('#pausebttn').on('click', function (e) {
+  event.preventDefault()
+  //
+  $formData = 'PAUSE&'
+  $endpoint = window.location.origin+'/sampleapp/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: pauseMethodSuccess,
+  error: pauseMethodError,
+  })
+})
+
 function cleanMethodSuccess(data, textStatus, jqXHR){
   console.log(data);
+  $('.control-bttn').removeClass('btn-danger btn-secondary')
+  $('.control-bttn').addClass('btn btn-success')
   cleaningstatusalert(true, data.message)
   checkStatusInterval = setInterval("checkCleaningStatus()", 3000);
 }
 function cleanMethodError(jqXHR, textStatus, errorThrown){
   console.log(errorThrown)
 }
+function stopMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+  $('.control-bttn').removeClass('btn-success btn-secondary')
+  $('.control-bttn').addClass('btn btn-danger')
+}
+function stopMethodError(jqXHR, textStatus, errorThrown){}
+function pauseMethodSuccess(data, textStatus, jqXHR){
+  console.log(data);
+    $('.control-bttn').removeClass('btn-success btn-danger')
+  $('.control-bttn').addClass('btn btn-secondary')
+}
+function pauseMethodError(jqXHR, textStatus, errorThrown){}
+
 
 
 // Cleaning status EndPoint
