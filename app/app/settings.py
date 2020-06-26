@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'channels',
     'detection',
     'sampleapp',
+    'development',
     # 'users',
     # 'users_api',
     # 'rest_framework',
