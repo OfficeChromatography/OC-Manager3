@@ -68,7 +68,7 @@ class ConnectionForm(forms.ModelForm):
 
     # Connect to the Arduino and wait for response also save the response in the DB
     def update(self):
-        self.devices = DevicesConnected()
+        self.devices = self.devices_connected()
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
@@ -77,8 +77,6 @@ class ConnectionForm(forms.ModelForm):
     def clean_oc_lab(self, *args, **kwargs):
         oc_lab = self.cleaned_data.get('oc_lab')
         choices = self.fields['oc_lab'].choices
-        if 'Plug an OC-Lab' in choices[0]:
-            raise forms.ValidationError('Please connect an OC-Lab')
         return oc_lab
 
     def clean_monitor(self, *args, **kwargs):
@@ -98,6 +96,14 @@ class ConnectionForm(forms.ModelForm):
             OC_LAB.connect(port=selected_port, baud=selected_baudarate)
         except:
             raise forms.ValidationError('Imposible to connect to {}'.format(selected_port))
+
+    def devices_connected(self):
+        list = []
+        a = serial.tools.list_ports.comports()
+        for devices in a:
+            if str(devices.description) != 'n/a':
+                list.append(devices)
+        return list
 
 
 # Formular to send the Arduino based on Connection_Db
@@ -119,11 +125,3 @@ class ChatForm(forms.Form):
         message = self.cleaned_data['chattext']
         OC_LAB.send_now(message)
         return message
-
-def DevicesConnected():
-    list = []
-    a = serial.tools.list_ports.comports()
-    for devices in a:
-        if str(devices.description) != 'n/a':
-            list.append(devices)
-    return list
