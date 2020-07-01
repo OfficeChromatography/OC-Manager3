@@ -5,6 +5,7 @@ window.onload = function(){
   // Load the text from the DataBase
   scrolldown()
   isConnectedEndpointRequest()
+  loadDeviceInfo()
   // AJAX POST of the serial_port connection
 }
 
@@ -55,6 +56,7 @@ function monitorEndpointRequest(){
 }
 function monitorEndpointSucess(data, textStatus, jqXHR){
   document.querySelector('#MonitorTextArea').value += data['monitortext']
+  scrolldown()
 }
 function monitorEndpointError(jqXHR, textStatus, errorThrown){}
 
@@ -74,8 +76,11 @@ $('.connection-form').submit(function(event){
   })
 })
 function connectionFormSuccess(data, textStatus, jqXHR){
-  scrolldown();
   checkconnection();
+  scrolldown();
+  // Delay until the OC is connected
+  resolveAfter2Seconds()
+  loadDeviceInfo();
 }
 function connectionFormError(jqXHR, textStatus, errorThrown){}
 
@@ -88,22 +93,47 @@ $('.message-form').submit(function(event){
     method: 'POST',
     url:    $endpoint,
     data:   $formData,
-    success: handleFormSuccess1,
-    error: handleFormError1,
+    success: sendMessageSuccess,
+    error: sendMessageError,
   })
 })
-function handleFormSuccess1(data, textStatus, jqXHR){
-  scrolldown()
+function sendMessageSuccess(data, textStatus, jqXHR){
   document.getElementById('id_chattext').value = ''
   $ConnectionForm[0].reset()
+  scrolldown()
 }
-function handleFormError1(jqXHR, textStatus, errorThrown){}
+function sendMessageError(jqXHR, textStatus, errorThrown){}
 
 // Some monitor Functions
 function scrolldown(){
-  //Move the Scroll to the bottom every time a message is add
-    document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
-  //Clean the 'chattext' field and Focus it.
-    // document.getElementById('id_chattext').value = ''
-    // document.getElementById('id_chattext').focus();
+  $("#MonitorTextArea").scrollTop($(this).height())
+}
+
+// Load device info in the bottom of Monitor card
+function loadDeviceInfo(){
+  data={}
+  $.ajax({
+    method: 'GET',
+    url:    window.location.origin+'/isconnected/',
+    data:   data,
+    success: infoDeviceMethodSuccess,
+    error: infoDeviceMethodError,
+  })
+  function infoDeviceMethodSuccess(data, textStatus, jqXHR){
+    if(data.connected == true){
+      $('#id_device_info').html("<b>"+data.port+"</b>");
+      $('#id_baudrate_info').html("<b>"+data.baudrate+"</b>");
+    }
+    console.log(data);
+  }
+  function infoDeviceMethodError(jqXHR, textStatus, errorThrown){}
+
+}
+
+function resolveAfter2Seconds() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, 2000);
+  });
 }

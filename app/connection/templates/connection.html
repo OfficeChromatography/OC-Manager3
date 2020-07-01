@@ -136,16 +136,14 @@
 
                 </div>
                   <div class="card-footer text-muted font-italic font-weight-bold">
-                    {% if connected %}
                     <table class="table table-borderless table-sm m-0 p-0">
                       <thead>
                         <tr>
-                          <th scope="col">Dev:{{device}}</th>
-                          <th scope="col">Baudrate:{{baudrate}}</th>
+                          <th scope="col">Dev: <span id='id_device_info'></span></th>
+                          <th scope="col">Baudrate: <span id='id_baudrate_info'></span></th>
                         </tr>
                       </thead>
                     </table>
-                    {% endif %}
                   </div>
               </div>
             </div>
