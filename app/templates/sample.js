@@ -291,7 +291,7 @@ function total_gap_length(number_bands, gap_size){
   }
 }
 
-function total_bands_length(workingarea,sum_gaps_size,number_bands){
+function total_bands_length(working_area,sum_gaps_size,number_bands){
   bands_size = (working_area[0]-sum_gaps_size)/number_bands
   if(bands_size<=0){
     return NaN
