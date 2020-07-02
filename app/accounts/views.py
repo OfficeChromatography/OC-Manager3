@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from connection.models import Connection_Db
+from django.forms.models import model_to_dict
+from django.db.models.fields import DateTimeField
+from datetime import datetime
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -7,6 +11,19 @@ from django.contrib.auth import (
     logout,
     update_session_auth_hash,
 )
+from itertools import chain
+
+def to_dict(instance):
+    opts = instance._meta
+    data = {}
+    for f in chain(opts.concrete_fields, opts.private_fields):
+        data[f.name] = f.value_from_object(instance)
+        if isinstance(f, DateTimeField):
+            data[f.name] = f.value_from_object(instance).strftime("%Y/%m/%d, %H:%M:%S")
+    for f in opts.many_to_many:
+        data[f.name] = [i.id for i in f.value_from_object(instance)]
+    return data
+
 User = get_user_model()
 
 USER_INFO = {
@@ -89,3 +106,16 @@ def change_password_view(request):
             update_session_auth_hash(request, request.user)
             return redirect("/login/")
     return render(request,'changepass.html',{'form':form})
+
+def log_view(request):
+    connections = Connection_Db.objects.filter(auth_id=request.user)
+    return render(request,'log.html',{})
+
+
+def data_table(request):
+    list = []
+    connections = Connection_Db.objects.filter(auth_id=request.user)
+    print(to_dict(connections[1]))
+    for i in connections:
+        list.append(to_dict(i))
+    return JsonResponse(list, safe = False)

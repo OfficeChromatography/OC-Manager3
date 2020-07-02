@@ -22,4 +22,6 @@ urlpatterns = [
     path('profile/',  accounts_views.profile_view, name='profile'),
     path('userinfo/',  accounts_views.username_view, name='username'),
     path('changepass/',  accounts_views.change_password_view, name='username'),
+    path('log/',  accounts_views.log_view, name='logs'),
+    path('logdatatable/',  accounts_views.data_table, name='logs'),
 ]
