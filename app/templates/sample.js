@@ -97,18 +97,14 @@ $("#id_main_property").change(
 $("#id_size_x").change(
   function(){
     console.log('sizex');
-    plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($(this).val());
-    plotPreview.update();
-    bandsmain()
+    changegraphsize()
     loadresume()
   }
 )
 $("#id_size_y").change(
   function(){
     console.log('sizey');
-    plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($(this).val());
-    plotPreview.update();
-    bandsmain()
+    changegraphsize()
     loadresume()
   }
 );
@@ -325,20 +321,34 @@ function loadresume(){
   $('#gap_resume').text($("#id_gap").val())
 }
 
-function loadtable(band){
+function loadtable(band,fromDB){
   console.log(band);
   var newTr1
   $('#tbody_band').empty()
+  if(fromDB==true){
+    idbandname = "band_number"
+    idvolumename= "volume"
+  }
+  else{
+    idbandname= "band"
+    idvolumename= "volume (ul)"
+  }
   for (i = 0; i < Object.keys(band).length; i++){
     newTr1 = `
     <tr class="hide">
-    <td class="pt-3-half">`+band[i]["band_number"]+`</td>
+    <td class="pt-3-half">`+band[i][idbandname]+`</td>
     <td class="pt-3-half" contenteditable="true">`+band[i]["description"]+`</td>
-    <td class="pt-3-half" contenteditable="true">`+band[i]["volume"]+`</td>
+    <td class="pt-3-half" contenteditable="true">`+band[i][idvolumename]+`</td>
     <td class="pt-3-half" contenteditable="true">`+band[i]["type"]+`</td>
     </tr>`;
     $('#tbody_band').append(newTr1);
   }
+}
+
+function changegraphsize(){
+  plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($("#id_size_x").val());
+  plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($("#id_size_y").val());
+  plotPreview.update();
 }
 
 $('#stopbttn').on('click', function (e) {
@@ -367,7 +377,6 @@ $('#pausebttn').on('click', function (e) {
   error: pauseMethodError,
   })
 })
-
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
@@ -383,8 +392,7 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
-  $formData = $formData.concat(gettablevalues())
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+gettablevalues(true)
   $endpoint = window.location.origin+'/samplesave/'
   $.ajax({
   method: 'POST',
@@ -421,6 +429,80 @@ $('#hommingbttn').on('click', function (e) {
   })
 })
 
+
+// Import/Export DATA
+$('#downloadfilebttn').on('click', function (e) {
+  event.preventDefault()
+  var element = document.createElement('a');
+
+  var plate = getFormData($('#plateform'))
+  var movement = getFormData($('#movementform'))
+  var table = {bands:gettablevalues(false)}
+  items = Object.assign(plate,movement,table)
+
+  content = JSON.stringify(items);
+  filename = new Date().toLocaleString()+".json"
+
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+})
+$('#loadfilebttn').on('click', function (e) {
+  event.preventDefault()
+  var file = $('#file')[0].files[0];
+  getAsText(file);
+})
+$('#removefilebttn').on('click', function (e) {
+  $('#file').next('.custom-file-label').html('');
+  $('#file').val('')
+  $('#sizesfile').html('')
+})
+$('#file').on('change',function(e){
+                //get the file name
+                var fileName = e.target.files[0];
+                $(this).next('.custom-file-label').html(fileName.name);
+            })
+
+function getFormData($form){
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function(n, i){
+        indexed_array[n['name']] = n['value'];
+    });
+
+    return indexed_array;
+}
+function getAsText(readFile) {
+
+  var reader = new FileReader();
+
+  // Read file into memory as UTF-16
+  reader.readAsText(readFile, "UTF-8");
+
+  // Handle progress, success, and errors
+  reader.onload = loaded;
+  reader.onerror = errorHandler;
+}
+function loaded(evt) {
+  var fileString = evt.target.result;
+  console.log(fileString);
+  jsonObject = JSON.parse(fileString)
+  loadformvalues(jsonObject)
+  loadtable(jsonObject['bands'],false)
+  changegraphsize()
+}
+function errorHandler(evt) {
+  if(evt.target.error.name == "NotReadableError") {
+    // The file could not be read
+  }
+}
+
+
+
 function hommingMethodSuccess(data, textStatus, jqXHR){
   if(data.error!=''){
     theres_error('#id_parameter_error',false)
@@ -455,31 +537,9 @@ function startMethodError(jqXHR, textStatus, errorThrown){}
 
 function loadMethodSuccess(data, textStatus, jqXHR){
   // Load all the fields with the ones get in the database
-  $("#id_motor_speed").val(data.motor_speed)
-  $("#id_pressure").val(data.pressure)
-  $("#id_frequency").val(data.frequency)
-  $("#id_temperature").val(data.temperature)
-  $("#id_delta_y").val(data.delta_y)
-  $("#id_delta_x").val(data.delta_x)
-
-
-  $("#id_size_x").val(data.size_x)
-  $("#id_size_y").val(data.size_y)
-
-  $("#id_offset_left").val(data.offset_left)
-  $("#id_offset_right").val(data.offset_right)
-  $("#id_offset_top").val(data.offset_top)
-  $("#id_offset_bottom").val(data.offset_bottom)
-
-  $("#id_main_property").val(data.main_property)
-  $("#id_value").val(data.value)
-  $("#id_height").val(data.height)
-  $("#id_gap").val(data.gap)
-
-  $( "#id_value" ).trigger( "change" );
-  $('#id_load_sucess').html(data.file_name+' successfully load!')
-  $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
-  loadtable(data['bands'])
+  loadformvalues(data);
+  loadtable(data['bands'],true)
+  changegraphsize()
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -504,6 +564,32 @@ function saveMethodError(jqXHR, textStatus, errorThrown){
   $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
 
+function loadformvalues(data){
+  $("#id_motor_speed").val(data.motor_speed)
+  $("#id_pressure").val(data.pressure)
+  $("#id_frequency").val(data.frequency)
+  $("#id_temperature").val(data.temperature)
+  $("#id_delta_y").val(data.delta_y)
+  $("#id_delta_x").val(data.delta_x)
+
+
+  $("#id_size_x").val(data.size_x)
+  $("#id_size_y").val(data.size_y)
+
+  $("#id_offset_left").val(data.offset_left)
+  $("#id_offset_right").val(data.offset_right)
+  $("#id_offset_top").val(data.offset_top)
+  $("#id_offset_bottom").val(data.offset_bottom)
+
+  $("#id_main_property").val(data.main_property)
+  $("#id_value").val(data.value)
+  $("#id_height").val(data.height)
+  $("#id_gap").val(data.gap)
+
+  $( "#id_value" ).trigger( "change" );
+  $('#id_load_sucess').html(data.file_name+' successfully load!')
+  $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
+}
 
 // TABLE FUNCTIONS
 const $tableID = $('#table');
@@ -515,7 +601,7 @@ var tablevalues
 jQuery.fn.pop = [].pop;
 jQuery.fn.shift = [].shift;
 
-function gettablevalues(){
+function gettablevalues(toString){
 
  const $rows = $tableID.find('tr:not(:hidden)');
  const headers = [];
@@ -542,6 +628,11 @@ function gettablevalues(){
  });
 
  // Output the result
- tablevalues = '&table='+JSON.stringify(data)
+ if(toString){
+   tablevalues = '&table='+JSON.stringify(data)
+ }
+ else{
+   tablevalues = data
+ }
  return tablevalues
 };
