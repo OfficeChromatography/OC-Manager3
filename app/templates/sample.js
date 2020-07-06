@@ -469,6 +469,24 @@ function getAsText(readFile) {
   }
 }
 
+// Handles list filling with the saved sampleapps
+function loadlistofsampleapps(){
+  $.ajax({
+    method: 'GET',
+    url:    window.location.origin+'/sample/',
+    data:   '&LISTLOAD',
+    success: loadlistMethodSuccess,
+    error: loadlistMethodError,
+  })
+  function loadlistMethodSuccess(data, textStatus, jqXHR){
+    $('#list-load').empty()
+    $.each(data, function(key, value) {
+        $('#list-load').append('<a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">'+value+'</a>')
+      })
+  }
+  function loadlistMethodError(jqXHR, textStatus, errorThrown){}
+}
+
 // Endpoints
 $('#stopbttn').on('click', function (e) {
   event.preventDefault()
@@ -521,7 +539,8 @@ $('#savebttn').on('click', function (e) {
   error: saveMethodError,stopbttn
   })
 })
-$('#list-load a').on('click', function (e) {
+
+$('#list-load').on('click','#list-home-list', function (e) {
 e.preventDefault()
 data={'filename':$(this)[0].innerHTML}
 console.log(data);
@@ -530,7 +549,7 @@ $.ajax({
   url:    window.location.origin+'/samplesave/',
   data:   data,
   success: loadMethodSuccess,
-  error: loadMethodError,
+  error: loadMethodSuccess,
 })
 })
 $('#hommingbttn').on('click', function (e) {
@@ -631,14 +650,14 @@ function saveMethodSuccess(data, textStatus, jqXHR){
   console.log(typeof(data.error));
   if(data.error==undefined){
     $('#id_save_sucess').html(data.message)
-    $( "#id_save_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
+    $("#id_save_sucess").fadeIn().delay( 800 ).fadeOut( 400 );
   }
   else {
     $('#id_save_error').html(data.error)
     $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
   }
-
-
+  console.log("funciono");
+  loadlistofsampleapps();
 }
 function saveMethodError(jqXHR, textStatus, errorThrown){
   console.log(data);

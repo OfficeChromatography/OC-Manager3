@@ -37,9 +37,15 @@ class HommingSetup(View):
 
 class Sample(FormView):
     def get(self, request):
-        # Send the saved config files
-        forms['list_load'] = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
-        return render(request,'sample.html',forms)
+        # LIST LOADING
+        if 'LISTLOAD' in request.GET:
+            sample_application = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
+            names = [i.file_name for i in sample_application]
+            return JsonResponse(names, safe=False)
+        else:
+            forms['list_load'] = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
+            return render(request,'sample.html',forms)
+
 
 class SampleAppPlay(View):
     def post(self, request):
