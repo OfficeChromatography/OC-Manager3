@@ -82,7 +82,7 @@ SCENE_MODE = (('0','None'),('8','Night'),('11','Sports'))
 
 POWER_LINE_FREQUENCY = (('0','Disable'),('1','50 Hz'),('2','60 Hz'),('3','Auto'))
 
-COLOR_EFFECT = {('0','None'),
+COLOR_EFFECT = (('0','None'),
                 ('1','Black & White'),
                 ('2','Sepia'),
                 ('3','Negative'),
@@ -96,8 +96,7 @@ COLOR_EFFECT = {('0','None'),
                 ('11','Art Freeze'),
                 ('12','Silhouette'),
                 ('13','Solarization'),
-                ('14','Set Cb/Cr'),
-                }
+                ('14','Set Cb/Cr'))
 # class PhotoShootPropertiesModel(model.Model):
 #     name = models.CharField(max_length=180)
 #     description = models.TextField()

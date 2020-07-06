@@ -3,28 +3,6 @@ from django.forms import ModelForm
 from .models import CameraControls_Db, UserControls_Db
 from django.contrib.auth.models import User
 
-AWB_MODES = (('0', 'off'),
-            ('1', 'auto'),
-            ('2', 'sunlight'),
-            ('3', 'cloudy'),
-            ('4', 'shade'),
-            ('5', 'tungsten'),
-            ('6', 'fluorescent'),
-            ('7', 'incandescent'),
-            ('8', 'flash'),
-            ('9', 'horizon'))
-
-AUTO_EXPOSURE = (('0', 'off'),
-                ('1', 'auto'))
-
-ISO_SENSITIVITY =   ((0,'0'),
-                    (1,'100000'),
-                    (2,'200000'),
-                    (3,'400000'),
-                    (4,'900000'))
-
-ISO_SENSITIVITY_AUTO =  ((0,'Manual'),
-                        (1,'Auto'))
 FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
             (1,'YUYV'),    # (YUYV 4:2:2)
             (2,'RGB3'),    # (24-bit RGB 8-8-8)
@@ -39,58 +17,6 @@ FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
             (11,'YV12'),   # (Planar YVU 4:2:0)
             (12,'NV21'),   # (Y/CrCb 4:2:0)
             (13,'BGR4'))   # (32-bit BGRA/X 8-8-8-8))
-
-
-IMAGE_EFFECTS = (('0', 'none'),
-                ('1', 'negative'),
-                ('2', 'solarize'),
-                ('6', 'sketch'),
-                ('7', 'denoise'),
-                ('8', 'emboss'),
-                ('9', 'oilpaint'),
-                ('10', 'hatch'),
-                ('11', 'gpen'),
-                ('12', 'pastel'),
-                ('13', 'watercolor'),
-                ('14', 'film'),
-                ('15', 'blur'),
-                ('16', 'saturation'),
-                ('17', 'colorswap'),
-                ('18', 'washedout'),
-                ('19', 'posterise'),
-                ('20', 'colorpoint'),
-                ('21', 'colorbalance'),
-                ('22', 'cartoon'),
-                ('23', 'deinterlace1'),
-                ('24', 'deinterlace2'))
-
-ROTATION = (('0','0'),
-('1','90'),
-('2','180'),
-('3','270'))
-
-EXPOSURE_METERING_MODES = ((0,'Averange'),(1,'Center Weighted'),(2,'Spot'))
-
-SCENE_MODE = ((0,'None'),(8,'Night'),(11,'Sports'))
-
-POWER_LINE_FREQUENCY = ((0,'Disable'),(1,'50 Hz'),(2,'60 Hz'),(3,'Auto'))
-
-COLOR_EFFECT = {(0,'None'),
-                (1,'Black & White'),
-                (2,'Sepia'),
-                (3,'Negative'),
-                (4,'Emboss'),
-                (5,'Sketch'),
-                (6,'Sky Blue'),
-                (7,'Grass Green'),
-                (8,'Skin Whiten'),
-                (9,'Vivid'),
-                (10,'Aqua'),
-                (11,'Art Freeze'),
-                (12,'Silhouette'),
-                (13,'Solarization'),
-                (14,'Set Cb/Cr'),
-                }
 
 
 class SaveShot(forms.Form):
