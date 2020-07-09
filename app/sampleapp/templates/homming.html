@@ -1,0 +1,58 @@
+{% load static %}
+<div class="modal fade" id="hommingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Homming Setup</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="d-flex justify-content-center py-1">
+            <button class="btn btn-secondary btn-icon-split" id='up_arrow'>
+              <span class="icon text-white-50">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+            </button>
+          </div>
+          <div class="d-flex justify-content-around py-1">
+              <button class="btn btn-secondary btn-icon-split" id='left_arrow'>
+                <span class="icon text-white-50">
+                  <i class="fas fa-arrow-left"></i>
+                </span>
+              </button>
+              <button class="btn btn-secondary btn-icon-split" id='homming'>
+                <span class="icon text-white-50">
+                  <i class="fas fa-home"></i>
+                </span>
+              </button>
+              <button class="btn btn-secondary btn-icon-split" id='right_arrow'>
+                <span class="icon text-white-50">
+                  <i class="fas fa-arrow-right"></i>
+                </span>
+              </button>
+          </div>
+          <div class="d-flex justify-content-center py-1">
+            <button class="btn btn-secondary btn-icon-split" id='down_arrow'>
+              <span class="icon text-white-50">
+                <i class="fas fa-arrow-down"></i>
+              </span>
+            </button>
+          </div>
+          <div class="d-flex justify-content-center py-2">
+              <p class="text-center m-0">Steps</p>
+              <input class="custom-range mx-2" name='steprange' value='0' type="range" min="0" max="100" id='steprange'/>
+              <input type="number" class='form-control' value="1" id='steptext' min="1" max="100" style="width: 4em"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-secondary" id='setHome' type="button" data-dismiss="modal">Set Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'homming.js' %}"></script>

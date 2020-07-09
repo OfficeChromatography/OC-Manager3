@@ -23,17 +23,10 @@ forms = {
 
 class HommingSetup(View):
     def post(self, request):
-        try:
-            x = Decimal(request.POST.get('x'))
-            y = Decimal(request.POST.get('y'))
-            # Calculate the movement
-            x_mov = 50-(x/2)
-            y_mov = 30+((100-y)/2)
-            gcode = f'G28\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
-            OC_LAB.send(gcode)
+        print(request.POST['gcode'])
+        if 'move' == request.POST.get('task'):
+            OC_LAB.send(request.POST['gcode'])
             return JsonResponse({'message':'ok'})
-        except ValueError:
-            return JsonResponse({'error':'Error check values'})
 
 class Sample(FormView):
     def get(self, request):

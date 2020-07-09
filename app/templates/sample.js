@@ -552,21 +552,6 @@ $.ajax({
   error: loadMethodSuccess,
 })
 })
-$('#hommingbttn').on('click', function (e) {
-  event.preventDefault()
-  sizes=[,parseFloat($("#id_size_y").val())]
-  $formData = 'HOMMING&x='+$("#id_size_x").val()+'&y='+$("#id_size_y").val()
-  $endpoint = window.location.origin+'/gohomming/'
-  // if
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: hommingMethodSuccess,
-  error: hommingMethodError,
-  })
-})
-
 // Import/Export DATA
 $('#downloadfilebttn').on('click', function (e) {
   event.preventDefault()
