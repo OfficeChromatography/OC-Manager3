@@ -1,3 +1,12 @@
+$('#hommingModal').on('shown.bs.modal', function (e) {
+    gcode = 'G91'
+    sendToMachine(gcode,'move')
+})
+$('#hommingModal').on('hidden.bs.modal', function (e) {
+    gcode = 'G90'
+    sendToMachine(gcode,'move')
+})
+$('#steprange').on()
 $('#steprange').on('change',function(){
   $('#steptext').val($(this).val())
 })
