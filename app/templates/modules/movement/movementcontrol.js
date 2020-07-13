@@ -1,12 +1,10 @@
-$('#hommingModal').on('shown.bs.modal', function (e) {
-    gcode = 'G91'
-    sendToMachine(gcode,'move')
+$('#speedrange').on('change',function(){
+  $('#speedtext').val($(this).val())
 })
-$('#hommingModal').on('hidden.bs.modal', function (e) {
-    gcode = 'G90'
-    sendToMachine(gcode,'move')
+$('#speedtext').on('change',function(){
+  $('#speedrange').val($(this).val())
 })
-$('#steprange').on()
+
 $('#steprange').on('change',function(){
   $('#steptext').val($(this).val())
 })
@@ -33,13 +31,27 @@ $('#homming').on('click',function(){
   gcode = 'G28'
   sendToMachine(gcode,'move')
 })
-$('#setHome').on('click',function(){
-  gcode = 'G92X0Y0'
-  sendToMachine(gcode,'move')
-})
+
 
 function movement(direction){
+  mm = $('#steptext').val()
   value = 'G0'+direction+$('#steptext').val()
+  if(direction.includes("X")){
+    if(direction.includes("-")){
+      zero_position[0]=parseInt(zero_position[0])-parseInt(mm);
+    }
+    else{
+      zero_position[0]+=parseInt(mm);
+    }
+  }
+  if(direction.includes("Y")){
+    if(direction.includes("-")){
+      zero_position[1]-=parseInt(mm);
+    }
+    else{
+      zero_position[1]+=parseInt(mm);
+    }
+  }
   return value;
 }
 
@@ -48,7 +60,7 @@ function sendToMachine(value,task){
   console.log(data);
   $.ajax({
     method: 'POST',
-    url:    window.location.origin + '/gohomming/',
+    url:    window.location.origin + '/setuphomming/',
     data:   data,
     success: setHommingEndpointSucess,
     error: setHommingEndpointError,

@@ -24,3 +24,13 @@ class CleaningProcess_Db(models.Model):
     stop_frequency = models.DecimalField(max_digits=4, decimal_places=0, blank=True, null=True)
     steps = models.DecimalField(max_digits=3, decimal_places=0, blank=True, null=True)
     pressure = models.DecimalField(max_digits=3, decimal_places=0, blank=True, null=True)
+
+class ZeroPosition(models.Model):
+    uploader = models.ForeignKey(
+                get_user_model(),
+                null=True,
+                on_delete=models.CASCADE,
+                blank=True,
+                )
+    zero_x = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    zero_y = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)

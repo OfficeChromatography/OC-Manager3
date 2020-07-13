@@ -21,12 +21,6 @@ forms = {
     'PressureSettings_Form':PressureSettings_Form(),
     }
 
-class HommingSetup(View):
-    def post(self, request):
-        print(request.POST['gcode'])
-        if 'move' == request.POST.get('task'):
-            OC_LAB.send(request.POST['gcode'])
-            return JsonResponse({'message':'ok'})
 
 class Sample(FormView):
     def get(self, request):
