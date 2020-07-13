@@ -1,6 +1,6 @@
 var zero_position
 $('#hommingModal').on('shown.bs.modal', function (e) {
-    gcode = 'G91'
+    gcode = 'G28\nG91'
     sendToMachine(gcode,'move')
     zero_position = [0,0];
 })
