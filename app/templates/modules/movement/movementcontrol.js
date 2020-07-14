@@ -1,3 +1,4 @@
+var zero_position = [0,0]
 $('#speedrange').on('change',function(){
   $('#speedtext').val($(this).val())
 })

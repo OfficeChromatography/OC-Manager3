@@ -1,5 +1,5 @@
 # IMPORTS FOR CLASS BASED View
-from connection.forms import ChatForm, OC_LAB
+from connection.forms import OC_LAB
 from connection.models import Connection_Db
 from django.views import View
 from django.http import JsonResponse, HttpResponse
@@ -13,14 +13,12 @@ from .models import GcodeFile, ZeroPosition
 from printrun import printcore, gcoder
 import time
 
-form = {
-    'commandsend' : ChatForm()
-}
+form ={}
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
-            'stop_frequency':500,
-            'steps':50,
-            'pressure':200}
+                            'stop_frequency':500,
+                            'steps':50,
+                            'pressure':200}
 
 
 class HommingSetup(View):
@@ -80,22 +78,22 @@ class MotorControl(View):
             "./motorcontrol.html",
             form)
 
-    def post(self, request):
-        # Steps follow after a message is Send (Monitor send Form)
-        if 'chattext' in request.POST:
-            form['commandsend'] = ChatForm(request.POST)
-            if form['commandsend'].is_valid():
-                form['commandsend'].send()
-            return JsonResponse({})
-
-        if 'speedrange' in request.POST:
-            print(request.POST)
-            # Converts the request into a valid gcode
-            gcode = simple_move_Gcode_gen(request)
-            form['commandsend'] = ChatForm({'chattext': gcode})
-            if form['commandsend'].is_valid():
-                form['commandsend'].send()
-                return JsonResponse({})
+    # def post(self, request):
+        # # Steps follow after a message is Send (Monitor send Form)
+        # if 'chattext' in request.POST:
+        #     form['commandsend'] = ChatForm(request.POST)
+        #     if form['commandsend'].is_valid():
+        #         form['commandsend'].send()
+        #     return JsonResponse({})
+        #
+        # if 'speedrange' in request.POST:
+        #     print(request.POST)
+        #     # Converts the request into a valid gcode
+        #     gcode = simple_move_Gcode_gen(request)
+        #     form['commandsend'] = ChatForm({'chattext': gcode})
+        #     if form['commandsend'].is_valid():
+        #         form['commandsend'].send()
+        #         return JsonResponse({})
 
 class PumpControl(View):
 

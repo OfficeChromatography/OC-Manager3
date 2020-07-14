@@ -3,27 +3,7 @@
 {% load static %}
 <head>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>OC-Manager 3</title>
-
-  <!-- Custom fonts for this template-->
-  <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-  <!-- Bootstrap core JavaScript-->
-  <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <!-- Core plugin JavaScript-->
-  <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
-  <!-- Custom scripts for all pages-->
-  <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
-  <!-- Custom styles for this template-->
-  <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+{% include 'head.html' %}
 
 </head>
 
@@ -100,52 +80,7 @@
 
             <!-- Monitor Card -->
             <div class="col-sm-12 col-md-10 col-lg-8 col-xl-7 mb-4">
-              <div class="card border-left-success shadow">
-                <div class="card-header">
-                  <div class="container row">
-                    <div class="col align-self-center">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase">Monitor</div>
-                    </div>
-                    <div class="col-auto align-self-center">
-                      {% if connected %}
-                        <i class="fa fa-desktop fa-2x text-green-500" aria-hidden="true"></i>
-                      {% else %}
-                        <i class="fa fa-desktop fa-2x text-gray-300" aria-hidden="true"></i>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <!-- Text on Monitor -->
-                  <div class="row no-gutters align-items-start">
-                    <div class="col">
-                      <div class="form-group noresize" style="height:90%">
-                        <!-- <textarea class="form-control" disabled id="MonitorTextArea" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE">{{received}}</textarea> -->
-                        <textarea class="form-control" disabled id="MonitorTextArea" style="height:100%; resize: none; font-size:small; background-color : #FEFEFE" rows='20'></textarea>
-                        <form method="post" class='message-form' data-url='/monitor/' id="send_area"> {% csrf_token %}
-                          <div class="input-group mb-3 pt-2">
-                            {{commandsend}}
-                            <div class="input-group-append">
-                              <button class="btn btn-outline-secondary" type="submit">Send</button>
-                            </div>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-                  <div class="card-footer text-muted font-italic font-weight-bold">
-                    <table class="table table-borderless table-sm m-0 p-0">
-                      <thead>
-                        <tr>
-                          <th scope="col">Dev: <span id='id_device_info'></span></th>
-                          <th scope="col">Baudrate: <span id='id_baudrate_info'></span></th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
-              </div>
+              {% include 'modules/monitor/monitor.html' %}
             </div>
 
           </div>
@@ -192,39 +127,7 @@
   <script type="text/javascript">
     document.getElementById("MonitorTextArea").scrollTop = document.getElementById("MonitorTextArea").scrollHeight
   </script>
-
-  <script>
-  // using jQuery
-  function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-              var cookie = jQuery.trim(cookies[i]);
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-  }
-
-  var csrftoken = getCookie('csrftoken');
-
-  function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-      }
-  });
-  </script>
+  {% include 'modules/csrftoken/csrftoken.html' %}
   <script src="{% static 'js/sb-admin-2.js' %}"></script>
   <script type="text/javascript">
      var monitor_text = "{{monitor|escapejs|safe}}"

@@ -104,24 +104,3 @@ class ConnectionForm(forms.ModelForm):
             if str(devices.description) != 'n/a':
                 list.append(devices)
         return list
-
-
-# Formular to send the Arduino based on Connection_Db
-class ChatForm(forms.Form):
-
-    chattext = forms.CharField(
-            label="",
-            required=False,
-            widget=forms.TextInput(attrs={
-                        'class': "form-control overflow-y:scroll",
-                        'type': "text",
-                        'aria-describedby': "basic-addon2",
-                        'style': "resize: none; background-color : #FEFEFE"
-            })
-    )
-
-    # method to send to the connected OC_LAB
-    def send(self):
-        message = self.cleaned_data['chattext']
-        OC_LAB.send_now(message)
-        return message
