@@ -241,4 +241,5 @@ class Images_Db(models.Model):
                 blank=True,
                 )
     url = models.CharField(max_length=100, null=True)
+    path = models.CharField(max_length=200, null=True)
     datetime = models.DateTimeField(auto_now_add=True, null=True)

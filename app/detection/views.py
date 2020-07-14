@@ -49,7 +49,8 @@ class Capture_View(View):
             image = Images_Db.objects.filter(uploader=request.user,filename=filename)
             url = image[0].url
             response = {'url':image[0].url,
-                        'filename':image[0].filename}
+                        'filename':image[0].filename,
+                        'meta':'none yet'}
             return JsonResponse(response)
 
         if 'LISTLOAD' in request.GET:
@@ -148,8 +149,13 @@ class Capture_View(View):
                     new_name = fs.save('best.'+pixelformat, File(f))
                     print(fs.url(new_name))
                     data = {
-                        'url':request.META['HTTP_ORIGIN']+fs.url(new_name)
+                        'url':request.META['HTTP_ORIGIN']+fs.url(new_name),
+                        'new_name':new_name,
                     }
 
             print(form['FormatControlsForm'].errors)
             return JsonResponse(data)
+
+class Hdr_View(View):
+    def get(self,request):
+        return render(request,"hdr.html",{})
