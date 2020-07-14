@@ -78,22 +78,6 @@ class MotorControl(View):
             "./motorcontrol.html",
             form)
 
-    # def post(self, request):
-        # # Steps follow after a message is Send (Monitor send Form)
-        # if 'chattext' in request.POST:
-        #     form['commandsend'] = ChatForm(request.POST)
-        #     if form['commandsend'].is_valid():
-        #         form['commandsend'].send()
-        #     return JsonResponse({})
-        #
-        # if 'speedrange' in request.POST:
-        #     print(request.POST)
-        #     # Converts the request into a valid gcode
-        #     gcode = simple_move_Gcode_gen(request)
-        #     form['commandsend'] = ChatForm({'chattext': gcode})
-        #     if form['commandsend'].is_valid():
-        #         form['commandsend'].send()
-        #         return JsonResponse({})
 
 class PumpControl(View):
 
@@ -295,31 +279,6 @@ class GcodeEditor(View):
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
             return JsonResponse({'danger':'STOP'})
-
-
-
-def simple_move_Gcode_gen(request):
-    direction = request.POST.get('button')
-    speed = request.POST.get('speedrange')
-    step = request.POST.get('steprange')
-    if 'arrow' in direction:
-        gcode = "G1 "
-        if 'left' in direction:
-            gcode += "X-"
-        elif 'right' in direction:
-            gcode += "X"
-        elif 'down' in direction:
-            gcode += "Y-"
-        else:
-            gcode += "Y+"
-        gcode += str(step)
-    if 'homming' in direction:
-        gcode = "G28 "
-        if 'x' in direction:
-            gcode += 'X'
-        else:
-            gcode += 'Y'
-    return gcode + ' F' + str(speed)
 
 
 def static_cleaning():
