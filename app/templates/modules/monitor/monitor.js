@@ -7,14 +7,14 @@ chatSocket = new WebSocket(
 '/ws/monitor/' + roomName + '/');
 chatSocket.onmessage = function(e) {
   var data = JSON.parse(e.data);
-  writeOnTextBox(data['message'])
+  writeOnTextBox(data['message']+'\n')
 };
 chatSocket.onclose = function(e) {
   console.error('Chat socket closed unexpectedly');
 };
 function writeOnTextBox(text){
-  document.querySelector('#MonitorTextArea').value += (text + '\n');
-  $("#MonitorTextArea").scrollTop($(this).prop('scrollHeight'))
+  document.querySelector('#MonitorTextArea').value += text;
+  $("#MonitorTextArea").scrollTop($("#MonitorTextArea").prop('scrollHeight'))
   // document.getElementById('MonitorTextArea').scrollTop = document.getElementById("MonitorTextArea").scrollHeight
 }
 

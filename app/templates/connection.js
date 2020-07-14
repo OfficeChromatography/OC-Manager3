@@ -3,7 +3,6 @@ var chatSocket = ''
 
 window.onload = function(){
   // Load the text from the DataBase
-  scrolldown()
   isConnectedEndpointRequest()
   loadDeviceInfo()
   // AJAX POST of the serial_port connection

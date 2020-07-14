@@ -1,3 +1,4 @@
+var new_name;
 $('#shootbttn').on('click', function (e) {
   event.preventDefault()
   $formData = $('#cameraControlsForm').serialize()+'&'+$('#userControlsForm').serialize()+'&'+$('#codecControlsForm').serialize()
@@ -45,11 +46,12 @@ $('#removebttn').on('click', function (e) {
   })
 })
 function savefileMethodSuccess(data, textStatus, jqXHR){
-  loadlistofgcodes()
+  loadlistofimages()
 }
 function savefileMethodError(jqXHR, textStatus, errorThrown){}
 function shootMethodSuccess(data, textStatus, jqXHR){
   $("#image_id").attr("src",data.url);
+  console.log(data.new_name);
 }
 function shootMethodError(jqXHR, textStatus, errorThrown){}
 function loadfileMethodSuccess(data, textStatus, jqXHR){
@@ -58,12 +60,11 @@ function loadfileMethodSuccess(data, textStatus, jqXHR){
 }
 function loadfileMethodError(jqXHR, textStatus, errorThrown){}
 function removeFileMethodSuccess(data, textStatus, jqXHR){
-  loadlistofgcodes()
+  loadlistofimages()
 }
 function removeFileMethodError(jqXHR, textStatus, errorThrown){}
 
-
-function loadlistofgcodes(){
+function loadlistofimages(){
   $.ajax({
     method: 'GET',
     url:    window.location.origin+'/capture/',
