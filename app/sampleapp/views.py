@@ -186,9 +186,9 @@ def calculate(data):
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
 
     applicationsurface = []
-    current_height = 0
-    while current_height <= data.height:
-        for i in range(0,n_bands):
+    for i in range(0,n_bands):
+        current_height = 0
+        while current_height <= data.height:
             applicationline=[]
             current_length=0
             zeros=(i*(length+data.gap))+data.offset_left
@@ -196,7 +196,7 @@ def calculate(data):
                 applicationline.append([data.offset_bottom+current_height, current_length+zeros])
                 current_length+=data.delta_x
             applicationsurface.append(applicationline)
-        current_height+=data.delta_y
+            current_height+=data.delta_y
 
     # Creates the Gcode for the application and return it
     return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure)
