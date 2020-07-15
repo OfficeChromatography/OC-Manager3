@@ -14,23 +14,23 @@ $('#steptext').on('change',function(){
 })
 $('#right_arrow').on('click',function(){
   gcode = movement('X')
-  sendToMachine(gcode,'move')
+  sendToMachine(gcode)
 })
 $('#left_arrow').on('click',function(){
   gcode = movement('X-')
-  sendToMachine(gcode,'move')
+  sendToMachine(gcode)
 })
 $('#up_arrow').on('click',function(){
   gcode = movement('Y')
-  sendToMachine(gcode,'move')
+  sendToMachine(gcode)
 })
 $('#down_arrow').on('click',function(){
   gcode = movement('Y-')
-  sendToMachine(gcode,'move')
+  sendToMachine(gcode)
 })
 $('#homming').on('click',function(){
   gcode = 'G28'
-  sendToMachine(gcode,'move')
+  sendToMachine(gcode)
 })
 
 
@@ -56,12 +56,12 @@ function movement(direction){
   return value;
 }
 
-function sendToMachine(value,task){
-  data={'gcode':value, 'task':task}
+function sendToMachine(value){
+  data={'gcode':value}
   console.log(data);
   $.ajax({
     method: 'POST',
-    url:    window.location.origin + '/setuphomming/',
+    url:    window.location.origin+'/send/',
     data:   data,
     success: setHommingEndpointSucess,
     error: setHommingEndpointError,

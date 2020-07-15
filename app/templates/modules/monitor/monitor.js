@@ -21,7 +21,7 @@ function writeOnTextBox(text){
 // Send the POST request when 'Send' button is pressed
 $('#chatform').on('submit', function(event){
   event.preventDefault()
-  var data = {'chat':$('#id_chattext').val()}
+  var data = {'gcode':$('#id_chattext').val()}
   $.ajax({
     method: 'POST',
     url:    window.location.origin+'/send/',

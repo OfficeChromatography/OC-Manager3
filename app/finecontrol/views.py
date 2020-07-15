@@ -23,18 +23,15 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
 
 class HommingSetup(View):
     def post(self, request):
-        if 'move' == request.POST.get('task'):
-            OC_LAB.send(request.POST['gcode'])
-            return JsonResponse({'message':'ok'})
-        if 'setzero' == request.POST.get('task'):
-            zeros_values = list(request.POST['gcode'].split(","))
+        if request.POST.get('setzero'):
+            zeros_values = list(request.POST['setzero'].split(","))
             zero_on_DB = ZeroPosition( uploader = request.user,
                                      zero_x = float(zeros_values[0]),
                                      zero_y = float(zeros_values[1]))
             zero_on_DB.save()
             return JsonResponse({'message':'ok'})
     def get(self, request):
-        if 'getzero' == request.GET.get('task'):
+        if request.GET.get('getzero'):
             last_zero_position = ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
             OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
         return JsonResponse({'message':'ok'})
