@@ -46,6 +46,6 @@ class IsConnected(View):
 
 class CommunicationWithOC(View):
     def post(self,request):
-        chat = request.POST.get('gcode')
-        OC_LAB.send(chat)
+        gcode = request.POST.get('gcode')
+        OC_LAB.send(gcode)
         return JsonResponse({'message':'Message sent'})

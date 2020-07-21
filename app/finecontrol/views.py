@@ -53,9 +53,21 @@ class Cleaning(object):
         f.write(f'G94 P{pressure}')
         for i in range(fi,fo+step,step):
             for j in range(1,self.time_window*i+1):
-                f.write(f'G97 F{i} P{pressure}'+'\n')
-            f.write('G94 P0\n')
+                f.write(f'G93 F{i} P{pressure}'+'\n')
+                self.duration += 0.25
             self.duration += self.time_window
+        f.close()
+        self.duration*=1.2 # Error correction
+        self.time_left = self.duration
+
+    def static_cleaning(self,fi,fo,step,pressure):
+        # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
+        # range(start, stop, step)
+        self.duration = 0
+        f = open("static_clean.gcode", "w+")
+        f.write(f'G96')
+        for i in range(0,250):
+            f.write(f'G96\n')
         f.close()
         self.duration*=1.2 # Error correction
         self.time_left = self.duration
