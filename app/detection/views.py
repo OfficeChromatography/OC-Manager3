@@ -1,14 +1,22 @@
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
-from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm
-from app.settings import STATIC_ROOT
+from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm
+from app.settings import STATIC_ROOT, MEDIA_ROOT
 from .models import Images_Db
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 import time
 import subprocess
 from types import SimpleNamespace
+import cv2 as cv
+import numpy as np
+from  django.http import QueryDict
+
+MOTION_MODEL = ((0, 'Translation'),
+                    (1, 'Euclidean'),
+                    (2, 'Affine'),
+                    (3, 'Homography'))
 
 
 INITIALS = {'brightness': 50,
@@ -144,7 +152,7 @@ class Capture_View(View):
 
                 fs = FileSystemStorage()
                 photo = '.'+STATIC_ROOT+'/best.'+pixelformat
-
+                
                 with open(photo, 'rb') as f:
                     new_name = fs.save('best.'+pixelformat, File(f))
                     print(fs.url(new_name))
@@ -158,4 +166,90 @@ class Capture_View(View):
 
 class Hdr_View(View):
     def get(self,request):
-        return render(request,"hdr.html",{})
+        form = {
+            'AligmentConfigurationForm':AligmentConfigurationForm(initial={
+                    'number_of_iterations':5000,
+                    'warp_mode':0,
+            }),
+        }
+        return render(request,"hdr.html",form)
+
+    def post(self, request):
+        # print(request.POST)
+        fs = FileSystemStorage()
+
+        form = AligmentConfigurationForm(QueryDict(request.POST.getlist('AligmentConfigurationForm')[0]))
+        urls = request.POST.getlist('url[]')
+
+        if not form.is_valid() or not urls:
+            print("Error")
+            print(form.errors)
+            return JsonResponse({'message':'No images selected'})
+        else:
+            paths = []
+            print(form.cleaned_data)
+            for url in urls:
+                paths.append(fs.path(url[url.rfind('/')+1:]))
+            img_list = [cv.imread(path) for path in paths]
+            test_mertens(   img_list,
+                            form.cleaned_data.get('warp_mode'),
+                            form.cleaned_data.get('number_of_iterations'))
+
+
+            fs_results = FileSystemStorage()
+            with open(f'{MEDIA_ROOT}/hdr/results/fusion_mertens_aligned.jpeg', 'rb') as f:
+                new_name = fs_results.save(f'hdr/results/fusion_mertens_aligned.jpeg', File(f))
+                data = {
+                    'url':request.META['HTTP_ORIGIN']+fs_results.url(new_name),
+                    'new_name':new_name,
+                    'method': MOTION_MODEL[form.cleaned_data.get('warp_mode')][1]
+                }
+                print(data)
+            return JsonResponse(data)
+
+def test_mertens(images, warp_mode, iterations):
+    """MOTION_MODELS = ((0, 'Translation'),
+                        (1, 'Euclidean'),
+                        (2, 'Affine'),
+                        (3, 'Homography'))"""
+    # Convert to grey scale
+    grey_images = []
+    for i in images:
+        grey_images.append(cv.cvtColor(i,cv.COLOR_BGR2GRAY))
+
+    # Find size of 1 of the images
+    sz = grey_images[0].shape
+
+    # Define 2x3 or 3x3 matrices and initialize the matrix to identity
+    if warp_mode == cv.MOTION_HOMOGRAPHY :
+        warp_matrix = np.eye(3, 3, dtype=np.float32)
+    else :
+        warp_matrix = np.eye(2, 3, dtype=np.float32)
+
+    # Specify the threshold of the increment
+    # in the correlation coefficient between two iterations
+    termination_eps = 1e-10;
+    criteria = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, iterations,  termination_eps)
+
+	# Run the ECC algorithm. The results are stored in warp_matrix.
+    aligned_images = []
+    for i in range(1,len(images)):
+        (cc, warp_matrix) = cv.findTransformECC(grey_images[0],grey_images[i],warp_matrix, warp_mode, criteria, grey_images[0], 5)
+
+        if warp_mode == cv.MOTION_HOMOGRAPHY :
+            aligned_images.append(cv.warpPerspective (images[i], warp_matrix, (sz[1],sz[0]), flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP))
+        else:
+            aligned_images.append(cv.warpAffine(images[i], warp_matrix, (sz[1],sz[0]), flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP))
+        cv.imwrite(f'{MEDIA_ROOT}/hdr/aligned/aligned_image{i}.jpeg', aligned_images[i-1])
+        cv.imwrite(f'{MEDIA_ROOT}/hdr/aligned/aligned_image0.jpeg', images[0])
+
+    img_fn=[]
+    for i in range(0,len(images)):
+        img_fn.append(f'aligned_image{i}.jpeg')
+    img_list = [cv.imread(f'{MEDIA_ROOT}/hdr/aligned/'+fn) for fn in img_fn]
+
+    # Exposure fusion using Mertens
+    merge_mertens = cv.createMergeMertens()
+    res_mertens = merge_mertens.process(img_list)
+    res_mertens_8bit = np.clip(res_mertens*255, 0, 255).astype('uint8')
+    cv.imwrite(f'{MEDIA_ROOT}/hdr/results/fusion_mertens_aligned.jpeg', res_mertens_8bit)

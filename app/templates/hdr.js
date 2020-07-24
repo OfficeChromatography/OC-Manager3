@@ -52,7 +52,41 @@ function loadlistofimages(){
   }
   function loadlistMethodError(jqXHR, textStatus, errorThrown){}
 }
+//  Process images
+$('#processbttn').on('click',function(e){
+  event.preventDefault()
+  $endpoint = window.location.origin+'/hdr/'
+  $formData ={  AligmentConfigurationForm:$('#AligmentConfigurationForm').serialize(),
+                url:new Array()}
+  i=0;
+  $('.card-img-top').each(function(){
+      $formData.url.push($(this).attr('src'))
+      });
+  $.ajax({
+    method: 'POST',
+    url:    $endpoint,
+    data:   $formData,
+    success: processMethodSuccess,
+    error: processMethodError,
+    })
+    function processMethodSuccess(data, textStatus, jqXHR){
+      //Hide the images selected.
+      $('.card-columns').children().fadeOut("slow",function(){
+        $('#list-of-images').multiSelect('deselect_all')
+        $('.card-columns').empty()
+        $('.card-columns').append(`<div class="card" id='card-`+'RESULts'+`'>
+          <img class="card-img-top" src="`+data.url+`" alt="Card image cap">
+          <div class="card-body">
+            <h5 class="card-title">`+data.method+`</h5>
+            <p class="card-text">`+'RESULts'+`</p>
+          </div>
+        </div>`)
+      });
+      // Show the new image
 
+    }
+    function processMethodError(jqXHR, textStatus, errorThrown){}
+})
 // $('#processbttn').on('click', function (e) {
 //   event.preventDefault()
 //   $formData =

@@ -295,3 +295,24 @@ class ShootConfigurationForm(forms.Form):
         pixelformat = self.cleaned_data['pixelformat']
         pixelformat = FORMATS[int(pixelformat)][1]
         return pixelformat
+
+MOTION_MODEL = ((0, 'Translation'),
+                    (1, 'Euclidean'),
+                    (2, 'Affine'),
+                    (3, 'Homography'))
+
+class AligmentConfigurationForm(forms.Form):
+    warp_mode = forms.ChoiceField(label='Motion Modes', choices = MOTION_MODEL, widget=forms.Select(attrs={'class':'form-control'}))
+    number_of_iterations = forms.DecimalField(label='Iterations',
+                            required=False,
+                            max_digits=5,
+                            decimal_places=0,
+                            max_value=99000,
+                            min_value=1000,
+                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'step':'1000' ,'class':'form-control'}))
+
+    def clean_number_of_iterations(self):
+        return int(self.cleaned_data['number_of_iterations'])
+
+    def clean_warp_mode(self):
+        return int(self.cleaned_data['warp_mode'])
