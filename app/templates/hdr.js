@@ -74,19 +74,21 @@ $('#processbttn').on('click',function(e){
       $('.card-columns').children().fadeOut("slow",function(){
         $('#list-of-images').multiSelect('deselect_all')
         $('.card-columns').empty()
-        $('.card-columns').append(`<div class="card" id='card-`+'RESULts'+`'>
+        $('.card-columns').append(`<div class="card" id='card-`+'Result:'+`'>
           <img class="card-img-top" src="`+data.url+`" alt="Card image cap">
           <div class="card-body">
             <h5 class="card-title">`+data.method+`</h5>
-            <p class="card-text">`+'RESULts'+`</p>
+            <p class="card-text">`+'Result'+`</p>
           </div>
         </div>`)
       });
       // Show the new image
-
     }
     function processMethodError(jqXHR, textStatus, errorThrown){}
 })
+function toZero(){
+
+}
 // $('#processbttn').on('click', function (e) {
 //   event.preventDefault()
 //   $formData =
