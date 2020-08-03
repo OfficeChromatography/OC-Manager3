@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
-from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm
+from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
+from connection.forms import OC_LAB
 from app.settings import STATIC_ROOT, MEDIA_ROOT
 from .models import Images_Db
 from django.core.files import File
@@ -70,6 +71,7 @@ class Capture_View(View):
             form['FormatControlsForm'] = ShootConfigurationForm(initial=INITIALS)
             form['CameraControlsForm'] = CameraControlsForm(initial=INITIALS)
             form['UserControlsForm'] = UserControlsForm(initial=INITIALS)
+            form['LedsControlsForm'] = LedsControlsForm()
             form['list_load'] = Images_Db.objects.filter(uploader=request.user).order_by('-id')
 
             data={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
@@ -109,6 +111,7 @@ class Capture_View(View):
             form['FormatControlsForm'] = ShootConfigurationForm(request.POST or None)
             form['CameraControlsForm'] = CameraControlsForm(request.POST or None)
             form['UserControlsForm'] = UserControlsForm(request.POST or None)
+            form['LedsControlsForm'] = LedsControlsForm(request.POST or None)
 
             data={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
             if form['CameraControlsForm'].is_valid():
@@ -125,6 +128,16 @@ class Capture_View(View):
                     subprocess.run([f'v4l2-ctl -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
             else:
                 print('Error user Control')
+
+            if form['LedsControlsForm'].is_valid():
+                led365 = form['LedsControlsForm'].cleaned_data['uv365_power']
+                led278 = form['LedsControlsForm'].cleaned_data['uv278_power']
+
+                OC_LAB.send_now(f'M42 P17 S{led365}')
+                OC_LAB.send_now(f'M42 P23 S{led278}')
+                time.sleep(1)
+            else:
+                print('Error LEDs Control')
 
             if form['FormatControlsForm'].is_valid():
                 conf = form['FormatControlsForm'].cleaned_data
@@ -149,10 +162,13 @@ class Capture_View(View):
                 pixelformat=pixelformat.lower()
                 subprocess.call(['v4l2-ctl','--stream-mmap','--stream-count=1','--stream-skip=3','--stream-to='+'./'+STATIC_ROOT+'/best.'+pixelformat])
 
+                # Turn off leds
+                OC_LAB.send_now('M42 P17 S0')
+                OC_LAB.send_now('M42 P23 S0')
 
                 fs = FileSystemStorage()
                 photo = '.'+STATIC_ROOT+'/best.'+pixelformat
-                
+
                 with open(photo, 'rb') as f:
                     new_name = fs.save('best.'+pixelformat, File(f))
                     print(fs.url(new_name))
@@ -161,7 +177,8 @@ class Capture_View(View):
                         'new_name':new_name,
                     }
 
-            print(form['FormatControlsForm'].errors)
+
+
             return JsonResponse(data)
 
 class Hdr_View(View):

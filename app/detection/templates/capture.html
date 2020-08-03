@@ -141,6 +141,29 @@
                   </form>
                 </div>
               </div>
+              <!-- LED CONTROL -->
+              <div class="card shadow mb-4 ">
+                <div class="card-header py-3">
+                  <div class="d-flex flex-row justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">LEDs Controls</h6>
+                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#ledcontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                  </div>
+                </div>
+                <div class="card-body show" id='ledcontrolcontent'>
+                  <form id="ledsControlsForm">
+                    <div class="form-group row">
+                      <div class="col">
+                        {{ LedsControlsForm.uv365_power.label }}
+                        {{ LedsControlsForm.uv365_power }}
+                      </div>
+                      <div class="col">
+                        {{ LedsControlsForm.uv278_power.label }}
+                        {{ LedsControlsForm.uv278_power }}
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
               <!-- FORMAT CONTROL -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
@@ -161,18 +184,6 @@
                   </div>
                   </form>
                 </div>
-
-              <!-- LED CONTROL -->
-              <div class="card shadow mb-4 ">
-                <div class="card-header py-3">
-                  <div class="d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">LEDs Controls</h6>
-                    <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#ledcontrolcontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
-                  </div>
-                </div>
-                <div class="card-body collapse" id='ledcontrolcontent'>
-                </div>
-              </div>
             </div>
           </div>
 

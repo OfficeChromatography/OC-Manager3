@@ -1,7 +1,7 @@
 var new_name;
 $('#shootbttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#cameraControlsForm').serialize()+'&'+$('#userControlsForm').serialize()+'&'+$('#codecControlsForm').serialize()
+  $formData = $('#cameraControlsForm').serialize()+'&'+$('#userControlsForm').serialize()+'&'+$('#codecControlsForm').serialize()+'&'+$('#ledsControlsForm').serialize()
   $endpoint = window.location.origin+'/capture/'
   $.ajax({
   method: 'POST',

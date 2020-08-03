@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import CameraControls_Db, UserControls_Db
+from .models import CameraControls_Db, UserControls_Db, Leds_Db
 from django.contrib.auth.models import User
 
 FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
@@ -316,3 +316,41 @@ class AligmentConfigurationForm(forms.Form):
 
     def clean_warp_mode(self):
         return int(self.cleaned_data['warp_mode'])
+
+class LedsControlsForm(forms.ModelForm):
+        class Meta:
+            model = Leds_Db
+
+            fields =[   'uv365_power',
+                        'uv278_power',]
+
+        uv365_power = forms.DecimalField(label='UV365:',
+                                            required=False,
+                                            max_digits=3,
+                                            decimal_places=0,
+                                            max_value=255,
+                                            min_value=0,
+                                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                            )
+
+        uv278_power = forms.DecimalField(label='UV278:',
+                                            required=False,
+                                            max_digits=3,
+                                            decimal_places=0,
+                                            max_value=255,
+                                            min_value=0,
+                                            widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                            )
+        def clean_uv365_power(self):
+            uv365_power = self.cleaned_data['uv365_power']
+            if not uv365_power:
+                return 0
+            else:
+                return int(uv365_power)
+
+        def clean_uv278_power(self):
+            uv278_power = self.cleaned_data['uv278_power']
+            if not uv278_power:
+                return 0
+            else:
+                return int(uv278_power)

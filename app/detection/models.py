@@ -243,3 +243,16 @@ class Images_Db(models.Model):
     url = models.CharField(max_length=100, null=True)
     path = models.CharField(max_length=200, null=True)
     datetime = models.DateTimeField(auto_now_add=True, null=True)
+
+class Leds_Db(models.Model):
+    uv365_power = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
+
+    uv278_power = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
