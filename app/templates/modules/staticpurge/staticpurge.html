@@ -1,0 +1,68 @@
+{% load static %}
+<div class="card shadow mb-4" id='staticpurgecard'>
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">Static Purge</h6>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Remember!!</strong> To place a magnet over the valve!
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <form id='static-form' method="post"> {% csrf_token %}
+      <div class="form-row align-items-center">
+        <div class="col-2">
+          <span class="text-center mx-2">Cycles</span>
+        </div>
+        <div class="col-6">
+          <input class="custom-range form-control px-1" name='cycles' value='0' type="range" min="0" max="100" id='steprange'/>
+        </div>
+        <div class="col-2">
+          <input type="number" class='form-control px-1' value="0" id='steptext'/>
+        </div>
+        <div class="col-2">
+          <button class="btn btn-secondary btn-icon-split btn-sm" data-toggle="modal" data-target="#warningModal" id='pump_manual' type="submit">
+            <span class="icon text-white-50">
+              <i class="fas fa-gas-pump"></i>
+            </span>
+            <span class="text">Start!</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="card-footer text-muted">
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-secondary btn-icon-split btn-sm" id='next_bttn_stat'>
+        <span class="icon text-white-50">
+          <i class="fas fa-forward"></i>
+        </span>
+        <span class="text">Next Step!</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="warningModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Warning!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>You are about to start the static purge of the system, for this you must place a magnet on the valve to open it.</p>
+        <p>NOT DOING THIS MAY DAMAGE THE SYSTEM</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="clean_bttn">Let's Clean it!</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Let me check it again...</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'modules/staticpurge/staticpurge.js' %}"></script>

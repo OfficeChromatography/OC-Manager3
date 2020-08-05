@@ -20,7 +20,7 @@ function checkconnection(){
   $.get( window.location.origin + '/isconnected/', function( data ) {
     foot = $('#footer')
     footText = $('#footerText')
-    if (data.port!=null){
+    if (data.connected==true){
       $('#footer').removeClass("bg-warning").addClass("bg-success");
       footText.html("OC-Lab Connected to "+ data.port)
     } else{

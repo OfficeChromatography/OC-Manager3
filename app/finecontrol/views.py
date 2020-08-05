@@ -18,7 +18,7 @@ form ={}
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
                             'steps':50,
-                            'pressure':200}
+                            'pressure':20}
 
 
 class HommingSetup(View):
@@ -37,47 +37,36 @@ class HommingSetup(View):
         return JsonResponse({'message':'ok'})
 
 
+
 class Cleaning(object):
 
     def __init__(self):
-        self.time_left = 0
-        self.time_window = 5 # Minimun time for each frequency 5 sec
+        self.time_window = 1 # Minimun time for each frequency 5 sec
         self.duration = 0
-        # self._lastcheck = time.now()
+        self.lines_left = 0
 
     def dinamic_cleaning(self,fi,fo,step,pressure):
         # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
         # range(start, stop, step)
         self.duration = 0
-        f = open("dinamic_clean.gcode", "w+")
-        f.write(f'G94 P{pressure}')
+        dinamic_clean = [f'G94 P{pressure}',]
         for i in range(fi,fo+step,step):
             for j in range(1,self.time_window*i+1):
-                f.write(f'G93 F{i} P{pressure}'+'\n')
-                self.duration += 0.25
+                dinamic_clean.append(f'G93 F{i} P{pressure}'+'\n')
+                self.lines_left += 1
             self.duration += self.time_window
-        f.close()
-        self.duration*=1.2 # Error correction
-        self.time_left = self.duration
 
-    def static_cleaning(self,fi,fo,step,pressure):
+        return dinamic_clean
+
+    def static_cleaning(self,step):
         # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
         # range(start, stop, step)
-        self.duration = 0
-        f = open("static_clean.gcode", "w+")
-        f.write(f'G96')
-        for i in range(0,250):
-            f.write(f'G96\n')
-        f.close()
-        self.duration*=1.2 # Error correction
-        self.time_left = self.duration
+        gcode = []
+        for i in range(0,step):
+            gcode.append(f'G96')
+        return gcode
 
-    def read_cleaning_file(self):
-        return [code_line.strip() for code_line in open(f'{fs.location}/{new_name}')]
-
-    def remain_time(self):
-        self.time_left-=3
-        return self.time_left
+clean = Cleaning();
 
 class MotorControl(View):
     # Manage the GET request
@@ -88,71 +77,61 @@ class MotorControl(View):
             form)
 
 
-class PumpControl(View):
+class Clean(View):
 
     CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                 'stop_frequency':500,
                 'steps':50,
-                'pressure':200}
+                'pressure':15}
 
     def get(self, request):
         form['CleaningProcessForm'] = CleaningProcessForm(initial=CLEANINGPROCESS_INITIALS)
         return render(
             request,
-            "./pumpcontrol.html",
+            "./cleanprocess.html",
             form)
 
     def post(self, request):
         if 'cycles' in request.POST:
             for i in range(0,int(request.POST['cycles'])):
                 OC_LAB.send('M42 P63 T')
-                time.sleep(3/5)
         return render(
             request,
-            "./pumpcontrol.html",
+            "./cleanprocess.html",
             {**form})
 
 clean = Cleaning();
 
-class CleanControl(View):
-
+class StaticPurge(View):
     def post(self, request):
-        print(request.POST)
+        if request.POST.get('cycles'):
+            gcode = clean.static_cleaning(int(request.POST.get('cycles')))
+            light_gcode = gcoder.LightGCode(gcode)
+            OC_LAB.startprint(light_gcode)
+        return JsonResponse({'message':'ok'})
+    def get(self, request):
+        return JsonResponse({'message':'ok'})
+
+class CleanControl(View):
+    def post(self, request):
         if 'PROCESS' in request.POST:
             clean_param = CleaningProcessForm(request.POST)
 
             if clean_param.is_valid():
                 clean_param = clean_param.cleaned_data
-                clean.dinamic_cleaning(clean_param['start_frequency'],clean_param['stop_frequency'],clean_param['steps'],clean_param['pressure'])
-
-                gcode = [code_line.strip() for code_line in open('dinamic_clean.gcode')]
+                gcode = clean.dinamic_cleaning(clean_param['start_frequency'],
+                                                clean_param['stop_frequency'],
+                                                clean_param['steps'],
+                                                clean_param['pressure'])
                 light_gcode = gcoder.LightGCode(gcode)
                 OC_LAB.startprint(light_gcode)
 
-                data= {'message':f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()} sec'}
+                data= {'message':f'Cleaning process in progress, please wait! \n'}
                 data.update({'duration':clean.duration})
             else:
                 data = {'message':'ERROR'}
                 print(clean_param.errors)
             return  JsonResponse(data)
-
-    def get(self, request):
-        # Check the status
-        if 'checkstatus' in request.GET:
-            data = {    'busy':'true',
-                        'message':'',
-                        }
-            if clean.time_left>=0:
-                data['message'] = f'Cleaning process in progress, please wait! \n Approx. time left {clean.remain_time()}s'
-                data.update({'duration':clean.duration})
-                data.update({'time_left':clean.time_left})
-                return  JsonResponse(data)
-            else:
-                data['busy']='false'
-                data['message']='Done!'
-                data.update({'duration':clean.duration})
-                data.update({'time_left':clean.time_left})
-                return  JsonResponse(data)
 
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
@@ -160,6 +139,22 @@ class CleanControl(View):
         if 'PAUSE' in request.POST:
             OC_LAB.pause()
             return JsonResponse({'message':'paused'})
+
+    def get(self, request):
+        # Check the status
+        if 'checkstatus' in request.GET:
+            data = {    'busy':'true',
+                        'message':'',
+                        }
+            if OC_LAB.printing:
+                data['message'] = f'Cleaning process in progress, please wait! \n'
+                return  JsonResponse(data)
+            else:
+                data['busy']='false'
+                data['message']='Done!'
+                return  JsonResponse(data)
+
+
 
 class GcodeEditor(View):
 

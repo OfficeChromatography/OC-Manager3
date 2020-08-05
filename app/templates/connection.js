@@ -68,6 +68,10 @@ function loadDeviceInfo(){
       $('#id_device_info').html("<b>"+data.port+"</b>");
       $('#id_baudrate_info').html("<b>"+data.baudrate+"</b>");
     }
+    else{
+      $('#id_device_info').html("<b>"+"</b>");
+      $('#id_baudrate_info').html("<b>"+"</b>");
+    }
     console.log(data);
   }
   function infoDeviceMethodError(jqXHR, textStatus, errorThrown){}
@@ -81,3 +85,22 @@ function resolveAfter2Seconds() {
     }, 2000);
   });
 }
+
+$('#disconnectBttn').on('click',function(e){
+  event.preventDefault();
+  $.ajax({
+    method: 'POST',
+    url:    window.location.origin + '/connection/',
+    data:   '&DISCONNECT',
+    success: disconnectSuccess,
+    error: disconnectError,
+  })
+  function disconnectSuccess(data, textStatus, jqXHR){
+    document.querySelector('#MonitorTextArea').value = ''
+    resolveAfter2Seconds()
+    loadDeviceInfo();
+    checkconnection();
+  }
+  function disconnectError(jqXHR, textStatus, errorThrown){}
+
+})

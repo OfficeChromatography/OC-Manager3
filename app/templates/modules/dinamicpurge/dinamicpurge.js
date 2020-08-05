@@ -1,7 +1,3 @@
-// Slider
-function sliderChange(val,id){
-  document.getElementById(id).value = val;
-}
 
 // Cleaning EndPoint
 $('#cleanbttn').on('click', function (e) {
@@ -20,7 +16,7 @@ $('#stopbttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'STOP&'
-  $endpoint = window.location.origin+'/sampleapp/'
+  $endpoint = window.location.origin+'/cleanprocess/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
@@ -33,7 +29,7 @@ $('#pausebttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'PAUSE&'
-  $endpoint = window.location.origin+'/sampleapp/'
+  $endpoint = window.location.origin+'/cleanprocess/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
@@ -42,6 +38,7 @@ $('#pausebttn').on('click', function (e) {
   error: pauseMethodError,
   })
 })
+
 
 function cleanMethodSuccess(data, textStatus, jqXHR){
   console.log(data);
@@ -67,7 +64,6 @@ function pauseMethodSuccess(data, textStatus, jqXHR){
 function pauseMethodError(jqXHR, textStatus, errorThrown){}
 
 
-
 // Cleaning status EndPoint
 var checkStatusInterval
 function checkCleaningStatus(){
@@ -85,11 +81,11 @@ function checkCleaningStatus(){
     console.log(data);
     if(data.busy=='true'){
       cleaningstatusalert(true, data.message)
-      progressbar(data.duration,data.time_left,data.busy)
+      progressbar(data.busy)
     }
     else{
       cleaningstatusalert(false, data.message)
-      progressbar(data.duration,data.time_left,data.busy)
+      progressbar(data.busy)
       clearInterval(checkStatusInterval)
     }
     // return true
@@ -114,11 +110,11 @@ function cleaningstatusalert(show, message){
   }
 }
 
-function progressbar(duration,time_left,state){
+function progressbar(state){
   progress_obj = $('#id_clean_progress_bar')
   if(state=='true'){
     progress_obj.fadeIn()
-    progressval = 100-(parseInt(time_left)*100/parseInt(duration))+'%'
+    progressval = 50+'%'
     $('#id_clean_progress_bar').width(progressval)
     console.log(progressval);
   }
@@ -127,3 +123,9 @@ function progressbar(duration,time_left,state){
   }
 
 }
+$("#next_bttn_dina").on('click',function(e){
+  $.when($("#dinamicpurgecard").fadeOut()).done(function() {
+         $("#stepscounter").text('Step 3/3')
+         $("#staticpurgecard").fadeIn();
+  });
+})

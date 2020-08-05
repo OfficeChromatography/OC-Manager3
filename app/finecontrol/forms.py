@@ -52,8 +52,8 @@ class CleaningProcessForm(forms.ModelForm):
                             required=False,
                             max_digits=3,
                             decimal_places=0,
-                            max_value=350,
-                            min_value=100,
+                            max_value=20,
+                            min_value=14,
                             widget=forms.NumberInput(attrs={'size': '1', 'placeholder':'200', 'class':'form-control'}))
 
     def clean_start_frequency(self):
