@@ -20,6 +20,7 @@ class Connection_test(View):
                         )
 
     def post(self, request):
+        print(request.POST)
         # Steps follow after a ConnectionRequest is Send (Connection Form)
         if 'oc_lab' in request.POST:
             connection_form_instance = ConnectionForm(request.POST, user=request.user)
@@ -29,6 +30,11 @@ class Connection_test(View):
             else:
                 data = IsConnected.data_info()
             return JsonResponse({**data})
+
+        if 'DISCONNECT' in request.POST:
+            if OC_LAB:
+                OC_LAB.disconnect();
+                return JsonResponse({'message':'disconnected'})
 
 
 # EndPoint to Know if theres a current connection with an OC-Lab

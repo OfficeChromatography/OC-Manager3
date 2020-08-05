@@ -71,7 +71,10 @@
                     {{ connectionset.timeout.label_tag }}
                     {{ connectionset.timeout }}
 
-                    <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
+                    <div class="d-flex">
+                      <button class="btn btn-outline-secondary" type="submit" id="connButton">Connect</button>
+                      <button class="btn btn-outline-secondary" id="disconnectBttn">Disconnect</button>
+                    </div>
                   </form>
                 </div>
                   <div class="card-footer text-muted">{{message}}</div>
