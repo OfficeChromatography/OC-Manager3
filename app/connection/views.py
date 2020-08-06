@@ -53,5 +53,6 @@ class IsConnected(View):
 class CommunicationWithOC(View):
     def post(self,request):
         gcode = request.POST.get('gcode')
+        print(gcode)
         OC_LAB.send(gcode)
         return JsonResponse({'message':'Message sent'})

@@ -14,7 +14,7 @@ $('#setHome').on('click',function(e){
   console.log(data);
   $.ajax({
     method: 'POST',
-    url:    window.location.origin+'/send/',
+    url:    window.location.origin+'/setuphomming/',
     data:   data,
     success: setHommingEndpointSucess,
     error: setHommingEndpointError,
@@ -29,5 +29,11 @@ $('#getHome').on('click',function(e){
     method: 'GET',
     url:    window.location.origin + '/setuphomming/',
     data:   data,
+    success: loadHommingEndpointSucess,
+    error: loadHommingEndpointError,
   })
+  function loadHommingEndpointSucess(data, textStatus, jqXHR){
+    console.log("SADSADASD");
+  }
+  function loadHommingEndpointError(jqXHR, textStatus, errorThrown){}
 })
