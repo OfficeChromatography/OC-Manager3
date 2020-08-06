@@ -20,6 +20,17 @@ class Development_Form(forms.ModelForm):
         }
 
 class PlateProperties_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['size_y'] = 100
+        initial['size_x'] = 100
+        initial['offset_left'] = 1
+        initial['offset_right'] = 1
+        initial['offset_top'] = 1
+        initial['offset_bottom'] = 1
+        kwargs['initial'] = initial
+        super(PlateProperties_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = PlateProperties_Dev_Db
         fields = ['size_x','size_y','offset_left','offset_right','offset_top','offset_bottom']
@@ -41,31 +52,72 @@ class PlateProperties_Form(forms.ModelForm):
         }
 
 class DevelopmentBandSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['volume'] = 100
+        initial['fluid'] = 'Methanol'
+        kwargs['initial'] = initial
+        super(DevelopmentBandSettings_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','printBothways']
+        fields = ['volume','fluid','printBothways','density','viscosity']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'printBothways'   : forms.CheckboxInput(attrs={'class': 'form-control checkbox'}),
+            'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
+                ('n-Hexane','n-Hexane'),
+                ('Pentane','Pentane'),
+                ('Cyclohexane','Cyclohexane'),
+                ('Carbon Tetrachloride','Carbon Tetrachloride'),
+                ('Toluene','Toluene'),
+                ('Chloroform','Chloroform'),
+                ('Dichloromethane','Dichloromethane'),
+                ('Diethyl ether','Diethyl ether'),
+                ('Ethyl acetate','Ethyl acetate'),
+                ('Acetone','Acetone'),
+                ('Ethanol','Ethanol'),
+                ('Methanol','Methanol'),
+                ('Pyridine','Pyridine'),
+                ('Water','Water'),
+                ('Specific','Specific')
+            ]),
         }
         labels = {
             'volume'         : _('Volume'),
-            'printBothways'         : _('print bothways'),
+            'fluid'         : _('Fluid'),
         }
 
+        def clean(self):
+            fluid = self.cleaned_data.get("fluid")
+            density = self.cleaned_data.get("density")
+            viscosity = self.cleaned_data.get("viscosity")
+            print('helloforms')
+            if fluid == 'Specific':
+                if density == "null" or viscosity == "null":
+                    raise forms.ValidationError(
+                        "Specify Density and Viscosity!"
+                    )
+            return self.cleaned_data
+            
+
 class MovementSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['motor_speed'] = 3000
+        initial['delta_x'] = 0.5
+        kwargs['initial'] = initial
+        super(MovementSettings_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = MovementSettings_Dev_Db
-        fields = ['motor_speed','delta_x','delta_y']
+        fields = ['motor_speed','delta_x']
         widgets = {
             'motor_speed'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'delta_x'       : forms.NumberInput(attrs={'class': 'form-control'}),
-            'delta_y'       : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'motor_speed' : _('MotorSpeed'),
             'delta_x'     : _('Delta X'),
-            'delta_y'     : _('Delta Y'),
         }
 
         def clean_motor_speed(self):
@@ -74,13 +126,29 @@ class MovementSettings_Form(forms.ModelForm):
 
 
 class PressureSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['pressure'] = 21
+        initial['frequency'] = 1400
+        initial['temperature'] = 0
+        kwargs['initial'] = initial
+        super(PressureSettings_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = PressureSettings_Dev_Db
-        fields = ['pressure','frequency', 'temperature']
+        fields = ['pressure','frequency', 'temperature','nozzlediameter']
         widgets = {
             'pressure'              : forms.NumberInput(attrs={'class': 'form-control'}),
             'frequency'             : forms.NumberInput(attrs={'class': 'form-control'}),
             'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
+            'nozzlediameter'        : forms.Select(attrs={'class': 'form-control'}, choices=[
+                ('0.25','0.25'),
+                ('0.19','0.19'),
+                ('0.13','0.13'),
+                ('0.10','0.10'),
+                ('0.08','0.08'),
+                ('0.05','0.05'),
+            ]),
         }
 
         def clean_temperature(self):

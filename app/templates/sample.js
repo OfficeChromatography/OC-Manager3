@@ -79,10 +79,10 @@ $("#id_delta_x").change(
     loadResumeTable()
   }
 )
-$("#id_mainCalculations_property").change(
+$("#id_main_property").change(
   // The default hiden is in the html file
   function(){
-    switch ($("#id_mainCalculations_property").val()) {
+    switch ($("#id_main_property").val()) {
       case '1':
           $("#id_valuesform").fadeOut();
           $("#id_valuesunit").html('#');
@@ -92,14 +92,14 @@ $("#id_mainCalculations_property").change(
           break;
       case '2':
           $("#id_valuesform").fadeOut();
-          $("#id_valuesunit").html('mm');
+          $("#id_valuesunit").html('[mm]');
           $("#id_valuesform").fadeIn();
           $("#bandlengthform").fadeIn();
           $("#nbandsrow").hide();
           $("#lengthbandsrow").show();
         break;
-    loadResumeTable()
     }
+    loadResumeTable()
   }
 )
 
@@ -143,7 +143,7 @@ $("#id_offset_top").change(
   }
 );
 
-$("#id_mainCalculations_property").change(
+$("#id_main_property").change(
   function(){
     mainCalculations()
     loadResumeTable()
@@ -167,6 +167,16 @@ $("#id_gap").change(
     loadResumeTable()
   }
 )
+
+$('#table').change(function(){
+  $(".fluidSelect").each(function(){
+    if ($(this).val() == 'Specific') {
+      $(this).parent().find($('.specificFluidTable')).show()
+    } else {
+      $(this).parent().find($('.specificFluidTable')).hide()
+    }
+  })
+})
 
 // MAIN
 function mainCalculations(){
@@ -308,7 +318,7 @@ function loadResumeTable(){
   $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
   $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
   $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
-  $('#band_properties_resume').text($("#id_mainCalculations_property option:selected").text())
+  $('#band_properties_resume').text($("#id_main_property option:selected").text())
   $('#n_bands_resume').text($("#id_value").val())
   $('#length_resume').text($("#id_value").val())
   $('#delta_resume').text($("#id_delta_x").val()+','+$("#id_delta_y").val())
@@ -319,18 +329,22 @@ function loadResumeTable(){
 // Create a new Table with a given number of rows
 function newComponentsTable(number_row){
   let newTr1 = `
-  <tr class="hide">
-  <td class="pt-3-half">`;
+  <tr class="hide trClass">
+  <td class="pt-3-half bcomponents">`;
   let newTr2 = `</td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  </tr>`
+  <td class="pt-3-half bcomponents" contenteditable="true"></td>
+  <td class="pt-3-half bcomponents" contenteditable="true"></td>
+  <td class="pt-3-half bcomponents"><select class="form-control fluidSelect" id="fluidSelect`
+  let newTr3 = `" ><option>Water</option><option>Methanol</option><option>Acetone</option><option>Specific</option></select>
+  <div style="display: none;" class="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
+  <tr class="hide"><td class="pt-3-half">density [g/cm³]</td><td class="pt-3-half densityval" contenteditable="true"></td></tr>
+  <tr class="hide"><td class="pt-3-half">viscosity [cSt]</td><td class="pt-3-half viscosityval" contenteditable="true"></td></tr>
+  `
   $('#tbody_band').empty()
   console.log(number_row);
   number_row = parseInt(number_row)
   for(i=0;i<number_row;i++){
-    $('#tbody_band').append(newTr1+(i+1)+newTr2);
+    $('#tbody_band').append(newTr1+(i+1)+newTr2+(i+1)+newTr3+'</div></td></tr>');
   }
 }
 // Load the table with data from de DB or from file
@@ -346,17 +360,29 @@ function loadComponentsTable(band,fromDB){
     idbandname= "band"
     idvolumename= "volume (ul)"
   }
+  console.log(Object.keys(band))
   for (i = 0; i < Object.keys(band).length; i++){
+    
+    selectOption = '<select id="fluidSelect'+(i+1)+'" class="form-control fluidSelect"><option value="Water">Water</option><option value="Methanol">Methanol</option><option value="Acetone">Acetone</option><option value="Specific">Specific</option></select>'
+      
     newTr1 = `
-    <tr class="hide">
-    <td class="pt-3-half">`+band[i][idbandname]+`</td>
-    <td class="pt-3-half" contenteditable="true">`+band[i]["description"]+`</td>
-    <td class="pt-3-half" contenteditable="true">`+band[i][idvolumename]+`</td>
-    <td class="pt-3-half" contenteditable="true">`+band[i]["type"]+`</td>
+    <tr class="hide trClass">
+    <td class="pt-3-half bcomponents">`+band[i][idbandname]+`</td>
+    <td class="pt-3-half bcomponents" contenteditable="true">`+band[i]["description"]+`</td>
+    <td class="pt-3-half bcomponents" contenteditable="true">`+band[i][idvolumename]+`</td>
+    <td class="pt-3-half bcomponents">`+selectOption+`<div style="display: none;" class="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
+    <tr class="hide"><td class="pt-3-half">density</td><td class="pt-3-half densityval" contenteditable="true">`+band[i]["density"]+`</td></tr>
+    <tr class="hide"><td class="pt-3-half">viscosity</td><td class="pt-3-half viscosityval" contenteditable="true">`+band[i]["viscosity"]+`</td></tr></div></td>
     </tr>`;
     $('#tbody_band').append(newTr1);
+    fluidString = '#fluidSelect'+(i+1)
+    $(fluidString).val(band[i]["type"])
+      if (band[i]["type"] == "Specific") {
+        $(fluidString).parent().find($('.specificFluidTable')).show()
+      }
   }
 }
+
 
 // Load field values with 'data' Object
 function loadFieldsValues(data){
@@ -366,6 +392,7 @@ function loadFieldsValues(data){
   $("#id_temperature").val(data.temperature)
   $("#id_delta_y").val(data.delta_y)
   $("#id_delta_x").val(data.delta_x)
+  $('#id_nozzlediameter').val(data.nozzlediameter)
 
 
   $("#id_size_x").val(data.size_x)
@@ -376,40 +403,49 @@ function loadFieldsValues(data){
   $("#id_offset_top").val(data.offset_top)
   $("#id_offset_bottom").val(data.offset_bottom)
 
-  $("#id_mainCalculations_property").val(data.mainCalculations_property)
+  $("#id_main_property").val(data.main_property)
   $("#id_value").val(data.value)
   $("#id_height").val(data.height)
   $("#id_gap").val(data.gap)
 
   $( "#id_value" ).trigger( "change" );
-  $('#id_load_sucess').html(data.file_name+' successfully load!')
+  $('#id_load_sucess').html(data.file_name+' successfully loaded!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
 
 // Returns a string or an Object with the table values
 function getTableValues(toString){
 
- const $rows = $tableID.find('tr:not(:hidden)');
+ const $rows = $tableID.find('.trClass');
  const headers = [];
  const data = [];
 
  // Get the headers (add special header logic here)
- $($rows.shift()).find('th:not(:empty)').each(function () {
-
+ $tableID.find('th').each(function () {
    headers.push($(this).text().toLowerCase());
  });
-
  // Turn all existing rows into a loopable array
- $rows.each(function () {
-   const $td = $(this).find('td');
+ $rows.each(function (j) {
+   const $td = $(this).find('.bcomponents');
    const h = {};
-
    // Use the headers from earlier to name our hash keys
    headers.forEach((header, i) => {
+    if (header == 'type') {
+      stringFluidSelect = 'select[id="fluidSelect'+(j+1)+'"] option:selected';
+      h[header] = $(stringFluidSelect).val();
 
-     h[header] = $td.eq(i).text();
+        if (h[header]=='Specific') {
+          h['density'] = $(stringFluidSelect).parent().parent().find('.densityval').text();
+          h['viscosity'] = $(stringFluidSelect).parent().parent().find('.viscosityval').text();
+        } else {
+          h['density'] = ''
+          h['viscosity'] = ''
+        }
+    } else {
+      h[header] = $td.eq(i).text();
+    }
    });
-
+   console.log(h);
    data.push(h);
  });
 
@@ -517,7 +553,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getTableValues(true)
   $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
   method: 'POST',
@@ -549,7 +585,7 @@ $.ajax({
   url:    window.location.origin+'/samplesave/',
   data:   data,
   success: loadMethodSuccess,
-  error: loadMethodSuccess,
+  error: loadMethodError,
 })
 })
 // Import/Export DATA
@@ -615,7 +651,7 @@ function pauseMethodSuccess(data, textStatus, jqXHR){
 function pauseMethodError(jqXHR, textStatus, errorThrown){}
 
 function startMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
+  //console.log(data);
   $('.control-bttn').removeClass('btn-danger btn-secondary')
   $('.control-bttn').addClass('btn btn-success')
 }
@@ -641,11 +677,25 @@ function saveMethodSuccess(data, textStatus, jqXHR){
     $('#id_save_error').html(data.error)
     $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
   }
-  console.log("funciono");
+  //console.log("funciono");
   loadlistofsampleapps();
 }
-function saveMethodError(jqXHR, textStatus, errorThrown){
+function saveMethodError(data, jqXHR, textStatus, errorThrown){
   console.log(data);
   $('#id_save_error').html(data.error)
   $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
+
+//sets the initial setting of main_property
+$(window).on('beforeunload', function(){
+  $('#id_main_property').val("1")
+});
+
+
+function showSpecificFields() {
+  $('select').filter(function() {return $(this).val()=="Specific"}).each(function() {
+    $(this).parent().append("Some appended text.");
+  })
+}
+
+

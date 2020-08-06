@@ -1,10 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import PlateProperties_Db, SampleApplication_Db, BandSettings_Db, MovementSettings_Db, PressureSettings_Db, BandsComponents_Db
-PROP_CHOICES =(
-    ("1", "N Bands"),
-    ("2", "Lenght"),
-)
+
 
 class SampleApplication_Form(forms.ModelForm):
     class Meta:
@@ -23,6 +20,16 @@ class SampleApplication_Form(forms.ModelForm):
         }
 
 class PlateProperties_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['size_y'] = 100
+        initial['size_x'] = 100
+        initial['offset_left'] = 1
+        initial['offset_right'] = 1
+        initial['offset_top'] = 1
+        initial['offset_bottom'] = 1
+        kwargs['initial'] = initial
+        super(PlateProperties_Form, self).__init__(*args, **kwargs)
     class Meta:
         model = PlateProperties_Db
         fields = ['size_x','size_y','offset_left','offset_right','offset_top','offset_bottom']
@@ -44,9 +51,21 @@ class PlateProperties_Form(forms.ModelForm):
         }
 
 class BandSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['value'] = 2
+        initial['height'] = 1
+        initial['gap'] = 4
+        kwargs['initial'] = initial
+        super(BandSettings_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = BandSettings_Db
         fields = ['main_property','value','height','gap']
+        PROP_CHOICES =(
+            ("1", "N Bands"),
+            ("2", "Length"),
+            )
         widgets = {
             'main_property' : forms.Select(choices=PROP_CHOICES, attrs={'class': 'form-control'}),
             'value'   : forms.NumberInput(attrs={'class': 'form-control'}),
@@ -64,6 +83,13 @@ class BandSettings_Form(forms.ModelForm):
             return int(self.main_property)
 
 class MovementSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['motor_speed'] = 3000
+        initial['delta_x'] = 0.5
+        initial['delta_y'] = 0.5
+        kwargs['initial'] = initial
+        super(MovementSettings_Form, self).__init__(*args, **kwargs)
     class Meta:
         model = MovementSettings_Db
         fields = ['motor_speed','delta_x','delta_y']
@@ -84,15 +110,29 @@ class MovementSettings_Form(forms.ModelForm):
 
 
 class PressureSettings_Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        initial['pressure'] = 21
+        initial['frequency'] = 1400
+        initial['temperature'] = 0
+        kwargs['initial'] = initial
+        super(PressureSettings_Form, self).__init__(*args, **kwargs)
     class Meta:
         model = PressureSettings_Db
-        fields = ['pressure','frequency', 'temperature']
+        fields = ['pressure','frequency', 'temperature','nozzlediameter']
         widgets = {
             'pressure'              : forms.NumberInput(attrs={'class': 'form-control'}),
             'frequency'             : forms.NumberInput(attrs={'class': 'form-control'}),
             'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
+            'nozzlediameter'        : forms.Select(attrs={'class': 'form-control'}, choices=[
+                ('0.25','0.25'),
+                ('0.19','0.19'),
+                ('0.13','0.13'),
+                ('0.10','0.10'),
+                ('0.08','0.08'),
+                ('0.05','0.05'),
+            ]),
         }
-
         def clean_temperature(self):
             temperature = self.temperature
             if not temperature:
@@ -101,7 +141,7 @@ class PressureSettings_Form(forms.ModelForm):
 class BandsComponents_Form(forms.ModelForm):
     class Meta:
         model = BandsComponents_Db
-        fields = ['band_number','description', 'volume', 'type']
+        fields = ['band_number','description', 'volume', 'type', 'density', 'viscosity']
         exclude = ['sample_application']
 
     def clean_band_number(self):
@@ -119,3 +159,25 @@ class BandsComponents_Form(forms.ModelForm):
     def clean_type(self):
         type = self.cleaned_data.get('type')
         return type
+    
+    def clean_density(self):
+        density = self.cleaned_data.get('density')
+        return density
+
+    def clean_viscosity(self):
+        viscosity = self.cleaned_data.get('viscosity')
+        return viscosity
+
+    def clean(self):
+        viscosity = self.cleaned_data.get('viscosity')
+        density = self.cleaned_data.get('density')
+        type = self.cleaned_data.get('type')
+
+        if type == 'Specific':
+            if density == "null" or viscosity == "null":
+                    raise forms.ValidationError(
+                        "Specify Density and Viscosity!"
+                    )
+        return self.cleaned_data
+
+

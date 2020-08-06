@@ -57,12 +57,6 @@ $("#id_frequency").change(
     loadresume()
   }
 )
-$("#id_delta_y").change(
-  function(){
-    console.log('dey');
-    loadresume()
-  }
-)
 $("#id_delta_x").change(
   function(){
     console.log('dex');
@@ -118,12 +112,18 @@ $("#id_volume").change(
     loadresume()
   }
 );
-$("#id_printBothways").change(
+$("#id_fluid").change(
   function(){
     bandsmain()
     loadresume()
+    if ($(this).val() == 'Specific') {
+      $('#specificFluidTable').show()
+    } else {
+      $('#specificFluidTable').hide()
+    }
   }
 );
+
 
 function bandsmain(){
   plate_x_size = parseFloat($("#id_size_x").val());
@@ -135,7 +135,7 @@ function bandsmain(){
   offset_bottom_size = parseFloat($("#id_offset_bottom").val());
 
   volume = parseFloat($("#id_volume").val());
-  printBothways = $('#id_printBothways').is(":checked");
+  printBothways = $('#printBothwaysButton').text();
 
   band_height = 0.1;
 
@@ -155,7 +155,7 @@ function bandsmain(){
   if(theres_error('#id_space_error',working_area[1]<band_height)){return}
 
   band_size = working_area[0]
-  console.log(band_size);
+  
   while(plotPreview.data.datasets.pop()!=undefined){}
   newdata = []
   newdata[0]={y:offset_bottom_size,x:offset_left_size}
@@ -178,7 +178,7 @@ function banddescrition(number_row){
   <td class="pt-3-half" contenteditable="true"></td>
   </tr>`
   $('#tbody_band').empty()
-  console.log(number_row);
+  //console.log(number_row);
   number_row = parseInt(number_row)
   for(i=0;i<number_row;i++){
     $('#tbody_band').append(newTr1+(i+1)+newTr2);
@@ -229,9 +229,10 @@ function loadresume(){
   $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
   $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
   $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
-  $('#delta_resume').text($("#id_delta_x").val()+','+$("#id_delta_y").val())
-  $('#volume_resume').text($("id_volume").val())
-  $('#printBothways_resume').text($("id_printBothways").val())
+  $('#delta_resume').text($("#id_delta_x").val())
+  $('#volume_resume').text($("#id_volume").val())
+  $('#fluid_resume').text($("#id_fluid").val())
+  $('#printBothways_resume').text($('#printBothwaysButton').text());
 }
 
 function changegraphsize(){
@@ -270,7 +271,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentplay/'
   $.ajax({
   method: 'POST',
@@ -282,7 +283,7 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentsave/'
   $.ajax({
   method: 'POST',
@@ -303,20 +304,6 @@ $.ajax({
   success: loadMethodSuccess,
   error: loadMethodError,
 })
-})
-$('#hommingbttn').on('click', function (e) {
-  event.preventDefault()
-  sizes=[,parseFloat($("#id_size_y").val())]
-  $formData = 'HOMMING&x='+$("#id_size_x").val()+'&y='+$("#id_size_y").val()
-  $endpoint = window.location.origin+'/gohomming/'
-  // if
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: hommingMethodSuccess,
-  error: hommingMethodError,
-  })
 })
 
 function hommingMethodSuccess(data, textStatus, jqXHR){
@@ -357,9 +344,8 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_pressure").val(data.pressure)
   $("#id_frequency").val(data.frequency)
   $("#id_temperature").val(data.temperature)
-  $("#id_delta_y").val(data.delta_y)
   $("#id_delta_x").val(data.delta_x)
-
+  $('#id_nozzlediameter').val(data.nozzlediameter)
 
   $("#id_size_x").val(data.size_x)
   $("#id_size_y").val(data.size_y)
@@ -370,11 +356,28 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_offset_bottom").val(data.offset_bottom)
 
   $("#id_volume").val(data.volume)
-  $("#id_printBothways").val(data.printBothways)
 
-  $('#id_load_sucess').html(data.file_name+' successfully load!')
+  if (data.printBothways=='On') {
+    $("#printBothwaysButton").text('On');
+  } else {
+    $("#printBothwaysButton").text('Off');
+  }
+  
+  $('#id_fluid').val(data.fluid)
+
+  if (data.fluid == 'Specific') {
+    $('#specificFluidTable').show()
+  } else {
+    $('#specificFluidTable').hide()
+  }
+
+  $('#densityval').text(data.density)
+  $('#viscosityval').text(data.viscosity)
+
+  $('#id_load_sucess').html(data.file_name+' successfully loaded!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
   bandsmain()
+  loadresume()
   changegraphsize()
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
@@ -399,3 +402,38 @@ function saveMethodError(jqXHR, textStatus, errorThrown){
   $('#id_save_error').html(data.error)
   $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }
+
+function getSpecificFluid(toString){
+  data = {}
+  data['fluid'] = $('#id_fluid').val()
+  data['printBothways'] = $('#printBothwaysButton').text()
+  data['volume'] = $('#id_volume').val()
+  data['density'] = $('#densityval').text()
+  data['viscosity'] = $('#viscosityval').text()
+
+  if(toString){
+    data = '&devBandSettings='+JSON.stringify(data)
+  }
+  return data
+}
+
+$('#printBothwaysButton').on('click', function (e) {
+  event.preventDefault()
+  if ($('#printBothwaysButton').text()=='Off') {
+    $("#id_printBothways").prop('checked', true);
+    $('#printBothwaysButton').text('On');
+    $('#printBothways_resume').text('On');
+  } else {
+    $("#id_printBothways").prop('checked', false);
+    $('#printBothwaysButton').text('Off');
+    $('#printBothways_resume').text('Off');
+  }
+})
+
+function checkSpecificValues() {
+  if ($("#id_fluid").val() == 'Specific') {
+    if ($("#densityval").text() == "" || $("#viscosityval").text() == "" ) {
+      alert("Please specify density and viscosity!")
+    }
+  }
+} 

@@ -11,6 +11,7 @@ from printrun import printcore, gcoder
 from types import SimpleNamespace
 import json
 from decimal import *
+from .flowCalc import FlowCalc
 
 forms = {
     'Development_Form': Development_Form(),
@@ -36,13 +37,18 @@ class HommingSetup(View):
 
 class Development(FormView):
     def get(self, request):
-        # Send the saved config files
-        forms['list_load'] = Development_Db.objects.filter(auth_id=request.user).order_by('-id')
-        return render(request,'development.html',forms)
+        if 'LISTLOAD' in request.GET:
+            development = Development_Db.objects.filter(auth=request.user).order_by('-id')
+            names = [i.file_name for i in development]
+            return JsonResponse(names, safe=False)
+        else:
+            forms['list_load'] = Development_Db.objects.filter(auth=request.user).order_by('-id')
+            #print(forms['list_load'])
+            return render(request,'development.html',forms)
 
 class DevelopmentPlay(View):
     def post(self, request):
-        print(request.POST)
+        #print(request.POST)
         # Treatment for play button
         if 'START' in request.POST:
             if OC_LAB.paused == True:
@@ -50,12 +56,21 @@ class DevelopmentPlay(View):
             else:
                 # Run the form validations and return the clean data
                 forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
-                                    developmentband_settings_form       =   DevelopmentBandSettings_Form(request.POST),
                                     movement_settings_form   =   MovementSettings_Form(request.POST),
                                     pressure_settings_form   =   PressureSettings_Form(request.POST))
 
+                
+                
+                devBandSettings = request.POST.get('devBandSettings')
+                devBandSettings_data = json.loads(devBandSettings)
+                developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
+                if developmentBandSettings_form.is_valid():
+                    forms_data.update(devBandSettings_data)
+                else:
+                    return JsonResponse({'error':'Check band properties'})
+                
                 # With the data, gcode is generated
-                gcode = calculate(forms_data)
+                gcode = calculateDevelopment(forms_data)
                 # Printrun
                 light_gcode = gcoder.LightGCode(gcode)
                 OC_LAB.startprint(light_gcode)
@@ -69,12 +84,15 @@ class DevelopmentPlay(View):
 
 class DevelopmentSaveAndLoad(View):
     def post(self, request):
-        print(request.POST)
+        #print(request.POST)
         development_form  =   Development_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
-        developmentband_settings_form       =   DevelopmentBandSettings_Form(request.POST)
+        #developmentBandSettings_form       =   DevelopmentBandSettings_Form(request.POST)
         movement_settings_form   =   MovementSettings_Form(request.POST)
         pressure_settings_form   =   PressureSettings_Form(request.POST)
+
+        devBandSettings = request.POST.get('devBandSettings')
+        devBandSettings_data = json.loads(devBandSettings)
 
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
@@ -83,8 +101,10 @@ class DevelopmentSaveAndLoad(View):
             return JsonResponse({'error':'Check plate properties'})
 
         # Check Band Settings Formular
-        if developmentband_settings_form.is_valid():
-            developmentband_settings_object = developmentband_settings_form.save()
+        developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
+        if developmentBandSettings_form.is_valid():
+            print('hello')
+            developmentBandSettings_object = developmentBandSettings_form.save()
         else:
             return JsonResponse({'error':'Check band properties'})
 
@@ -115,7 +135,7 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.movement_settings = movement_settings_object
                 development_instance.pressure_settings = pressure_settings_object
                 development_instance.plate_properties = plate_properties_object
-                development_instance.developmentband_settings = developmentband_settings_object
+                development_instance.developmentBandSettings = developmentBandSettings_object
                 new_development=development_instance.save()
 
                 return JsonResponse({'message':f'The File {filename} was saved!'})
@@ -126,18 +146,18 @@ class DevelopmentSaveAndLoad(View):
     def get(self, request):
         file_name=request.GET.get('filename')
 
-        # print(file_name)
+        
         development_conf=model_to_dict(Development_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Dev_Db.objects.get(id=development_conf['plate_properties']))
-        developmentband_settings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentband_settings']))
+        developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         movement_settings_conf=model_to_dict(MovementSettings_Dev_Db.objects.get(id=development_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
 
         development_conf.update(plate_properties_conf)
-        development_conf.update(developmentband_settings_conf)
+        development_conf.update(developmentBandSettings_conf)
         development_conf.update(movement_settings_conf)
         development_conf.update(pressure_settings_conf)
-        #print(development_conf)
+        
         return JsonResponse(development_conf)
 
 # AUX Functions
@@ -153,27 +173,46 @@ def data_validations(**kwargs):
             return
     return forms_data
 
-def calculate(data):
+def calculateDevelopment(data):
+    #dropvolume in uL
+    dropVolume = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], frequency = float(data['frequency']), fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcVolume()
+    print("dropVolume: "+str(dropVolume))
+    #dropVolume = 0.025
     data = SimpleNamespace(**data)
+    
+    length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
 
-    length = data.size_x-data.offset_left-data.offset_right
+    points = round(float(data.volume) / dropVolume)
+    pointsPerLine = round(length / float(data.delta_x))
+    lines = round(points / pointsPerLine)
+    #realVolume = lines * pointsPerLine * dropVolume
 
-    applicationsurface = []
-    current_height = 0
-    while current_height <= data.height:
+    applicationLine=[]
+    current_length=0
+    while current_length<=length:
+        applicationLine.append([round(float(data.offset_bottom),3), round(float(data.offset_left)+current_length,3)])
+        current_length+=float(data.delta_x)
 
-        applicationline=[]
-        current_length=0
-        while current_length<=length:
-            applicationline.append([data.offset_bottom+current_height, data.offset_left+current_length])
-            current_length+=data.delta_x
-        applicationsurface.append(applicationline)
-        current_height+=data.delta_y
-
+    applicationLines=[]
+    line = 0
+    if (data.printBothways=='On'):
+        while line < lines:
+            if (line == 0) or (line%2 == 0):
+                applicationLines.extend(applicationLine)
+            else:
+                applicationLines.extend(applicationLine[::-1])
+            line+=1
+    else:
+        while line < lines:
+            applicationLines.extend(applicationLine)
+            line+=1
+    
     # Creates the Gcode for the application and return it
-    return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure)
+    #print(applicationLines)
+    return GcodeGenDevelopment(applicationLines, data.motor_speed, data.frequency, data.temperature, data.pressure)
 
-def GcodeGen(listoflines, speed, frequency, temperature, pressure):
+
+def GcodeGenDevelopment(line, speed, frequency, temperature, pressure):
     gcode=list()
     # No HEATBED CASE
     if temperature!=0:
@@ -181,22 +220,20 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
     # Only MOVEMENT CASE
     if pressure==0 and frequency==0:
         gcode.append(f'G94 P{pressure}')
-        for listofpoints in listoflines:
-            for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
-                gcode.append(gline)
-                gcode.append('M400')
+        for point in line:
+            gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+            gcode.append(gline)
+            gcode.append('M400')
 
     # Normal Application
     else:
         gcode.append(f'G94 P{pressure}')
-        for listofpoints in listoflines:
-            for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
-                gcode.append(gline)
-                gcode.append('M400')
-                gcode.append(f'G93 F{frequency} P{pressure}')
-                gcode.append('M400')
+        for point in line:
+            gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+            gcode.append(gline)
+            gcode.append('M400')
+            gcode.append(f'G93 F{frequency} P{pressure}')
+            gcode.append('M400')
     gcode.append('G28')
     return gcode
 

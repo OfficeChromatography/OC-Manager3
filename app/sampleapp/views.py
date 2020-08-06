@@ -12,6 +12,9 @@ from printrun import printcore, gcoder
 from types import SimpleNamespace
 import json
 from decimal import *
+import numpy as np
+from scipy.optimize import minimize
+from .flowCalc import FlowCalc
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -19,6 +22,7 @@ forms = {
     'BandSettings_Form': BandSettings_Form(),
     'MovementSettings_Form': MovementSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
+    'BandComponents_Form':BandsComponents_Form(),
     }
 
 
@@ -36,7 +40,7 @@ class Sample(FormView):
 
 class SampleAppPlay(View):
     def post(self, request):
-        print(request.POST)
+        #print(request.POST)
         # Treatment for play button
         if 'START' in request.POST:
             if OC_LAB.paused == True:
@@ -47,7 +51,11 @@ class SampleAppPlay(View):
                                     band_settings_form       =   BandSettings_Form(request.POST),
                                     movement_settings_form   =   MovementSettings_Form(request.POST),
                                     pressure_settings_form   =   PressureSettings_Form(request.POST))
-
+                table = request.POST.get('table')
+                table_data = json.loads(table)
+                
+                forms_data.update({'table':table_data})
+                #print(forms_data)
                 # With the data, gcode is generated
                 gcode = calculate(forms_data)
                 # Printrun
@@ -63,7 +71,7 @@ class SampleAppPlay(View):
 
 class SampleAppSaveAndLoad(View):
     def post(self, request):
-        print(request.POST)
+        #print(request.POST)
         sample_application_form  =   SampleApplication_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
         band_settings_form       =   BandSettings_Form(request.POST)
@@ -97,6 +105,8 @@ class SampleAppSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check pressure settings'})
 
+        
+
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
@@ -105,7 +115,7 @@ class SampleAppSaveAndLoad(View):
 
             # Check if theres
             if len(in_db)>0:
-                return JsonResponse({'error':'File Name exist!'})
+                return JsonResponse({'error':'File Name already exists!'})
             else:
                 sample_application_instance = sample_application_form.save(commit=False)
                 sample_application_instance.auth = request.user
@@ -122,17 +132,19 @@ class SampleAppSaveAndLoad(View):
                     i['volume'] = i['volume (ul)']
 
                     bands_components_form = BandsComponents_Form(i)
-
+                    
                     if bands_components_form.is_valid():
                         bands_components_instance=bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = sample_application_instance
                         bands_components_instance.save()
+                        bands_components_instance
                     else:
                         JsonResponse({'error':bands_components_form.errors})
+          
                 return JsonResponse({'message':f'The File {filename} was saved!'})
 
         else:
-            return JsonResponse({'error':'Please fill the filename!'})
+            return JsonResponse({'error':'Please fill in the filename!'})
 
     def get(self, request):
         file_name=request.GET.get('filename')
@@ -145,18 +157,17 @@ class SampleAppSaveAndLoad(View):
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
 
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
-
+        
         bands=dict()
         for i, band in enumerate(bands_components):
             bands[i]=model_to_dict(band)
-
         bands = {'bands':bands}
         sample_application_conf.update(bands)
         sample_application_conf.update(plate_properties_conf)
         sample_application_conf.update(band_settings_conf)
         sample_application_conf.update(movement_settings_conf)
         sample_application_conf.update(pressure_settings_conf)
-        # print(sample_application_conf)
+        #print(sample_application_conf)
         return JsonResponse(sample_application_conf)
 # AUX Functions
 
@@ -171,15 +182,53 @@ def data_validations(**kwargs):
             return
     return forms_data
 
+def calculateDeltaX(length,height,maxPoints):
+    '''calculates the distance of the points if deltaX == deltaY'''
+
+    #deltaX = [0,0]
+    deltaX = - ((length+height)/(2*(1-maxPoints))) + math.sqrt(((length+height)/(2*(1-maxPoints)))**2-((length*height)/(1-maxPoints)))
+    #deltaX[1] = - ((length+height)/(2*(1-maxPoints))) - math.sqrt(((length+height)/(2*(1-maxPoints)))**2-((length*height)/(1-maxPoints)))
+
+    return deltaX
+
+def optimizeMaxPoints(length, height, maxPoints):
+    '''calculates the error function, so it can
+    be minimized to get the best number of points'''
+
+    deltaX = calculateDeltaX(length,height,maxPoints)
+    pointsX = np.round(length / deltaX)
+    pointsY = np.round(height / deltaX)
+
+    error = (pointsX * deltaX - length)**2 + (pointsY * deltaX - height)**2
+
+    return error
+
+def minimizeDeltaX(length, height, volume, bandNum, data):
+    '''calculates deltaX according to the set volume'''
+    #print(data)
+    dropVolume = FlowCalc(pressure=float(data.pressure), nozzleDiameter=data.nozzlediameter, frequency = float(data.frequency), fluid=data.table[bandNum]['type'], density=data.table[bandNum]['density'], viscosity=data.table[bandNum]['viscosity']).calcVolume()
+    print("dropVolume: "+str(dropVolume))
+    #dropVolume = 0.025
+
+    optimizeTest = lambda maxPoints: optimizeMaxPoints(length, height, maxPoints)
+    x0 = volume / dropVolume
+    res = minimize(optimizeTest,x0)
+    points = np.round(res.x)
+    deltaX = calculateDeltaX(length,height,points)
+    realVolume = points * dropVolume
+
+    return [deltaX[0], realVolume]
+
 def calculate(data):
+    
     data = SimpleNamespace(**data)
 
     working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
 
     if data.main_property==1:
         n_bands = int(data.value)
-        number_of_gaps = n_bands - 1;
-        sum_gaps_size = data.gap*number_of_gaps;
+        number_of_gaps = n_bands - 1
+        sum_gaps_size = data.gap*number_of_gaps
         length = (working_area[0]-sum_gaps_size)/n_bands
     else:
         length = data.value
@@ -187,16 +236,26 @@ def calculate(data):
 
     applicationsurface = []
     for i in range(0,n_bands):
-        current_height = 0
+
+        if data.table[i]['volume (ul)'] == "null":
+            deltaX = float(data.delta_x)
+            deltaY = float(data.delta_y)
+        else:
+            [deltaX, realVolume] = minimizeDeltaX(float(length), float(data.height), float(data.table[i]['volume (ul)']), i, data)
+            deltaY = deltaX
+
+        print("deltaX: "+str(deltaX))
+
+        zeros=(i*(length+data.gap))+data.offset_left
+        current_height = 0.
         while current_height <= data.height:
             applicationline=[]
-            current_length=0
-            zeros=(i*(length+data.gap))+data.offset_left
+            current_length=0.
             while current_length<=length:
-                applicationline.append([data.offset_bottom+current_height, current_length+zeros])
-                current_length+=data.delta_x
+                applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
+                current_length+=deltaX
             applicationsurface.append(applicationline)
-            current_height+=data.delta_y
+            current_height+=deltaY
 
     # Creates the Gcode for the application and return it
     return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure)
@@ -211,7 +270,7 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
         gcode.append(f'G94 P{pressure}')
         for listofpoints in listoflines:
             for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+                gline = 'G1Y{}X{}F{}'.format(str(round(point[0],3)), str(round(point[1],3)), speed)
                 gcode.append(gline)
                 gcode.append('M400')
 
@@ -220,12 +279,13 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
         gcode.append(f'G94 P{pressure}')
         for listofpoints in listoflines:
             for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
+                gline = 'G1Y{}X{}F{}'.format(str(round(point[0],3)), str(round(point[1],3)), speed)
                 gcode.append(gline)
                 gcode.append('M400')
                 gcode.append(f'G93 F{frequency} P{pressure}')
                 gcode.append('M400')
     gcode.append('G28')
+    #print(gcode)
     return gcode
 
 def dinamic_cleaning():

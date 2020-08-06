@@ -3,4 +3,9 @@ channels>=2.2.0
 channels_redis>=2.4.0
 flake8>=3.6.0,<3.7.0
 pyserial>=3.4.0
+<<<<<<< HEAD
 opencv-python
+=======
+numpy>=1.18.3
+scipy>=1.5.0
+>>>>>>> marcel
