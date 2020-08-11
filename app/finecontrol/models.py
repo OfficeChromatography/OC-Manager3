@@ -32,5 +32,5 @@ class ZeroPosition(models.Model):
                 on_delete=models.CASCADE,
                 blank=True,
                 )
-    zero_x = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    zero_y = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    zero_x = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    zero_y = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)

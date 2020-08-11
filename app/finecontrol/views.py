@@ -24,14 +24,16 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
 class HommingSetup(View):
     def post(self, request):
         if request.POST.get('setzero'):
+            print(request.POST)
             zeros_values = list(request.POST['setzero'].split(","))
             zero_on_DB = ZeroPosition( uploader = request.user,
                                      zero_x = float(zeros_values[0]),
                                      zero_y = float(zeros_values[1]))
             zero_on_DB.save()
+            OC_LAB.send(f'G92X0Y0')
             return JsonResponse({'message':'ok'})
     def get(self, request):
-        if request.GET.get('getzero'):
+        if 'getzero' in request.GET:
             last_zero_position = ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
             OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
         return JsonResponse({'message':'ok'})
