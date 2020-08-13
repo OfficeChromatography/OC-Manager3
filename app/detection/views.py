@@ -133,8 +133,8 @@ class Capture_View(View):
                 led365 = form['LedsControlsForm'].cleaned_data['uv365_power']
                 led278 = form['LedsControlsForm'].cleaned_data['uv278_power']
 
-                OC_LAB.send_now(f'M42 P17 S{led365}')
-                OC_LAB.send_now(f'M42 P23 S{led278}')
+                OC_LAB.send_now(f'M42 P5 S{led365}')
+                OC_LAB.send_now(f'M42 P4 S{led278}')
                 time.sleep(1)
             else:
                 print('Error LEDs Control')
