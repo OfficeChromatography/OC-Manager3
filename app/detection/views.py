@@ -68,6 +68,7 @@ class Capture_View(View):
             return JsonResponse(names, safe=False)
 
         else:
+            OC_LAB.send('G0X0Y175')
             form['FormatControlsForm'] = ShootConfigurationForm(initial=INITIALS)
             form['CameraControlsForm'] = CameraControlsForm(initial=INITIALS)
             form['UserControlsForm'] = UserControlsForm(initial=INITIALS)

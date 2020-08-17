@@ -53,7 +53,7 @@ class SampleAppPlay(View):
                                     pressure_settings_form   =   PressureSettings_Form(request.POST))
                 table = request.POST.get('table')
                 table_data = json.loads(table)
-                
+
                 forms_data.update({'table':table_data})
                 #print(forms_data)
                 # With the data, gcode is generated
@@ -105,7 +105,7 @@ class SampleAppSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check pressure settings'})
 
-        
+
 
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
@@ -132,7 +132,7 @@ class SampleAppSaveAndLoad(View):
                     i['volume'] = i['volume (ul)']
 
                     bands_components_form = BandsComponents_Form(i)
-                    
+
                     if bands_components_form.is_valid():
                         bands_components_instance=bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = sample_application_instance
@@ -140,7 +140,7 @@ class SampleAppSaveAndLoad(View):
                         bands_components_instance
                     else:
                         JsonResponse({'error':bands_components_form.errors})
-          
+
                 return JsonResponse({'message':f'The File {filename} was saved!'})
 
         else:
@@ -157,7 +157,7 @@ class SampleAppSaveAndLoad(View):
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
 
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
-        
+
         bands=dict()
         for i, band in enumerate(bands_components):
             bands[i]=model_to_dict(band)
@@ -220,7 +220,7 @@ def minimizeDeltaX(length, height, volume, bandNum, data):
     return [deltaX[0], realVolume]
 
 def calculate(data):
-    
+
     data = SimpleNamespace(**data)
 
     working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
@@ -237,7 +237,7 @@ def calculate(data):
     applicationsurface = []
     for i in range(0,n_bands):
 
-        if data.table[i]['volume (ul)'] == "null":
+        if data.table[i]['volume (ul)'] == "null" or data.table[i]['volume (ul)'] == "":
             deltaX = float(data.delta_x)
             deltaY = float(data.delta_y)
         else:
