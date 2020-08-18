@@ -69,3 +69,4 @@ venv.bak/
 
 #Media Files
 /media
+app/db.sqlite3
