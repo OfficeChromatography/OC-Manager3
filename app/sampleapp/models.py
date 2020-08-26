@@ -26,7 +26,7 @@ class PressureSettings_Db(models.Model):
     pressure = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     frequency = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
-    nozzlediameter = models.CharField(max_length=120, default='0.05')
+    nozzlediameter = models.CharField(max_length=120, default='0.08')
 
 class SampleApplication_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)

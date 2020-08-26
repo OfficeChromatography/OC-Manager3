@@ -236,13 +236,15 @@ def calculate(data):
 
     applicationsurface = []
     for i in range(0,n_bands):
-
         if data.table[i]['volume (ul)'] == "null":
             deltaX = float(data.delta_x)
             deltaY = float(data.delta_y)
         else:
             [deltaX, realVolume] = minimizeDeltaX(float(length), float(data.height), float(data.table[i]['volume (ul)']), i, data)
+            if deltaX < 0.0002:
+                deltaX = 0.0002
             deltaY = deltaX
+                
 
         print("deltaX: "+str(deltaX))
 

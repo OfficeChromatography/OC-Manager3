@@ -141,8 +141,7 @@ function bandsmain(){
 
 
   // Check if theres missing parameters
-  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(volume)||isNaN(printBothways))
-
+  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(volume))
   if(theres_error('#id_parameter_error',missing_parameter)){return}
 
   // Calculate the Working Area [x,y]
