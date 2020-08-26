@@ -276,16 +276,16 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
 
     # Normal Application
     else:
-        gcode.append(f'G94 P{pressure}')
+        gcode.append(f'G97 P{pressure}')
         for listofpoints in listoflines:
             for point in listofpoints:
                 gline = 'G1Y{}X{}F{}'.format(str(round(point[0],3)), str(round(point[1],3)), speed)
                 gcode.append(gline)
                 gcode.append('M400')
-                gcode.append(f'G93 F{frequency} P{pressure}')
+                gcode.append(f'G97 P{pressure}')
+                gcode.append(f'G98 F{frequency}')
                 gcode.append('M400')
-    gcode.append('G28')
-    #print(gcode)
+    gcode.append('G28XY')
     return gcode
 
 def dinamic_cleaning():

@@ -29,7 +29,7 @@ class HommingSetup(View):
             # Calculate the movement
             x_mov = 50-(x/2)
             y_mov = 30+((100-y)/2)
-            gcode = f'G28\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
+            gcode = f'G28XY\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
             OC_LAB.send(gcode)
             return JsonResponse({'message':'ok'})
         except ValueError:
@@ -234,7 +234,7 @@ def GcodeGenDevelopment(line, speed, frequency, temperature, pressure):
             gcode.append('M400')
             gcode.append(f'G93 F{frequency} P{pressure}')
             gcode.append('M400')
-    gcode.append('G28')
+    gcode.append('G28XY')
     return gcode
 
 def dinamic_cleaning():

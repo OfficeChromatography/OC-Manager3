@@ -29,7 +29,7 @@ $('#down_arrow').on('click',function(){
   sendToMachine(gcode)
 })
 $('#homming').on('click',function(){
-  gcode = 'G28'
+  gcode = 'G28XY'
   sendToMachine(gcode)
 })
 

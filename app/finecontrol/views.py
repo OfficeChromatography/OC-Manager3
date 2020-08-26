@@ -87,7 +87,7 @@ class Clean(View):
                 'pressure':15}
 
     def get(self, request):
-        OC_LAB.send('G28')
+        OC_LAB.send('G28XY')
         form['CleaningProcessForm'] = CleaningProcessForm(initial=CLEANINGPROCESS_INITIALS)
         return render(
             request,
