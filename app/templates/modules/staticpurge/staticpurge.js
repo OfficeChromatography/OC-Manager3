@@ -30,3 +30,4 @@ $("#next_bttn_stat").on('click',function(e){
          $("#dinamicpurgecard").fadeIn();
   });
 })
+
