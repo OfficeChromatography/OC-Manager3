@@ -208,7 +208,7 @@
                             </div>
                             <p><b>Offsets<hr/></b><p>
                             <div class="alert alert-warning collapse" id='id_offsets_error' role="alert">
-                              Remember that the sum of offsets should be smaller than the sizes of the plate
+                              The sum of the offsets should be smaller than the plate size
                             </div>
                             <div class="form-group mt-3 mb-1 row">
                               <div class="input-group col">
@@ -250,14 +250,14 @@
                           </div>
                           <hr/>
                           <div class="alert alert-warning alert-dismissible collapse" id='id_gap_error' role="alert">
-                            Gap too big! For that amount of bands
+                            Reduce gap size for given number of bands
                           </div>
                           <div class="alert alert-warning alert-dismissible collapse" id='id_space_error' role="alert">
-                            Theres no enough space for such parameters
+                            There is not enough space for these parameters
                           </div>
                           <div class="form-group mt-3 mb-1 row" id='id_valuesform'>
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.value.label}}</label>
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" id="valueLabel">{{BandSettings_Form.value.label}}</label>
                               {{BandSettings_Form.value}}
                               <div class="input-group-append">
                                 <span id='id_valuesunit'class="input-group-text">[#]</span>
@@ -362,7 +362,7 @@
                               <td>[mm]</td>
                             </tr>
                             <tr>
-                              <th scope="row">Bands Properties</th>
+                              <th scope="row">Band Properties</th>
                               <td class='val' id='band_properties_resume'></td>
                               <td></td>
                             </tr>
@@ -372,7 +372,7 @@
                               <td>[#]</td>
                             </tr>
                             <tr id='lengthbandsrow' style="display:none">
-                              <th scope="row">Length Bands</th>
+                              <th scope="row">Length</th>
                               <td class='val' id='length_resume'></td>
                               <td>[mm]</td>
                             </tr>
@@ -435,7 +435,7 @@
                               <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.file_name }}</a>
                           {% endfor %}
                         </div>
-                        <label for="list-load" class="mt-4">Control</label>
+                        <label for="list-load" class="mt-4">Controll</label>
                         <div class="input-group">
                           <div class="input-group-prepend">
                             <button id='startbttn' name='start' class="btn btn-primary control-bttn">Start</button>

@@ -89,6 +89,7 @@ $("#id_main_property").change(
           $("#id_valuesform").fadeIn();
           $("#lengthbandsrow").hide();
           $("#nbandsrow").show();
+          $("#valueLabel").text('Number')
           break;
       case '2':
           $("#id_valuesform").fadeOut();
@@ -97,6 +98,7 @@ $("#id_main_property").change(
           $("#bandlengthform").fadeIn();
           $("#nbandsrow").hide();
           $("#lengthbandsrow").show();
+          $("#valueLabel").text('Length')
         break;
     }
     loadResumeTable()

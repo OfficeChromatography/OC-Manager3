@@ -63,7 +63,7 @@ class BandSettings_Form(forms.ModelForm):
         model = BandSettings_Db
         fields = ['main_property','value','height','gap']
         PROP_CHOICES =(
-            ("1", "N Bands"),
+            ("1", "Number of Bands"),
             ("2", "Length"),
             )
         widgets = {
@@ -73,8 +73,8 @@ class BandSettings_Form(forms.ModelForm):
             'gap'       : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'main_property' : _('Main Property'),
-            'value'         : _('Value'),
+            'main_property' : _('Band Calculation'),
+            'value'         : _('Number'),
             'height'        : _('Height'),
             'gap'           : _('Gap'),
         }
