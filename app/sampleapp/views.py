@@ -169,6 +169,14 @@ class SampleAppSaveAndLoad(View):
         sample_application_conf.update(pressure_settings_conf)
         #print(sample_application_conf)
         return JsonResponse(sample_application_conf)
+
+class CalcVol(View):
+    def post(self, request):
+        data = SimpleNamespace(**request.POST)
+        results = returnDropEstimateVol(data)
+        
+        return JsonResponse({'results':results})
+
 # AUX Functions
 
 def data_validations(**kwargs):
@@ -236,7 +244,7 @@ def calculate(data):
 
     applicationsurface = []
     for i in range(0,n_bands):
-        if data.table[i]['volume (ul)'] == "null":
+        if data.table[i]['volume (ul)'] == "null" or data.table[i]['volume (ul)'] == "":
             deltaX = float(data.delta_x)
             deltaY = float(data.delta_y)
         else:
@@ -308,3 +316,44 @@ def static_cleaning():
     for i in range(0,100):
         f.write(gcode+f'{i}'+'\n')
     f.close()
+
+
+def returnDropEstimateVol(data):
+
+    working_area = [float(data.size_x[0])-float(data.offset_left[0])-float(data.offset_right[0]),float(data.size_y[0])-float(data.offset_top[0])-float(data.offset_bottom[0])]
+    if data.main_property[0]==1:
+        n_bands = int(data.value[0])
+        number_of_gaps = n_bands - 1
+        sum_gaps_size = data.gap[0]*number_of_gaps
+        length = (working_area[0]-sum_gaps_size)/n_bands
+    else:
+        length = data.value[0]
+        n_bands = int(math.trunc(working_area[0]/(float(length)+float(data.gap[0]))))
+
+    
+    dataTable = json.loads(data.table[0])
+    results = []
+    for table in dataTable:
+    
+        dropVolume = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], frequency = float(data.frequency[0]), fluid=table['type'], density=table['density'], viscosity=table['viscosity']).calcVolume()
+
+
+        if table['volume (ul)'] == "" or table['volume (ul)'] == "null":
+            pointsX = np.round(float(length)/float(data.delta_x[0]))
+            pointsY = 1
+            if data.height[0] != "0":
+                pointsY = np.round(float(data.height[0])/float(data.delta_y[0]))
+            realVolume = pointsX * pointsY * dropVolume
+
+        else:
+            optimizeTest = lambda maxPoints: optimizeMaxPoints(float(length), float(data.height[0]), maxPoints)
+            x0 = float(table['volume (ul)']) / dropVolume
+            res = minimize(optimizeTest,x0)
+            points = np.round(res.x)
+            realVolume = points[0] * dropVolume
+            
+
+        #np.append(results, [dropVolume, realVolume])
+        results.append([dropVolume, realVolume])
+    
+    return results
