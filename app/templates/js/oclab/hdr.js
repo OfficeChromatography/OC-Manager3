@@ -7,14 +7,16 @@ $( document ).ready(function(){
 $('#list-of-images').multiSelect({
   afterSelect: function(values){
     getImages(values)
+    console.log(values)
   },
   afterDeselect: function(values){
     // eliminate images
+    console.log(values[0])
     $("#card-"+values[0]).remove()
   }
 });
 function getImages(values){
-  data = {'filename':values[0], 'LOADFILE':''}
+  data = {'id':values[0], 'LOADFILE':''}
   $.ajax({
     method: 'GET',
     url:    window.location.origin+'/capture/',
@@ -23,11 +25,17 @@ function getImages(values){
     error: loadfileMethodError,
   })
   function loadfileMethodSuccess(data, textStatus, jqXHR){
-    $('.card-columns').append(`<div class="card" id='card-`+data.filename+`'>
+  console.log(data)
+    text=`<table><tr><th>Property</th><th>Value</th></tr>`
+    $.each( data.meta, function( key, value ) {
+      text+= `<tr><td><b>`+key+`</b></td><td>`+value+`</td></tr>`
+    });
+//    text+=</table>
+    $('.card-columns').append(`<div class="card" id="card-`+data.id+`">
       <img class="card-img-top" src="`+data.url+`" alt="Card image cap">
       <div class="card-body">
         <h5 class="card-title">`+data.filename+`</h5>
-        <p class="card-text">`+data.meta+`</p>
+        <p class="card-text">`+text+`</p>
       </div>
     </div>`)
   }
@@ -43,9 +51,10 @@ function loadlistofimages(){
     error: loadlistMethodError,
   })
   function loadlistMethodSuccess(data, textStatus, jqXHR){
+  console.log(data)
     var i = 0;
     $.each(data, function(key, value) {
-        $('#list-of-images').multiSelect('addOption', { value: value, text: value});
+        $('#list-of-images').multiSelect('addOption', { value: value[1], text: value[0]});
         i++;
       })
     return

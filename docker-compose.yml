@@ -27,5 +27,6 @@ services:
     devices:
       - '/dev:/dev'
     command: >
-      sh -c " python manage.py migrate &&
+      sh -c " python -m pip install opencv-python &&
+              python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"

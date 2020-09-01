@@ -32,32 +32,7 @@
           <h1 class="h3 mb-4 text-gray-800">Capture Plate</h1>
           <div class="card-group row">
             <div class="col-lg-6">
-              <!-- PLATE PREVIEW -->
-              <div class="card shadow mb-4 ">
-                <div class="card-header py-3">
-                  <div class="d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
-                    <button id='minimize-settings' class="btn btn-link invisible" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
-                  </div>
-                </div>
-                <div class="card-body d-flex flex-column" id='card_image_body'>
-                  <img id='image_id' class="align-self-center" src={{url}} alt="" style="width:50%">
-                  <hr>
-                  <div class="input-group px-2">
-                    <div class="input-group-prepend">
-                      <button id='savebttn' class="btn btn-outline-success" type="button">Save</button>
-                      <button id='removebttn' class="btn btn-outline-danger" type="button">Remove</button>
-                    </div>
-                    <input id='filename' type="text" class="form-control" placeholder="Name" aria-label="" >
-                  </div>
-                  <div class="list-group p-3" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
-                    {% for list in list_load %}
-                        <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.filename }}</a>
-                    {% endfor %}
-                  </div>
-                </div>
-              </div>
-              <!-- USER CONTROL -->
+              {% include 'modules/imagelist/imagelist.html' %}
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
                   <div class="d-flex flex-row justify-content-between align-items-center">
@@ -66,7 +41,7 @@
                   </div>
                 </div>
                 <div class="card-body show" id='usercontrolcontent'>
-                  <form id="userControlsForm">
+                  <form id="userControlsForm" class="form">
                     <div class="form-group row">
                       <div class="col">
                         {{ UserControlsForm.brightness.label }}
@@ -230,38 +205,7 @@
 
 
   <script src="{% static 'js/oclab/topbar.js' %}"></script>
-  <script type="text/javascript">
-  // using jQuery
-  function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-              var cookie = jQuery.trim(cookies[i]);
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-  }
-
-  var csrftoken = getCookie('csrftoken');
-
-  function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-      }
-  });
-  </script>
+  {% include 'modules/csrftoken/csrftoken.html' %}
 </body>
 
 </html>

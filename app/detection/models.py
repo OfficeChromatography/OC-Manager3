@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+import os
 AWB_MODES = (('0', 'off'),
             ('1', 'auto'),
             ('2', 'sunlight'),
@@ -233,6 +233,7 @@ class UserControls_Db(models.Model):
                         decimal_places=0)
 
 class Images_Db(models.Model):
+    id = models.AutoField(primary_key=True)
     filename = models.CharField(max_length=100, null=True)
     uploader = models.ForeignKey(
                 get_user_model(),
@@ -240,9 +241,11 @@ class Images_Db(models.Model):
                 on_delete=models.CASCADE,
                 blank=True,
                 )
-    url = models.CharField(max_length=100, null=True)
-    path = models.CharField(max_length=200, null=True)
+    photo = models.ImageField(default='/default.jpeg')
     datetime = models.DateTimeField(auto_now_add=True, null=True)
+
+    def file_name(self):
+        return os.path.splitext(os.path.basename(self.photo.name))[0]
 
 class Leds_Db(models.Model):
     uv365_power = models.DecimalField(
@@ -256,3 +259,6 @@ class Leds_Db(models.Model):
                         blank=True,
                         max_digits=3,
                         decimal_places=0)
+
+class temporalImage(models.Model):
+    photo = models.ImageField()
