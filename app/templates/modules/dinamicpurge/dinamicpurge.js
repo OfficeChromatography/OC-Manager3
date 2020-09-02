@@ -127,5 +127,11 @@ $("#next_bttn_dina").on('click',function(e){
   $.when($("#dinamicpurgecard").fadeOut()).done(function() {
          $("#stepscounter").text('Step 3/3')
          $("#staticpurgecard").fadeIn();
+         $("#next_bttn_stat").hide()
+         $("#restart_bttn_dina").show()
   });
+})
+
+$("#restart_bttn_dina").on('click',function(e){
+  location.reload();
 })

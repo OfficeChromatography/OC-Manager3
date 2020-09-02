@@ -255,3 +255,22 @@ def static_cleaning():
     for i in range(0,100):
         f.write(gcode+f'{i}'+'\n')
     f.close()
+
+class DevelopmentCalc(View):
+    def post(self, request):
+        data = SimpleNamespace(**request.POST)
+        results = returnDropEstimateVol(data)
+        return JsonResponse({'results':results})
+
+def returnDropEstimateVol(data):
+    table = json.loads(data.devBandSettings[0])
+    
+    dropVolume = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], frequency = float(data.frequency[0]), fluid=table['fluid'], density=table['density'], viscosity=table['viscosity']).calcVolume()
+        
+    length = float(data.size_x[0])-float(data.offset_left[0])-float(data.offset_right[0])
+    points = round(float(data.volume[0]) / dropVolume)
+    pointsPerLine = round(length / float(data.delta_x[0]))
+    lines = round(points / pointsPerLine)
+    realVolume = lines * pointsPerLine * dropVolume
+
+    return [dropVolume, realVolume]

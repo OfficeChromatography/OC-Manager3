@@ -49,18 +49,21 @@ $("#id_pressure").change(
   function(){
     console.log('pres');
     loadresume()
+    calcVol()
   }
 )
 $("#id_frequency").change(
   function(){
     console.log('dpre');
     loadresume()
+    calcVol()
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
     loadresume()
+    calcVol()
   }
 )
 
@@ -70,6 +73,7 @@ $("#id_size_x").change(
     changegraphsize()
     bandsmain()
     loadresume()
+    calcVol()
   }
 )
 $("#id_size_y").change(
@@ -78,6 +82,7 @@ $("#id_size_y").change(
     changegraphsize()
     bandsmain()
     loadresume()
+    calcVol()
   }
 );
 
@@ -85,24 +90,28 @@ $("#id_offset_left").change(
     function(){
       bandsmain()
       loadresume()
+      calcVol()
     }
 );
 $("#id_offset_right").change(
   function(){
     bandsmain()
     loadresume()
+    calcVol()
   }
 );
 $("#id_offset_bottom").change(
     function(){
       bandsmain()
       loadresume()
+      calcVol()
     }
 );
 $("#id_offset_top").change(
   function(){
     bandsmain()
     loadresume()
+    calcVol()
   }
 );
 
@@ -110,10 +119,12 @@ $("#id_volume").change(
   function(){
     bandsmain()
     loadresume()
+    calcVol()
   }
 );
 $("#id_fluid").change(
   function(){
+    calcVol()
     bandsmain()
     loadresume()
     if ($(this).val() == 'Specific') {
@@ -121,6 +132,11 @@ $("#id_fluid").change(
     } else {
       $('#specificFluidTable').hide()
     }
+  }
+);
+$("#id_nozzlediameter").change(
+  function(){
+    calcVol()
   }
 );
 
@@ -141,8 +157,7 @@ function bandsmain(){
 
 
   // Check if theres missing parameters
-  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(volume)||isNaN(printBothways))
-
+  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(volume))
   if(theres_error('#id_parameter_error',missing_parameter)){return}
 
   // Calculate the Working Area [x,y]
@@ -437,3 +452,30 @@ function checkSpecificValues() {
     }
   }
 } 
+
+function calcVol(){
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getSpecificFluid(true)
+  $endpoint = window.location.origin+'/developmentcalc/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: calcMethodSuccess,
+  error: saveMethodError
+  })
+}
+
+function calcMethodSuccess(data, textStatus, jqXHR){
+  console.log(typeof(data.error));
+  if(data.error==undefined){
+    $('.vol').html("<br>estimated vol: " + data.results[1].toFixed(3) + "<br>estimated dropvol: " + data.results[0].toFixed(3))
+    }
+  else {
+    console.log('error')
+  }
+  
+}
+
+$(document).ready(function() {
+  calcVol();
+});

@@ -105,7 +105,7 @@ class SampleAppSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check pressure settings'})
 
-
+        
 
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
@@ -132,7 +132,7 @@ class SampleAppSaveAndLoad(View):
                     i['volume'] = i['volume (ul)']
 
                     bands_components_form = BandsComponents_Form(i)
-
+                    
                     if bands_components_form.is_valid():
                         bands_components_instance=bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = sample_application_instance
@@ -140,7 +140,7 @@ class SampleAppSaveAndLoad(View):
                         bands_components_instance
                     else:
                         JsonResponse({'error':bands_components_form.errors})
-
+          
                 return JsonResponse({'message':f'The File {filename} was saved!'})
 
         else:
@@ -157,7 +157,7 @@ class SampleAppSaveAndLoad(View):
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
 
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
-
+        
         bands=dict()
         for i, band in enumerate(bands_components):
             bands[i]=model_to_dict(band)
@@ -169,6 +169,14 @@ class SampleAppSaveAndLoad(View):
         sample_application_conf.update(pressure_settings_conf)
         #print(sample_application_conf)
         return JsonResponse(sample_application_conf)
+
+class CalcVol(View):
+    def post(self, request):
+        data = SimpleNamespace(**request.POST)
+        results = returnDropEstimateVol(data)
+
+        return JsonResponse({'results':results})
+
 # AUX Functions
 
 def data_validations(**kwargs):
@@ -220,7 +228,7 @@ def minimizeDeltaX(length, height, volume, bandNum, data):
     return [deltaX[0], realVolume]
 
 def calculate(data):
-
+    
     data = SimpleNamespace(**data)
 
     working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
@@ -236,13 +244,15 @@ def calculate(data):
 
     applicationsurface = []
     for i in range(0,n_bands):
-
         if data.table[i]['volume (ul)'] == "null" or data.table[i]['volume (ul)'] == "":
             deltaX = float(data.delta_x)
             deltaY = float(data.delta_y)
         else:
             [deltaX, realVolume] = minimizeDeltaX(float(length), float(data.height), float(data.table[i]['volume (ul)']), i, data)
+            if deltaX < 0.0002:
+                deltaX = 0.0002
             deltaY = deltaX
+
 
         print("deltaX: "+str(deltaX))
 
@@ -306,3 +316,44 @@ def static_cleaning():
     for i in range(0,100):
         f.write(gcode+f'{i}'+'\n')
     f.close()
+
+
+def returnDropEstimateVol(data):
+
+    working_area = [float(data.size_x[0])-float(data.offset_left[0])-float(data.offset_right[0]),float(data.size_y[0])-float(data.offset_top[0])-float(data.offset_bottom[0])]
+    if data.main_property[0]==1:
+        n_bands = int(data.value[0])
+        number_of_gaps = n_bands - 1
+        sum_gaps_size = data.gap[0]*number_of_gaps
+        length = (working_area[0]-sum_gaps_size)/n_bands
+    else:
+        length = data.value[0]
+        n_bands = int(math.trunc(working_area[0]/(float(length)+float(data.gap[0]))))
+
+
+    dataTable = json.loads(data.table[0])
+    results = []
+    for table in dataTable:
+
+        dropVolume = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], frequency = float(data.frequency[0]), fluid=table['type'], density=table['density'], viscosity=table['viscosity']).calcVolume()
+
+
+        if table['volume (ul)'] == "" or table['volume (ul)'] == "null":
+            pointsX = np.round(float(length)/float(data.delta_x[0]))
+            pointsY = 1
+            if data.height[0] != "0":
+                pointsY = np.round(float(data.height[0])/float(data.delta_y[0]))
+            realVolume = pointsX * pointsY * dropVolume
+
+        else:
+            optimizeTest = lambda maxPoints: optimizeMaxPoints(float(length), float(data.height[0]), maxPoints)
+            x0 = float(table['volume (ul)']) / dropVolume
+            res = minimize(optimizeTest,x0)
+            points = np.round(res.x)
+            realVolume = points[0] * dropVolume
+
+
+        #np.append(results, [dropVolume, realVolume])
+        results.append([dropVolume, realVolume])
+
+    return results

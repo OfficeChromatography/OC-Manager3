@@ -59,24 +59,36 @@ $("#id_pressure").change(
   function(){
     console.log('pres');
     loadResumeTable()
+    calcVol()
   }
 )
+
+$("#id_nozzlediameter").change(
+  function(){
+    loadResumeTable()
+    calcVol()
+  }
+)
+
 $("#id_frequency").change(
   function(){
     console.log('dpre');
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_delta_y").change(
   function(){
     console.log('dey');
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_main_property").change(
@@ -89,6 +101,7 @@ $("#id_main_property").change(
           $("#id_valuesform").fadeIn();
           $("#lengthbandsrow").hide();
           $("#nbandsrow").show();
+          $("#valueLabel").text('Number')
           break;
       case '2':
           $("#id_valuesform").fadeOut();
@@ -97,9 +110,11 @@ $("#id_main_property").change(
           $("#bandlengthform").fadeIn();
           $("#nbandsrow").hide();
           $("#lengthbandsrow").show();
+          $("#valueLabel").text('Length')
         break;
     }
     loadResumeTable()
+    calcVol()
   }
 )
 
@@ -108,6 +123,7 @@ $("#id_size_x").change(
     console.log('sizex');
     changeGraphSize()
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_size_y").change(
@@ -115,6 +131,7 @@ $("#id_size_y").change(
     console.log('sizey');
     changeGraphSize()
     loadResumeTable()
+    calcVol()
   }
 );
 
@@ -122,24 +139,28 @@ $("#id_offset_left").change(
     function(){
       mainCalculations()
       loadResumeTable()
+      calcVol()
     }
 );
 $("#id_offset_right").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 );
 $("#id_offset_bottom").change(
     function(){
       mainCalculations()
       loadResumeTable()
+      calcVol()
     }
 );
 $("#id_offset_top").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 );
 
@@ -147,28 +168,33 @@ $("#id_main_property").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_value").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_height").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 )
 $("#id_gap").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    calcVol()
   }
 )
 
 $('#table').change(function(){
+  calcVol();
   $(".fluidSelect").each(function(){
     if ($(this).val() == 'Specific') {
       $(this).parent().find($('.specificFluidTable')).show()
@@ -333,7 +359,7 @@ function newComponentsTable(number_row){
   <td class="pt-3-half bcomponents">`;
   let newTr2 = `</td>
   <td class="pt-3-half bcomponents" contenteditable="true"></td>
-  <td class="pt-3-half bcomponents" contenteditable="true"></td>
+  <td class="pt-3-half bcomponents vol" contenteditable="true"><small><br></small></td>
   <td class="pt-3-half bcomponents"><select class="form-control fluidSelect" id="fluidSelect`
   let newTr3 = `" ><option>Water</option><option>Methanol</option><option>Acetone</option><option>Specific</option></select>
   <div style="display: none;" class="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
@@ -369,7 +395,7 @@ function loadComponentsTable(band,fromDB){
     <tr class="hide trClass">
     <td class="pt-3-half bcomponents">`+band[i][idbandname]+`</td>
     <td class="pt-3-half bcomponents" contenteditable="true">`+band[i]["description"]+`</td>
-    <td class="pt-3-half bcomponents" contenteditable="true">`+band[i][idvolumename]+`</td>
+    <td class="pt-3-half bcomponents vol" contenteditable="true">`+band[i][idvolumename]+`</td>
     <td class="pt-3-half bcomponents">`+selectOption+`<div style="display: none;" class="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
     <tr class="hide"><td class="pt-3-half">density</td><td class="pt-3-half densityval" contenteditable="true">`+band[i]["density"]+`</td></tr>
     <tr class="hide"><td class="pt-3-half">viscosity</td><td class="pt-3-half viscosityval" contenteditable="true">`+band[i]["viscosity"]+`</td></tr></div></td>
@@ -381,6 +407,7 @@ function loadComponentsTable(band,fromDB){
         $(fluidString).parent().find($('.specificFluidTable')).show()
       }
   }
+  calcVol()
 }
 
 
@@ -441,6 +468,8 @@ function getTableValues(toString){
           h['density'] = ''
           h['viscosity'] = ''
         }
+    } else if ((header == 'volume (ul)')) {
+      h[header] = $td.eq(i).find("small").html().split('<b')[0];
     } else {
       h[header] = $td.eq(i).text();
     }
@@ -691,11 +720,44 @@ $(window).on('beforeunload', function(){
   $('#id_main_property').val("1")
 });
 
-
-function showSpecificFields() {
-  $('select').filter(function() {return $(this).val()=="Specific"}).each(function() {
-    $(this).parent().append("Some appended text.");
+function calcVol(){
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getTableValues(true)
+  $endpoint = window.location.origin+'/samplecalc/'
+  $.ajax({
+  method: 'POST',
+  url:    $endpoint,
+  data:   $formData,
+  success: calcMethodSuccess,
+  error: saveMethodError
   })
 }
+
+function calcMethodSuccess(data, textStatus, jqXHR){
+  console.log(typeof(data.error));
+  if(data.error==undefined){
+    var i;
+    for (i = 0; i < data.results.length; i++) {
+      findString = '#fluidSelect'+(i+1)
+      //console.log($(findString).parent().prev())
+      volumeString = $(findString).parent().prev().find("small").html().split('<b')[0]
+      console.log(volumeString)
+      console.log(data.results[i][1].toFixed(3))
+      $(findString).parent().prev().find("small").html(volumeString
+       + '<br> estimated vol: ' + data.results[i][1].toFixed(3)  + '<br> estimated dropvol: ' + data.results[i][0].toFixed(3))
+    }
+  }
+  else {
+    
+  }
+  
+}
+
+$(document).ready(function() {
+  calcVol();
+  $(document).on("blur", ".vol", function() {
+    calcVol();
+  })
+});
+
 
 
