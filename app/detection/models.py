@@ -260,5 +260,13 @@ class Leds_Db(models.Model):
                         max_digits=3,
                         decimal_places=0)
 
-class temporalImage(models.Model):
-    photo = models.ImageField()
+class Detection_ZeroPosition(models.Model):
+    uploader = models.ForeignKey(
+                get_user_model(),
+                null=True,
+                on_delete=models.CASCADE,
+                blank=True,
+                )
+    zero_x = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    zero_y = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+

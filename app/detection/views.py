@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
 from connection.forms import OC_LAB
 from app.settings import STATIC_ROOT, MEDIA_ROOT
-from .models import Images_Db
+from .models import Images_Db, Detection_ZeroPosition
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 
@@ -49,7 +49,6 @@ class Capture_View(View):
             return JsonResponse(names, safe=False)
 
         else:
-            OC_LAB.send('G0X0Y175')
             initial = basic_conf()
             form['FormatControlsForm'] = ShootConfigurationForm(initial=initial)
             form['CameraControlsForm'] = CameraControlsForm(initial=initial)
@@ -186,3 +185,20 @@ def test_mertens(images, warp_mode, iterations):
     res_mertens = merge_mertens.process(img_list)
     res_mertens_8bit = np.clip(res_mertens*255, 0, 255).astype('uint8')
     cv.imwrite(f'{MEDIA_ROOT}/hdr/results/fusion_mertens_aligned.jpeg', res_mertens_8bit)
+
+class Detection_Homming(View):
+    def post(self, request):
+        if request.POST.get('setzero'):
+            print(request.POST)
+            zeros_values = list(request.POST['setzero'].split(","))
+            zero_on_DB = Detection_ZeroPosition( uploader = request.user,
+                                     zero_x = float(zeros_values[0]),
+                                     zero_y = float(zeros_values[1]))
+            zero_on_DB.save()
+            OC_LAB.send(f'G92X0Y0')
+            return JsonResponse({'message':'ok'})
+    def get(self, request):
+        if 'getzero' in request.GET:
+            last_zero_position = Detection_ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
+            OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
+        return JsonResponse({'message':'ok'})
