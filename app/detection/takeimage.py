@@ -62,7 +62,7 @@ def take_photo(request):
         for key, value in user_config.cleaned_data.items():
             subprocess.run([f'v4l2-ctl -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
     else:
-        print('Error user Control')
+        print(user_config.errors)
 
     if led_config.is_valid():
         uv365_power = led_config.cleaned_data['uv365_power']
@@ -71,7 +71,7 @@ def take_photo(request):
         led_control(uv278_power,278)
         time.sleep(1)
     else:
-        print('Error LEDs Control')
+        print(led_config.errors)
 
     if format_config.is_valid():
         conf = format_config.cleaned_data
