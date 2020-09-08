@@ -394,6 +394,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   bandsmain()
   loadresume()
   changegraphsize()
+  calcVol()
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');

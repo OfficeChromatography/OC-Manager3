@@ -395,7 +395,7 @@ function loadComponentsTable(band,fromDB){
     <tr class="hide trClass">
     <td class="pt-3-half bcomponents">`+band[i][idbandname]+`</td>
     <td class="pt-3-half bcomponents" contenteditable="true">`+band[i]["description"]+`</td>
-    <td class="pt-3-half bcomponents vol" contenteditable="true">`+band[i][idvolumename]+`</td>
+    <td class="pt-3-half bcomponents vol" contenteditable="true"><small>`+band[i][idvolumename]+`</small></td>
     <td class="pt-3-half bcomponents">`+selectOption+`<div style="display: none;" class="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
     <tr class="hide"><td class="pt-3-half">density</td><td class="pt-3-half densityval" contenteditable="true">`+band[i]["density"]+`</td></tr>
     <tr class="hide"><td class="pt-3-half">viscosity</td><td class="pt-3-half viscosityval" contenteditable="true">`+band[i]["viscosity"]+`</td></tr></div></td>
@@ -691,6 +691,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   loadFieldsValues(data);
   loadComponentsTable(data['bands'],true)
   changeGraphSize()
+  calcVol()
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
