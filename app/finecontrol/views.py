@@ -51,24 +51,23 @@ class Cleaning(object):
         # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
         # range(start, stop, step)
         self.duration = 0
-        dinamic_clean = [f'G94 P{pressure}',]
+        dinamic_clean = []
         for i in range(fi,fo+step,step):
             for j in range(1,self.time_window*i+1):
-                dinamic_clean.append(f'G93 F{i} P{pressure}'+'\n')
+                dinamic_clean.append(f'G97 P{pressure}'+'\n')
+                dinamic_clean.append(f'G98 F{i}'+'\n')
                 self.lines_left += 1
             self.duration += self.time_window
 
         return dinamic_clean
 
-    def static_cleaning(self,step):
-        # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
-        # range(start, stop, step)
-        gcode = []
-        for i in range(0,step):
-            gcode.append(f'G96')
+    def static_cleaning(self,volume):
+        # Gcode to move the Pump for a specific volume from 0-position
+        zMovement = round(volume * 57/1000,2)
+        gcode = [f'G28Z', f'G1Z{zMovement}']
         return gcode
 
-clean = Cleaning();
+clean = Cleaning()
 
 class MotorControl(View):
     # Manage the GET request
