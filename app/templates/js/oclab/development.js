@@ -479,4 +479,5 @@ function calcMethodSuccess(data, textStatus, jqXHR){
 
 $(document).ready(function() {
   calcVol();
+  alert('Please place the development chamber.')
 });

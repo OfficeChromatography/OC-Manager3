@@ -27,7 +27,7 @@ class PlateProperties_Form(forms.ModelForm):
         initial['offset_left'] = 1
         initial['offset_right'] = 1
         initial['offset_top'] = 1
-        initial['offset_bottom'] = 1
+        initial['offset_bottom'] = 50
         kwargs['initial'] = initial
         super(PlateProperties_Form, self).__init__(*args, **kwargs)
 
@@ -40,7 +40,7 @@ class PlateProperties_Form(forms.ModelForm):
             'offset_left' : forms.NumberInput(attrs={'class': 'form-control'}),
             'offset_right' : forms.NumberInput(attrs={'class': 'form-control'}),
             'offset_top' : forms.NumberInput(attrs={'class': 'form-control'}),
-            'offset_bottom' : forms.NumberInput(attrs={'class': 'form-control'}),
+            'offset_bottom' : forms.Select(attrs={'class': 'form-control'}, choices=[(2.5,2.5),(50,50)]),
         }
         labels = {
             'size_y':           _('Y Size'),
