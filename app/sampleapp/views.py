@@ -298,26 +298,6 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
     gcode.append('G28XY')
     return gcode
 
-def dinamic_cleaning():
-    # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
-    # range(start, stop, step)
-    time = 5 # Minimun time for each frequency 5 sec
-    f = open("dinamic_clean.gcode", "w+")
-    for i in range(100,550,50):
-        for j in range(1,5*i+1):
-            f.write(f'G93 F{i} P300'+'\n')
-    f.close()
-
-def static_cleaning():
-    # THE GCODE TO PUMP NO MATTER THE PRESSURE
-    gcode = ''
-    # OPEN DE VALVE AND LEAVE IT LIKE THAT
-    f = open("static_clean.gcode", "w+")
-    for i in range(0,100):
-        f.write(gcode+f'{i}'+'\n')
-    f.close()
-
-
 def returnDropEstimateVol(data):
 
     working_area = [float(data.size_x[0])-float(data.offset_left[0])-float(data.offset_right[0]),float(data.size_y[0])-float(data.offset_top[0])-float(data.offset_bottom[0])]
