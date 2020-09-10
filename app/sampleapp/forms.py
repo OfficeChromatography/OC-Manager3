@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import PlateProperties_Db, SampleApplication_Db, BandSettings_Db, MovementSettings_Db, PressureSettings_Db, BandsComponents_Db
+from .models import *
 
 
 class SampleApplication_Form(forms.ModelForm):

@@ -1,9 +1,10 @@
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import SampleApplication_Form, PlateProperties_Form, BandSettings_Form, MovementSettings_Form, PressureSettings_Form, BandsComponents_Form
-from .models import SampleApplication_Db, BandSettings_Db, PlateProperties_Db, MovementSettings_Db, PressureSettings_Db, SampleApplication_Db, BandsComponents_Db
+from .forms import *
+from .models import *
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -24,7 +25,6 @@ forms = {
     'PressureSettings_Form':PressureSettings_Form(),
     'BandComponents_Form':BandsComponents_Form(),
     }
-
 
 class Sample(FormView):
     def get(self, request):
@@ -297,26 +297,6 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure):
                 gcode.append('M400')
     gcode.append('G28XY')
     return gcode
-
-def dinamic_cleaning():
-    # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
-    # range(start, stop, step)
-    time = 5 # Minimun time for each frequency 5 sec
-    f = open("dinamic_clean.gcode", "w+")
-    for i in range(100,550,50):
-        for j in range(1,5*i+1):
-            f.write(f'G93 F{i} P300'+'\n')
-    f.close()
-
-def static_cleaning():
-    # THE GCODE TO PUMP NO MATTER THE PRESSURE
-    gcode = ''
-    # OPEN DE VALVE AND LEAVE IT LIKE THAT
-    f = open("static_clean.gcode", "w+")
-    for i in range(0,100):
-        f.write(gcode+f'{i}'+'\n')
-    f.close()
-
 
 def returnDropEstimateVol(data):
 
