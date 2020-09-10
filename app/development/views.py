@@ -217,25 +217,18 @@ def GcodeGenDevelopment(line, speed, frequency, temperature, pressure):
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
-    # Only MOVEMENT CASE
-    if pressure==0 and frequency==0:
+    
+    gcode.append('G28XY')
+    glineY = 'G1Y{}F{}'.format(str(point[0]+19.2), speed)
+    gcode.append(glineY)
+    gcode.append(f'G97 P{pressure}')
+    for point in line:
+        glineX = 'G1X{}F{}'.format(str(point[1]+7), speed)
+        gcode.append(glineX)
+        gcode.append('M400')
         gcode.append(f'G97 P{pressure}')
-        for point in line:
-            gline = 'G1Y{}X{}F{}'.format(str(point[0]), str(point[1]), speed)
-            gcode.append(gline)
-            gcode.append('M400')
-
-    # Normal Application
-    else:
-        gcode.append('G28XY')
-        gcode.append(f'G97 P{pressure}')
-        for point in line:
-            gline = 'G1Y{}X{}F{}'.format(str(point[0]+19.2), str(point[1]), speed)
-            gcode.append(gline)
-            gcode.append('M400')
-            gcode.append(f'G97 P{pressure}')
-            gcode.append(f'G98 F{frequency}')
-            gcode.append('M400')
+        gcode.append(f'G98 F{frequency}')
+        gcode.append('M400')
     gcode.append('G28XY')
     return gcode
 
