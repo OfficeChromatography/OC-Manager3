@@ -69,4 +69,5 @@ venv.bak/
 
 #Media Files
 /media
-app/db.sqlite3
+**/db.sqlite3
+**/**/migrations
