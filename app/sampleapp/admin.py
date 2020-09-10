@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PlateProperties_Db, BandSettings_Db, MovementSettings_Db, PressureSettings_Db, SampleApplication_Db, BandsComponents_Db
+from .models import *
 from django.db import models
 
 admin.site.register(PlateProperties_Db)

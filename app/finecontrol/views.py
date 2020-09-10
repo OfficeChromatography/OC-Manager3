@@ -9,7 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core import serializers
 from .forms import CleaningProcessForm
-from .models import GcodeFile, ZeroPosition
+from .models import *
 from printrun import printcore, gcoder
 import time
 
@@ -20,6 +20,54 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'steps':50,
                             'pressure':20}
 
+
+class SyringeLoad(View):
+    # def post:
+    def get(self,request):
+        if "LISTLOAD" in request.GET:
+            syringe_load_db = SyringeLoad_Db.objects.filter(author=request.user).order_by('volume')
+            volumes = [i.volume for i in syringe_load_db]
+            return JsonResponse(volumes, safe=False)
+
+    def post(self,request):
+        # Creates a new vol in the database
+        if 'SAVEMOVEMOTOR' in request.POST:
+            try:
+                SyringeLoad_Db.objects.filter(volume=request.POST['SAVEMOVEMOTOR']).filter(author=request.user)[0]
+                return JsonResponse("Volume already exist!", safe=False)
+            except IndexError:
+                syringe_load = SyringeLoad_Db.objects.create(volume=request.POST['SAVEMOVEMOTOR'],
+                                                             author=request.user)
+                syringe_load.save()
+                return JsonResponse("Volume saved!", safe=False)
+
+        if 'DELETE' in request.POST:
+            try:
+                SyringeLoad_Db.objects.filter(volume=request.POST['DELETE']).filter(author=request.user)[0].delete()
+                return JsonResponse("Volume Deleted!", safe=False)
+            except IndexError:
+                return JsonResponse("Volume doesn't exist!", safe=False)
+
+        if 'MOVEMOTOR' in request.POST:
+            print("Finish It!!")
+            mm_movement = round(float(request.POST['MOVEMOTOR'])*57,2);
+            OC_LAB.send(f"G1Z{mm_movement}")
+            return JsonResponse("Volume save", safe=False)
+
+    # def delete(self,request):
+    #     # Eliminates a vol from the database
+    #     print(request)
+    #     # if 'MOVEMOTOR' in request:
+    #     #     try:
+    #     #         SyringeLoad_Db.objects.filter(volume=request.POST['MOVEMOTOR']).filter(author=request.user)[0].delete()
+    #     #         return JsonResponse("Volume Deleted!", safe=False)
+    #     #     except IndexError:
+    #     return JsonResponse("Volume doesn't exist!", safe=False)
+
+    # def options(self, request):
+    #     if 'MOVEMOTOR' in request.OPTIONS:
+    #         print("Finish It!!")
+    #         return JsonResponse("Volume save", safe=False)
 
 class HommingSetup(View):
     def post(self, request):

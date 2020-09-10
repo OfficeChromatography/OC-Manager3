@@ -1,9 +1,10 @@
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import SampleApplication_Form, PlateProperties_Form, BandSettings_Form, MovementSettings_Form, PressureSettings_Form, BandsComponents_Form
-from .models import SampleApplication_Db, BandSettings_Db, PlateProperties_Db, MovementSettings_Db, PressureSettings_Db, SampleApplication_Db, BandsComponents_Db
+from .forms import *
+from .models import *
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -24,7 +25,6 @@ forms = {
     'PressureSettings_Form':PressureSettings_Form(),
     'BandComponents_Form':BandsComponents_Form(),
     }
-
 
 class Sample(FormView):
     def get(self, request):
