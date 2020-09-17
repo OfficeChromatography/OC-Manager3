@@ -31,6 +31,8 @@ $('#down_arrow').on('click',function(){
 $('#homming').on('click',function(){
   gcode = 'G28XY'
   sendToMachine(gcode)
+  zero_position = [0,0]
+  $('#currentPosition').text('x: ' + zero_position[0] + '    y: ' +zero_position[1])
 })
 
 
@@ -53,6 +55,7 @@ function movement(direction){
       zero_position[1]+=parseInt(mm);
     }
   }
+  $('#currentPosition').text('x: ' + zero_position[0] + '    y: ' +zero_position[1])
   return value;
 }
 

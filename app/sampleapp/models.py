@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from finecontrol.models import ZeroPosition
 # To have a better understandig on the Fields of the Database read pySerial
 # documentation. Mostly just the "class serial.Serial" parameters
 
@@ -35,6 +36,7 @@ class SampleApplication_Db(models.Model):
     pressure_settings = models.OneToOneField(PressureSettings_Db, null=True, on_delete=models.CASCADE)
     plate_properties = models.OneToOneField(PlateProperties_Db, null=True, on_delete=models.CASCADE)
     band_settings = models.OneToOneField(BandSettings_Db, null=True, on_delete=models.CASCADE)
+    zero_position = models.OneToOneField(ZeroPosition, null=True, on_delete=models.CASCADE)
 
 class BandsComponents_Db(models.Model):
     sample_application = models.ForeignKey(SampleApplication_Db, on_delete=models.CASCADE, blank=True, null=True,)
@@ -44,4 +46,6 @@ class BandsComponents_Db(models.Model):
     type = models.CharField(null=True, max_length=120, blank=True)
     density = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     viscosity = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+
+
 

@@ -9,7 +9,7 @@ $('#hommingModal').on('hidden.bs.modal', function (e) {
     zero_position = [0,0];
 })
 
-$('#setHome').on('click',function(e){
+/* $('#setHome').on('click',function(e){
   data={'setzero':zero_position.toString()}
   console.log(data);
   $.ajax({
@@ -35,4 +35,4 @@ $('#getHome').on('click',function(e){
   function loadHommingEndpointSucess(data, textStatus, jqXHR){
   }
   function loadHommingEndpointError(jqXHR, textStatus, errorThrown){}
-})
+}) */

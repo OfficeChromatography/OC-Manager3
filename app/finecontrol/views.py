@@ -8,12 +8,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.core import serializers
-from .forms import CleaningProcessForm
+from .forms import CleaningProcessForm, ZeroPosition_Form
 from .models import *
 from printrun import printcore, gcoder
 import time
 
-form ={}
+forms = {}
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
@@ -69,7 +69,7 @@ class SyringeLoad(View):
     #         print("Finish It!!")
     #         return JsonResponse("Volume save", safe=False)
 
-class HommingSetup(View):
+""" class HommingSetup(View):
     def post(self, request):
         if request.POST.get('setzero'):
             print(request.POST)
@@ -84,7 +84,7 @@ class HommingSetup(View):
         if 'getzero' in request.GET:
             last_zero_position = ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
             OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
-        return JsonResponse({'message':'ok'})
+        return JsonResponse({'message':'ok'}) """
 
 
 

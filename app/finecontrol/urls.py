@@ -6,6 +6,6 @@ urlpatterns = [
     path('cleanprocess/', CleanControl.as_view(), name='cleanprocess'),
     path('staticpurge/', StaticPurge.as_view(), name='staticpurge'),
     path('gcode-editor/',GcodeEditor.as_view(), name='gcodeeditor'),
-    path('setuphomming/', HommingSetup.as_view(), name='homming'),
+    # path('setuphomming/', HommingSetup.as_view(), name='homming'),
     path('syringeload/', SyringeLoad.as_view(), name='syringeload'),
 ]

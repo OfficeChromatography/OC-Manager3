@@ -16,6 +16,8 @@ from decimal import *
 import numpy as np
 from scipy.optimize import minimize
 from .flowCalc import FlowCalc
+from finecontrol.forms import ZeroPosition_Form
+from finecontrol.models import ZeroPosition
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -24,6 +26,7 @@ forms = {
     'MovementSettings_Form': MovementSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
     'BandComponents_Form':BandsComponents_Form(),
+    'ZeroPosition_Form': ZeroPosition_Form()
     }
 
 class Sample(FormView):
@@ -50,7 +53,8 @@ class SampleAppPlay(View):
                 forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
                                     band_settings_form       =   BandSettings_Form(request.POST),
                                     movement_settings_form   =   MovementSettings_Form(request.POST),
-                                    pressure_settings_form   =   PressureSettings_Form(request.POST))
+                                    pressure_settings_form   =   PressureSettings_Form(request.POST),
+                                    zero_position_form       =   ZeroPosition_Form(request.POST))
                 table = request.POST.get('table')
                 table_data = json.loads(table)
 
@@ -77,6 +81,7 @@ class SampleAppSaveAndLoad(View):
         band_settings_form       =   BandSettings_Form(request.POST)
         movement_settings_form   =   MovementSettings_Form(request.POST)
         pressure_settings_form   =   PressureSettings_Form(request.POST)
+        zero_position_form       =   ZeroPosition_Form(request.POST)
 
         table = request.POST.get('table')
         table_data = json.loads(table)
@@ -105,6 +110,12 @@ class SampleAppSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check pressure settings'})
 
+        # Check Home Settings Formular
+        if zero_position_form.is_valid():
+            zero_position_object = zero_position_form.save()
+        else:
+            return JsonResponse({'error':'Check home settings'})
+
         
 
 
@@ -123,6 +134,7 @@ class SampleAppSaveAndLoad(View):
                 sample_application_instance.pressure_settings = pressure_settings_object
                 sample_application_instance.plate_properties = plate_properties_object
                 sample_application_instance.band_settings = band_settings_object
+                sample_application_instance.zero_position = zero_position_object
                 new_sample_application=sample_application_instance.save()
 
 
@@ -155,9 +167,10 @@ class SampleAppSaveAndLoad(View):
         band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
         movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
+        zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
 
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
-        
+
         bands=dict()
         for i, band in enumerate(bands_components):
             bands[i]=model_to_dict(band)
@@ -167,7 +180,8 @@ class SampleAppSaveAndLoad(View):
         sample_application_conf.update(band_settings_conf)
         sample_application_conf.update(movement_settings_conf)
         sample_application_conf.update(pressure_settings_conf)
-        #print(sample_application_conf)
+        sample_application_conf.update(zero_position_conf)
+        print(sample_application_conf)
         return JsonResponse(sample_application_conf)
 
 class CalcVol(View):
@@ -268,13 +282,18 @@ def calculate(data):
             current_height+=deltaY
 
     # Creates the Gcode for the application and return it
-    return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure)
+    return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
 
-def GcodeGen(listoflines, speed, frequency, temperature, pressure):
+def GcodeGen(listoflines, speed, frequency, temperature, pressure, zeroPosition):
     gcode=list()
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
+    # Move to the home
+    gcode.append('G28XY')
+    gline = 'G1Y{}X{}F{}'.format(str(round(zeroPosition[1],3)), str(round(zeroPosition[0],3)), speed)
+    gcode.append(gline)
+    gcode.append('M400')
     # Only MOVEMENT CASE
     if pressure==0 and frequency==0:
         gcode.append(f'G94 P{pressure}')

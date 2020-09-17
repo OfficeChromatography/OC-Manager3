@@ -9,12 +9,39 @@
         </button>
       </div>
       <div class="modal-body">
-        {% include 'modules/movement/movementcontrol.html' %}
+       {% include 'modules/movement/movementcontrol.html' %}
+       <small>
+        <div id="currentPosition" style="text-align:right;">
+            x: 0    y: 0
+        </div>
+      </small>
       </div>
-      <div class="modal-footer">
+       <div class="modal-footer">
+      <div class="card-body show">
+       <form id="zeroform">
+        <div class="form-group mb-1 row">
+          <div class="input-group">
+            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{ZeroPosition_Form.zero_x.label}}</label>
+            {{ZeroPosition_Form.zero_x}}
+            <div class="input-group-append">
+              <span class="input-group-text">[mm]</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{ZeroPosition_Form.zero_y.label}}</label>
+            {{ZeroPosition_Form.zero_y}}
+            <div class="input-group-append">
+              <span class="input-group-text">[mm]</span>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+      </div>
+      <!-- <div class="modal-footer">
         <button class="btn btn-primary" id='getHome' type="button" data-dismiss="modal">Load Home</button>
         <button class="btn btn-secondary" id='setHome' type="button" data-dismiss="modal">Set Home</button>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

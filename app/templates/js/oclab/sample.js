@@ -421,6 +421,8 @@ function loadFieldsValues(data){
   $("#id_delta_x").val(data.delta_x)
   $('#id_nozzlediameter').val(data.nozzlediameter)
 
+  $('#id_zero_x').val(data.zero_x)
+  $('#id_zero_y').val(data.zero_y)
 
   $("#id_size_x").val(data.size_x)
   $("#id_size_y").val(data.size_y)
@@ -524,6 +526,7 @@ function getAsText(readFile) {
     console.log(fileString);
     jsonObject = JSON.parse(fileString)
     loadFieldsValues(jsonObject)
+    console.log(jsonObject)
     loadComponentsTable(jsonObject['bands'],false)
     changeGraphSize()
   }
@@ -582,7 +585,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getTableValues(true)
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getTableValues(true)
   $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
   method: 'POST',
@@ -594,7 +597,7 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getTableValues(true)
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getTableValues(true)
   $endpoint = window.location.origin+'/samplesave/'
   $.ajax({
   method: 'POST',
@@ -734,15 +737,15 @@ function calcVol(){
 }
 
 function calcMethodSuccess(data, textStatus, jqXHR){
-  console.log(typeof(data.error));
+  //console.log(typeof(data.error));
   if(data.error==undefined){
     var i;
     for (i = 0; i < data.results.length; i++) {
       findString = '#fluidSelect'+(i+1)
-      //console.log($(findString).parent().prev())
+      console.log($(findString).parent().prev())
       volumeString = $(findString).parent().prev().find("small").html().split('<b')[0]
-      console.log(volumeString)
-      console.log(data.results[i][1].toFixed(3))
+      //console.log(volumeString)
+      //console.log(data.results[i][1].toFixed(3))
       $(findString).parent().prev().find("small").html(volumeString
        + '<br> estimated vol: ' + data.results[i][1].toFixed(3)  + '<br> estimated dropvol: ' + data.results[i][0].toFixed(3))
     }
