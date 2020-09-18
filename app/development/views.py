@@ -12,6 +12,8 @@ from types import SimpleNamespace
 import json
 from decimal import *
 from .flowCalc import FlowCalc
+from finecontrol.forms import ZeroPosition_Form
+from finecontrol.models import ZeroPosition
 
 forms = {
     'Development_Form': Development_Form(),
@@ -19,21 +21,22 @@ forms = {
     'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
     'MovementSettings_Form': MovementSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
+    'ZeroPosition_Form': ZeroPosition_Form()
     }
 
-class HommingSetup(View):
-    def post(self, request):
-        try:
-            x = Decimal(request.POST.get('x'))
-            y = Decimal(request.POST.get('y'))
-            # Calculate the movement
-            x_mov = 50-(x/2)
-            y_mov = 30+((100-y)/2)
-            gcode = f'G28XY\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
-            OC_LAB.send(gcode)
-            return JsonResponse({'message':'ok'})
-        except ValueError:
-            return JsonResponse({'error':'Error check values'})
+# class HommingSetup(View):
+#     def post(self, request):
+#         try:
+#             x = Decimal(request.POST.get('x'))
+#             y = Decimal(request.POST.get('y'))
+#             # Calculate the movement
+#             x_mov = 50-(x/2)
+#             y_mov = 30+((100-y)/2)
+#             gcode = f'G28XY\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
+#             OC_LAB.send(gcode)
+#             return JsonResponse({'message':'ok'})
+#         except ValueError:
+#             return JsonResponse({'error':'Error check values'})
 
 class Development(FormView):
     def get(self, request):
@@ -57,7 +60,8 @@ class DevelopmentPlay(View):
                 # Run the form validations and return the clean data
                 forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
                                     movement_settings_form   =   MovementSettings_Form(request.POST),
-                                    pressure_settings_form   =   PressureSettings_Form(request.POST))
+                                    pressure_settings_form   =   PressureSettings_Form(request.POST),
+                                    zero_position_form       =   ZeroPosition_Form(request.POST))
 
                 
                 
@@ -90,7 +94,7 @@ class DevelopmentSaveAndLoad(View):
         #developmentBandSettings_form       =   DevelopmentBandSettings_Form(request.POST)
         movement_settings_form   =   MovementSettings_Form(request.POST)
         pressure_settings_form   =   PressureSettings_Form(request.POST)
-
+        zero_position_form       =   ZeroPosition_Form(request.POST)
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
 
@@ -103,7 +107,6 @@ class DevelopmentSaveAndLoad(View):
         # Check Band Settings Formular
         developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
         if developmentBandSettings_form.is_valid():
-            print('hello')
             developmentBandSettings_object = developmentBandSettings_form.save()
         else:
             return JsonResponse({'error':'Check band properties'})
@@ -120,6 +123,11 @@ class DevelopmentSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check pressure settings'})
 
+        # Check Home Settings Formular
+        if zero_position_form.is_valid():
+            zero_position_object = zero_position_form.save()
+        else:
+            return JsonResponse({'error':'Check home settings'})
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
@@ -136,6 +144,7 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.pressure_settings = pressure_settings_object
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
+                development_instance.zero_position = zero_position_object
                 new_development=development_instance.save()
 
                 return JsonResponse({'message':f'The File {filename} was saved!'})
@@ -152,11 +161,13 @@ class DevelopmentSaveAndLoad(View):
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         movement_settings_conf=model_to_dict(MovementSettings_Dev_Db.objects.get(id=development_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
+        zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
         development_conf.update(movement_settings_conf)
         development_conf.update(pressure_settings_conf)
+        development_conf.update(zero_position_conf)
         
         return JsonResponse(development_conf)
 
@@ -209,21 +220,21 @@ def calculateDevelopment(data):
     
     # Creates the Gcode for the application and return it
     #print(applicationLines)
-    return GcodeGenDevelopment(applicationLines, data.motor_speed, data.frequency, data.temperature, data.pressure)
+    return GcodeGenDevelopment(applicationLines, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
 
 
-def GcodeGenDevelopment(line, speed, frequency, temperature, pressure):
+def GcodeGenDevelopment(line, speed, frequency, temperature, pressure, zeroPosition):
     gcode=list()
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
     
     gcode.append('G28XY')
-    glineY = 'G1Y{}F{}'.format(str(line[0][0]+19.2), speed)
+    glineY = 'G1Y{}F{}'.format(str(line[0][0]+zeroPosition[1]), speed)
     gcode.append(glineY)
     gcode.append(f'G97 P{pressure}')
     for point in line:
-        glineX = 'G1X{}F{}'.format(str(point[1]+7), speed)
+        glineX = 'G1X{}F{}'.format(str(point[1]+zeroPosition[0]), speed)
         gcode.append(glineX)
         gcode.append('M400')
         gcode.append(f'G97 P{pressure}')

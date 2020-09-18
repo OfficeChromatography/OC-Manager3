@@ -181,7 +181,7 @@ class SampleAppSaveAndLoad(View):
         sample_application_conf.update(movement_settings_conf)
         sample_application_conf.update(pressure_settings_conf)
         sample_application_conf.update(zero_position_conf)
-        print(sample_application_conf)
+        # print(sample_application_conf)
         return JsonResponse(sample_application_conf)
 
 class CalcVol(View):
@@ -293,6 +293,7 @@ def GcodeGen(listoflines, speed, frequency, temperature, pressure, zeroPosition)
     gcode.append('G28XY')
     gline = 'G1Y{}X{}F{}'.format(str(round(zeroPosition[1],3)), str(round(zeroPosition[0],3)), speed)
     gcode.append(gline)
+    gcode.append('G92X0Y0')
     gcode.append('M400')
     # Only MOVEMENT CASE
     if pressure==0 and frequency==0:

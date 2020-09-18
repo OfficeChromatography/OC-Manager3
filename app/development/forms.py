@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Development_Db, PlateProperties_Dev_Db, BandSettings_Dev_Db, MovementSettings_Dev_Db, PressureSettings_Dev_Db
+from .models import *
 
 
 class Development_Form(forms.ModelForm):
@@ -40,7 +40,7 @@ class PlateProperties_Form(forms.ModelForm):
             'offset_left' : forms.NumberInput(attrs={'class': 'form-control'}),
             'offset_right' : forms.NumberInput(attrs={'class': 'form-control'}),
             'offset_top' : forms.NumberInput(attrs={'class': 'form-control'}),
-            'offset_bottom' : forms.Select(attrs={'class': 'form-control'}, choices=[(2.5,2.5),(50,50)]),
+            'offset_bottom' : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'size_y':           _('Y Size'),

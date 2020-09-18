@@ -286,7 +286,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getSpecificFluid(true)
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentplay/'
   $.ajax({
   method: 'POST',
@@ -298,7 +298,7 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+getSpecificFluid(true)
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentsave/'
   $.ajax({
   method: 'POST',
@@ -362,6 +362,9 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_delta_x").val(data.delta_x)
   $('#id_nozzlediameter').val(data.nozzlediameter)
 
+  $("#id_zero_x").val(data.zero_x)
+  $("#id_zero_y").val(data.zero_y)
+
   $("#id_size_x").val(data.size_x)
   $("#id_size_y").val(data.size_y)
 
@@ -369,6 +372,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_offset_right").val(data.offset_right)
   $("#id_offset_top").val(data.offset_top)
   $("#id_offset_bottom").val(data.offset_bottom)
+  console.log(data.offset_bottom)
 
   $("#id_volume").val(data.volume)
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from sampleapp.models import PlateProperties_Db, MovementSettings_Db, PressureSettings_Db
+from finecontrol.models import ZeroPosition
 
 class PlateProperties_Dev_Db(PlateProperties_Db):
     pass
@@ -25,3 +26,4 @@ class Development_Db(models.Model):
     pressure_settings = models.OneToOneField(PressureSettings_Db, null=True, on_delete=models.CASCADE)
     plate_properties = models.OneToOneField(PlateProperties_Db, null=True, on_delete=models.CASCADE)
     developmentBandSettings = models.OneToOneField(BandSettings_Dev_Db, null=True, on_delete=models.CASCADE)
+    zero_position = models.OneToOneField(ZeroPosition, null=True, on_delete=models.CASCADE)
