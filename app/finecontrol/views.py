@@ -13,7 +13,7 @@ from .models import *
 from printrun import printcore, gcoder
 import time
 
-form = {}
+form ={}
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
@@ -23,13 +23,13 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
 
 class SyringeLoad(View):
     # def post:
-    def get(self,request):
+    def get(self, request):
         if "LISTLOAD" in request.GET:
             syringe_load_db = SyringeLoad_Db.objects.filter(author=request.user).order_by('volume')
             volumes = [i.volume for i in syringe_load_db]
             return JsonResponse(volumes, safe=False)
 
-    def post(self,request):
+    def post(self, request):
         # Creates a new vol in the database
         if 'SAVEMOVEMOTOR' in request.POST:
             try:
@@ -50,7 +50,7 @@ class SyringeLoad(View):
 
         if 'MOVEMOTOR' in request.POST:
             print("Finish It!!")
-            mm_movement = round(float(request.POST['MOVEMOTOR'])*57,2);
+            mm_movement = round(float(request.POST['MOVEMOTOR']) * 57, 2);
             OC_LAB.send(f"G1Z{mm_movement}")
             return JsonResponse("Volume save", safe=False)
 
@@ -74,12 +74,13 @@ class SyringeLoad(View):
         if request.POST.get('setzero'):
             print(request.POST)
             zeros_values = list(request.POST['setzero'].split(","))
-            zero_on_DB = ZeroPosition( uploader = request.user,
-                                     zero_x = float(zeros_values[0]),
-                                     zero_y = float(zeros_values[1]))
+            zero_on_DB = ZeroPosition(uploader=request.user,
+                                      zero_x=float(zeros_values[0]),
+                                      zero_y=float(zeros_values[1]))
             zero_on_DB.save()
             OC_LAB.send(f'G92X0Y0')
-            return JsonResponse({'message':'ok'})
+            return JsonResponse({'message': 'ok'})
+
     def get(self, request):
         if 'getzero' in request.GET:
             last_zero_position = ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
@@ -87,35 +88,36 @@ class SyringeLoad(View):
         return JsonResponse({'message':'ok'}) """
 
 
-
 class Cleaning(object):
 
     def __init__(self):
-        self.time_window = 1 # Minimun time for each frequency 5 sec
+        self.time_window = 1  # Minimun time for each frequency 5 sec
         self.duration = 0
         self.lines_left = 0
 
-    def dinamic_cleaning(self,fi,fo,step,pressure):
+    def dinamic_cleaning(self, fi, fo, step, pressure):
         # THE GCODE TO OPEN THE VALVE AT A CERTAIN frequency
         # range(start, stop, step)
         self.duration = 0
         dinamic_clean = []
-        for i in range(fi,fo+step,step):
-            for j in range(1,self.time_window*i+1):
-                dinamic_clean.append(f'G97 P{pressure}'+'\n')
-                dinamic_clean.append(f'G98 F{i}'+'\n')
+        for i in range(fi, fo + step, step):
+            for j in range(1, self.time_window * i + 1):
+                dinamic_clean.append(f'G97 P{pressure}' + '\n')
+                dinamic_clean.append(f'G98 F{i}' + '\n')
                 self.lines_left += 1
             self.duration += self.time_window
 
         return dinamic_clean
 
-    def static_cleaning(self,volume):
+    def static_cleaning(self, volume):
         # Gcode to move the Pump for a specific volume from 0-position
-        zMovement = round(volume * 57/1000,2)
+        zMovement = round(volume * 57 / 1000, 2)
         gcode = [f'G28Z', f'G1Z{zMovement}']
         return gcode
 
+
 clean = Cleaning()
+
 
 class MotorControl(View):
     # Manage the GET request
@@ -127,11 +129,10 @@ class MotorControl(View):
 
 
 class Clean(View):
-
-    CLEANINGPROCESS_INITIALS = {'start_frequency':100,
-                'stop_frequency':500,
-                'steps':50,
-                'pressure':15}
+    CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
+                                'stop_frequency': 500,
+                                'steps': 50,
+                                'pressure': 15}
 
     def get(self, request):
         OC_LAB.send('G28XY')
@@ -143,14 +144,16 @@ class Clean(View):
 
     def post(self, request):
         if 'cycles' in request.POST:
-            for i in range(0,int(request.POST['cycles'])):
+            for i in range(0, int(request.POST['cycles'])):
                 OC_LAB.send('M42 P63 T')
         return render(
             request,
             "./cleanprocess.html",
             {**form})
 
-clean = Cleaning()
+
+clean = Cleaning();
+
 
 class StaticPurge(View):
     def post(self, request):
@@ -158,9 +161,11 @@ class StaticPurge(View):
             gcode = clean.static_cleaning(int(request.POST.get('cycles')))
             light_gcode = gcoder.LightGCode(gcode)
             OC_LAB.startprint(light_gcode)
-        return JsonResponse({'message':'ok'})
+        return JsonResponse({'message': 'ok'})
+
     def get(self, request):
-        return JsonResponse({'message':'ok'})
+        return JsonResponse({'message': 'ok'})
+
 
 class CleanControl(View):
     def post(self, request):
@@ -170,40 +175,39 @@ class CleanControl(View):
             if clean_param.is_valid():
                 clean_param = clean_param.cleaned_data
                 gcode = clean.dinamic_cleaning(clean_param['start_frequency'],
-                                                clean_param['stop_frequency'],
-                                                clean_param['steps'],
-                                                clean_param['pressure'])
+                                               clean_param['stop_frequency'],
+                                               clean_param['steps'],
+                                               clean_param['pressure'])
                 light_gcode = gcoder.LightGCode(gcode)
                 OC_LAB.startprint(light_gcode)
 
-                data= {'message':f'Cleaning process in progress, please wait! \n'}
-                data.update({'duration':clean.duration})
+                data = {'message': f'Cleaning process in progress, please wait! \n'}
+                data.update({'duration': clean.duration})
             else:
-                data = {'message':'ERROR'}
+                data = {'message': 'ERROR'}
                 print(clean_param.errors)
-            return  JsonResponse(data)
+            return JsonResponse(data)
 
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
-            return JsonResponse({'message':'stopped'})
+            return JsonResponse({'message': 'stopped'})
         if 'PAUSE' in request.POST:
             OC_LAB.pause()
-            return JsonResponse({'message':'paused'})
+            return JsonResponse({'message': 'paused'})
 
     def get(self, request):
         # Check the status
         if 'checkstatus' in request.GET:
-            data = {    'busy':'true',
-                        'message':'',
-                        }
+            data = {'busy': 'true',
+                    'message': '',
+                    }
             if OC_LAB.printing:
                 data['message'] = f'Cleaning process in progress, please wait! \n'
-                return  JsonResponse(data)
+                return JsonResponse(data)
             else:
-                data['busy']='false'
-                data['message']='Done!'
-                return  JsonResponse(data)
-
+                data['busy'] = 'false'
+                data['message'] = 'Done!'
+                return JsonResponse(data)
 
 
 class GcodeEditor(View):
@@ -219,18 +223,16 @@ class GcodeEditor(View):
 
         # FILE LOADING
         if 'LOADFILE' in request.GET:
-
             filename = request.GET.get('filename')
-            gcodefile = GcodeFile.objects.filter(uploader=request.user,filename=filename)
+            gcodefile = GcodeFile.objects.filter(uploader=request.user, filename=filename)
 
-
-            #Open the file
-            with open(gcodefile[0].gcode.path,'r') as f:
+            # Open the file
+            with open(gcodefile[0].gcode.path, 'r') as f:
                 text = f.read()
 
-            response = {'text':text,
-                        'filename':gcodefile[0].filename,
-                        'success':'File opened!'}
+            response = {'text': text,
+                        'filename': gcodefile[0].filename,
+                        'success': 'File opened!'}
             return JsonResponse(response)
 
         return render(
@@ -245,8 +247,8 @@ class GcodeEditor(View):
             if request.FILES['file']:
                 uploaded_file = request.FILES['file']
 
-                if GcodeFile.objects.filter(filename=uploaded_file,uploader=request.user):
-                    return JsonResponse({'danger':'Filename already exist, change it!'})
+                if GcodeFile.objects.filter(filename=uploaded_file, uploader=request.user):
+                    return JsonResponse({'danger': 'Filename already exist, change it!'})
 
                 if 'gcode' in uploaded_file.content_type:
                     fs = FileSystemStorage('media/gfiles/')
@@ -254,17 +256,16 @@ class GcodeEditor(View):
 
                     gcode = GcodeFile()
                     gcode.filename = uploaded_file.name;
-                    gcode.gcode = fs.location+'/'+new_name;
+                    gcode.gcode = fs.location + '/' + new_name;
                     gcode.gcode_url = fs.url(new_name)
                     gcode.uploader = request.user
                     gcode.save()
-                    return JsonResponse({'success':'File Saved!'})
+                    return JsonResponse({'success': 'File Saved!'})
                 else:
                     print('entro al else')
-                    return JsonResponse({'danger':'Invalid File'})
+                    return JsonResponse({'danger': 'Invalid File'})
             else:
-                return JsonResponse({'danger':'Please select a File'})
-
+                return JsonResponse({'danger': 'Please select a File'})
 
         # SAVE FILE
         if 'SAVE' in request.POST:
@@ -272,75 +273,61 @@ class GcodeEditor(View):
             filename = request.POST.get('name')
             text = request.POST.get('text')
             fs = FileSystemStorage('media/gfiles/')
-            gcodefile = GcodeFile.objects.filter(uploader=request.user,filename=filename)
+            gcodefile = GcodeFile.objects.filter(uploader=request.user, filename=filename)
 
             # if the file exist then edit
             if gcodefile:
-                with open(gcodefile[0].gcode.path,'w+') as f:
+                with open(gcodefile[0].gcode.path, 'w+') as f:
                     myfile = File(f)
                     myfile.write(text)
-                    new_name = fs.save(filename+'.gcode',content=myfile)
-                return JsonResponse({'info':f'{filename} edited'})
-
+                    new_name = fs.save(filename + '.gcode', content=myfile)
+                return JsonResponse({'info': f'{filename} edited'})
 
             # Create the file
-            with open(f'last.gcode','w+') as f:
+            with open(f'last.gcode', 'w+') as f:
                 myfile = File(f)
                 myfile.write(text)
-                new_name = fs.save(filename+'.gcode',content=myfile)
-
+                new_name = fs.save(filename + '.gcode', content=myfile)
 
                 gcode = GcodeFile()
                 gcode.filename = filename;
-                gcode.gcode = fs.location+'/'+new_name;
+                gcode.gcode = fs.location + '/' + new_name;
                 gcode.gcode_url = fs.url(new_name)
                 gcode.uploader = request.user
                 gcode.save()
-                return JsonResponse({'success':'File Saved!'})
+                return JsonResponse({'success': 'File Saved!'})
 
         # REMOVE FILE
         if 'REMOVE' in request.POST:
             filename = request.POST.get('name')
             if not filename:
-                return JsonResponse({'warning':'Choose a file!'})
+                return JsonResponse({'warning': 'Choose a file!'})
 
             try:
-                file = GcodeFile.objects.get(filename=filename,uploader=request.user)
+                file = GcodeFile.objects.get(filename=filename, uploader=request.user)
                 file.delete()
             except:
-                return JsonResponse({'warning':'Something went wrong!'})
+                return JsonResponse({'warning': 'Something went wrong!'})
 
-
-            return JsonResponse({'success':'File removed!'})
+            return JsonResponse({'success': 'File removed!'})
 
         # RUN FILE
         if 'START' in request.POST:
             filename = request.POST.get('name')
             if not filename:
-                return JsonResponse({'warning':'First save the file and Open it!'})
+                return JsonResponse({'warning': 'First save the file and Open it!'})
             try:
-                file = GcodeFile.objects.get(filename=filename,uploader=request.user)
+                file = GcodeFile.objects.get(filename=filename, uploader=request.user)
                 if file:
-                    with open(f'{file.gcode}','r') as f:
+                    with open(f'{file.gcode}', 'r') as f:
                         lines_gcode = [code_line.strip() for code_line in f]
                         light_gcode = gcoder.LightGCode(lines_gcode)
                         OC_LAB.startprint(light_gcode)
-                        return JsonResponse({'success':'Printing!'})
+                        return JsonResponse({'success': 'Printing!'})
             except DoesNotExist:
-                return JsonResponse({'danger':'File Not Found'})
+                return JsonResponse({'danger': 'File Not Found'})
 
         # STOP FILE
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
-            return JsonResponse({'danger':'STOP'})
-
-
-def static_cleaning():
-    # THE GCODE TO PUMP NO MATTER THE PRESSURE
-    gcode = ''
-    # OPEN DE VALVE AND LEAVE IT LIKE THAT
-    f = open("static_clean.gcode", "w+")
-    for i in range(0,100):
-        f.write(gcode+f'{i}'+'\n')
-    f.close()
-
+            return JsonResponse({'danger': 'STOP'})
