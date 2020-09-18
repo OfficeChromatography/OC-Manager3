@@ -1,0 +1,43 @@
+{% load static %}
+<div class="modal fade" id="rinseVolModal" tabindex="-1" role="dialog" aria-labelledby="rinseVolModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rinseVolModalLabel">rinseVol</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Place the magnet on top of the valve!</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form id='static-form' method="post"> {% csrf_token %}
+                    <div class="form-row align-items-center">
+                      <div class="col-3">
+                        <span class="text-center mx-3">Volume [uL]</span>
+                      </div>
+                      <div class="col-6">
+                        <input class="custom-range form-control px-1" name='cycles' value='300' type="range" min="0" max="1000" id='steprangeRins'/>
+                      </div>
+                      <div class="col-2">
+                        <input type="number" class='form-control px-1' value="300" id='steptextRins'/>
+                      </div>
+                    </div>
+                  </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split btn-sm" id='pump_manual' type="submit">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-gas-pump"></i>
+                    </span>
+                    <span class="text">Start!</span>
+                  </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'modules/rinseVol/rinseVol.js' %}"></script>

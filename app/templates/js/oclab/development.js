@@ -372,7 +372,6 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_offset_right").val(data.offset_right)
   $("#id_offset_top").val(data.offset_top)
   $("#id_offset_bottom").val(data.offset_bottom)
-  console.log(data.offset_bottom)
 
   $("#id_volume").val(data.volume)
 
@@ -471,7 +470,7 @@ function calcVol(){
 }
 
 function calcMethodSuccess(data, textStatus, jqXHR){
-  console.log(typeof(data.error));
+  // console.log(typeof(data.error));
   if(data.error==undefined){
     $('.vol').html("<br>estimated vol: " + data.results[1].toFixed(3) + "<br>estimated dropvol: " + data.results[0].toFixed(3))
     }

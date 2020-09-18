@@ -13,7 +13,7 @@ from .models import *
 from printrun import printcore, gcoder
 import time
 
-forms = {}
+form = {}
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
@@ -150,7 +150,7 @@ class Clean(View):
             "./cleanprocess.html",
             {**form})
 
-clean = Cleaning();
+clean = Cleaning()
 
 class StaticPurge(View):
     def post(self, request):
@@ -343,3 +343,4 @@ def static_cleaning():
     for i in range(0,100):
         f.write(gcode+f'{i}'+'\n')
     f.close()
+
