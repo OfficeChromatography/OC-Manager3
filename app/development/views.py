@@ -230,11 +230,11 @@ def GcodeGenDevelopment(line, speed, frequency, temperature, pressure, zeroPosit
         gcode=[f'M190 R{temperature}']
     
     gcode.append('G28XY')
-    glineY = 'G1Y{}F{}'.format(str(line[0][0]+zeroPosition[1]), speed)
+    glineY = 'G1Y{}F{}'.format(str(line[0][0]+float(zeroPosition[1])), speed)
     gcode.append(glineY)
     gcode.append(f'G97 P{pressure}')
     for point in line:
-        glineX = 'G1X{}F{}'.format(str(point[1]+zeroPosition[0]), speed)
+        glineX = 'G1X{}F{}'.format(str(point[1]+float(zeroPosition[0])), speed)
         gcode.append(glineX)
         gcode.append('M400')
         gcode.append(f'G97 P{pressure}')
