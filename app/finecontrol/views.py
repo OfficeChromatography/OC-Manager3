@@ -12,6 +12,7 @@ from .forms import CleaningProcessForm, ZeroPosition_Form
 from .models import *
 from printrun import printcore, gcoder
 import time
+import os
 
 form ={}
 
@@ -49,8 +50,7 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            print("Finish It!!")
-            mm_movement = round(float(request.POST['MOVEMOTOR']) * 57, 2);
+            mm_movement = round(-56*float(request.POST['MOVEMOTOR'])+57, 2);
             OC_LAB.send(f"G1Z{mm_movement}")
             return JsonResponse("Volume save", safe=False)
 
@@ -112,7 +112,8 @@ class Cleaning(object):
     def static_cleaning(self, volume):
         # Gcode to move the Pump for a specific volume from 0-position
         zMovement = round(volume * 57 / 1000, 2)
-        gcode = [f'G28Z', f'G1Z{zMovement}']
+
+        gcode = ['G91', f'G1Z{zMovement}', 'G90']
         return gcode
 
 
@@ -227,7 +228,7 @@ class GcodeEditor(View):
             gcodefile = GcodeFile.objects.filter(uploader=request.user, filename=filename)
 
             # Open the file
-            with open(gcodefile[0].gcode.path, 'r') as f:
+            with open(str(gcodefile[0].gcode), 'r') as f:
                 text = f.read()
 
             response = {'text': text,
@@ -277,7 +278,9 @@ class GcodeEditor(View):
 
             # if the file exist then edit
             if gcodefile:
-                with open(gcodefile[0].gcode.path, 'w+') as f:
+                # Get realitve path from app folder so that can be opened
+                path_rel = os.path.relpath(str(gcodefile[0].gcode), '/app/')
+                with open(path_rel, 'w+') as f:
                     myfile = File(f)
                     myfile.write(text)
                     new_name = fs.save(filename + '.gcode', content=myfile)
