@@ -50,7 +50,8 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            mm_movement = round(-56*float(request.POST['MOVEMOTOR'])+57, 2);
+            mm_movement = round(-56*float(request.POST['MOVEMOTOR'])+58, 2);
+            OC_LAB.send(f"G28Z")
             OC_LAB.send(f"G1Z{mm_movement}")
             return JsonResponse("Volume save", safe=False)
 
