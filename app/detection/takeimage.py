@@ -14,6 +14,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 
+from connection.forms import OC_LAB
 
 def basic_conf():
     basic_conf = {'brightness': 50,
@@ -41,7 +42,14 @@ def basic_conf():
                 'image_stabilization':0,
                 'iso_sensitivity_auto':1,
                 'iso_sensitivity':0,
-                'scene_mode':0
+                'scene_mode':0,
+
+                'uv365_power':0,
+                'uv278_power':0,
+                'red':100,
+                'blue':100,
+                'green':100,
+                'brightness':100,
                 }
     return basic_conf
 
@@ -65,10 +73,7 @@ def take_photo(request):
         print(user_config.errors)
 
     if led_config.is_valid():
-        uv365_power = led_config.cleaned_data['uv365_power']
-        uv278_power = led_config.cleaned_data['uv278_power']
-        led_control(uv365_power,365)
-        led_control(uv278_power,278)
+        led_control(led_config.cleaned_data)
         time.sleep(1)
     else:
         print(led_config.errors)
@@ -101,8 +106,7 @@ def take_photo(request):
     photo_path = shoot(pixelformat)
 
     # Turn off leds
-    led_control(uv365_power,0)
-    led_control(uv278_power,0)
+    led_control()
 
     return photo_path
 
@@ -124,16 +128,32 @@ def save_photo_db(path_to_photo,user):
         image.save()
         return image
 
-def led_control(power,wavelength):
+def led_control(led_config=None):
 # Power from: 0~255
 # Wavelength: 255,365,visible
-    if wavelength==255:
-        OC_LAB.send_now(f'M42 P23 S{power}')
-    if wavelength==355:
-        OC_LAB.send_now(f'M42 P17 S{power}')
-#         WORK IN PROGRESS
-#     if wavelength=="visible":
-#         OC_LAB.send_now('M42 P17 S0')
+    if led_config != None:
+        visible_ligth = "G93"
+        print(led_config)
+        for key, value in led_config.items():
+            if key == 'uv365_power':
+                OC_LAB.send_now(f'M42 P4 S{value}')
+            if key == 'uv278_power':
+                OC_LAB.send_now(f'M42 P5 S{value}')
+            if key == 'red':
+                visible_ligth += f'R{value}'
+            if key == 'green':
+                visible_ligth += f'G{value}'
+            if key == 'blue':
+                visible_ligth += f'B{value}'
+            if key == 'brightness':
+                visible_ligth += f'I{value}'
+        OC_LAB.send_now(visible_ligth)
+    else:
+        OC_LAB.send_now(f'M42 P4 S0')
+        OC_LAB.send_now(f'M42 P5 S0')
+        OC_LAB.send_now('G93R0B0G0I0')
+
+
 
 def get_metadata(image_in_Db):
 #     path = os.path.join('./', str(image_in_Db.photo))

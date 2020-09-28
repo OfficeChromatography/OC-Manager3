@@ -260,6 +260,31 @@ class Leds_Db(models.Model):
                         max_digits=3,
                         decimal_places=0)
 
+    red = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
+
+    blue = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
+
+    green = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
+
+    brightness = models.DecimalField(
+                        null=True,
+                        blank=True,
+                        max_digits=3,
+                        decimal_places=0)
+
+
 class Detection_ZeroPosition(models.Model):
     uploader = models.ForeignKey(
                 get_user_model(),

@@ -317,12 +317,24 @@ class AligmentConfigurationForm(forms.Form):
     def clean_warp_mode(self):
         return int(self.cleaned_data['warp_mode'])
 
+
+def null_to_zero(value):
+    if not value:
+        return 0
+    else:
+        return int(value)
+
+
 class LedsControlsForm(forms.ModelForm):
         class Meta:
             model = Leds_Db
 
             fields =[   'uv365_power',
-                        'uv278_power',]
+                        'uv278_power',
+                        'red',
+                        'blue',
+                        'green',
+                        'brightness']
 
         uv365_power = forms.DecimalField(label='UV365:',
                                             required=False,
@@ -341,16 +353,57 @@ class LedsControlsForm(forms.ModelForm):
                                             min_value=0,
                                             widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
                                             )
+
+        red = forms.DecimalField(label='Red:',
+                                         required=False,
+                                         max_digits=3,
+                                         decimal_places=0,
+                                         max_value=255,
+                                         min_value=0,
+                                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                         )
+
+        blue = forms.DecimalField(label='Blue:',
+                                         required=False,
+                                         max_digits=3,
+                                         decimal_places=0,
+                                         max_value=255,
+                                         min_value=0,
+                                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                         )
+
+        green = forms.DecimalField(label='Green:',
+                                         required=False,
+                                         max_digits=3,
+                                         decimal_places=0,
+                                         max_value=255,
+                                         min_value=0,
+                                         widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                         )
+
+        brightness = forms.DecimalField(label='Brightness:',
+                                        required=False,
+                                        max_digits=3,
+                                        decimal_places=0,
+                                        max_value=255,
+                                        min_value=0,
+                                        widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
+                                        )
+
         def clean_uv365_power(self):
-            uv365_power = self.cleaned_data['uv365_power']
-            if not uv365_power:
-                return 0
-            else:
-                return int(uv365_power)
+            return null_to_zero(self.cleaned_data['uv365_power'])
 
         def clean_uv278_power(self):
-            uv278_power = self.cleaned_data['uv278_power']
-            if not uv278_power:
-                return 0
-            else:
-                return int(uv278_power)
+            return null_to_zero(self.cleaned_data['uv278_power'])
+
+        def clean_red(self):
+            return null_to_zero(self.cleaned_data['red'])
+
+        def clean_green(self):
+            return null_to_zero(self.cleaned_data['green'])
+
+        def clean_blue(self):
+            return null_to_zero(self.cleaned_data['blue'])
+
+        def clean_brightness(self):
+            return null_to_zero(self.cleaned_data['brightness'])

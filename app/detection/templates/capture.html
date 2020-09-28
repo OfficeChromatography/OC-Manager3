@@ -126,7 +126,7 @@
                 </div>
                 <div class="card-body show" id='ledcontrolcontent'>
                   <form id="ledsControlsForm">
-                    <div class="form-group row">
+                    <div class="form-group row" id="uv_light">
                       <div class="col">
                         {{ LedsControlsForm.uv365_power.label }}
                         {{ LedsControlsForm.uv365_power }}
@@ -134,6 +134,25 @@
                       <div class="col">
                         {{ LedsControlsForm.uv278_power.label }}
                         {{ LedsControlsForm.uv278_power }}
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="form-group row" id="uv_light">
+                      <div class="col">
+                        {{ LedsControlsForm.red.label }}
+                        {{ LedsControlsForm.red }}
+                      </div>
+                      <div class="col">
+                        {{ LedsControlsForm.green.label }}
+                        {{ LedsControlsForm.green }}
+                      </div>
+                      <div class="col">
+                        {{ LedsControlsForm.blue.label }}
+                        {{ LedsControlsForm.blue }}
+                      </div>
+                      <div class="col">
+                        {{ LedsControlsForm.brightness.label }}
+                        {{ LedsControlsForm.brightness }}
                       </div>
                     </div>
                   </form>
