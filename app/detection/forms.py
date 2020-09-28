@@ -334,7 +334,7 @@ class LedsControlsForm(forms.ModelForm):
                         'red',
                         'blue',
                         'green',
-                        'brightness']
+                        'brightness_rgb']
 
         uv365_power = forms.DecimalField(label='UV365:',
                                             required=False,
@@ -405,5 +405,5 @@ class LedsControlsForm(forms.ModelForm):
         def clean_blue(self):
             return null_to_zero(self.cleaned_data['blue'])
 
-        def clean_brightness(self):
+        def clean_brightness_rgb(self):
             return null_to_zero(self.cleaned_data['brightness'])
