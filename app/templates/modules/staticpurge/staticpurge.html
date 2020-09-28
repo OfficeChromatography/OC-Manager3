@@ -1,7 +1,10 @@
 {% load static %}
 <div class="card shadow mb-4" id='staticpurgecard'>
   <div class="card-header py-3">
-    <h6 class="m-0 font-weight-bold text-primary">Static Purge</h6>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Static Purge</h6>
+      <button id='syringe-settings'class="btn btn-link"  data-toggle="modal" data-target="#syringeModal"><i class="fas fa-syringe"></i></button>
+    </div>
   </div>
   <div class="card-body">
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -72,3 +75,4 @@
   </div>
 </div>
 <script src="{% static 'modules/staticpurge/staticpurge.js' %}"></script>
+{% include 'modules/syringeload/syringeload.html' %}

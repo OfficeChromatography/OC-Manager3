@@ -50,9 +50,8 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            mm_movement = round(-54.5*float(request.POST['MOVEMOTOR'])+58, 2);
-            OC_LAB.send(f"G28Z")
-            OC_LAB.send(f"G1Z{mm_movement}")
+            mm_movement = round(-60*float(request.POST['MOVEMOTOR'])+60, 2);
+            OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
 
     # def delete(self,request):
@@ -103,18 +102,18 @@ class Cleaning(object):
         dinamic_clean = []
         for i in range(fi, fo + step, step):
             for j in range(1, self.time_window * i + 1):
-                dinamic_clean.append(f'G97 P{pressure}' + '\n')
                 dinamic_clean.append(f'G98 F{i}' + '\n')
+                if j % 10 == 0:
+                    dinamic_clean.append(f'G97 P{pressure}\n')
                 self.lines_left += 1
             self.duration += self.time_window
-
         return dinamic_clean
 
     def static_cleaning(self, volume):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
-        zMovement = round((58*volume/1000), 2);
-        gcode = ['G91', f'G1Z{zMovement}', 'G90']
+        zMovement = round((60*volume/1000), 2);
+        gcode = ['G28XY','G91', f'G1Z{zMovement}F250', 'G90']
         return gcode
 
 
