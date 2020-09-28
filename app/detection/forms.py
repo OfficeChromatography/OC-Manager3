@@ -381,7 +381,7 @@ class LedsControlsForm(forms.ModelForm):
                                          widget=forms.NumberInput(attrs={'size': '9', 'placeholder':'0', 'class':'form-control'}),
                                          )
 
-        brightness = forms.DecimalField(label='Brightness:',
+        brightness_rgb = forms.DecimalField(label='Brightness:',
                                         required=False,
                                         max_digits=3,
                                         decimal_places=0,

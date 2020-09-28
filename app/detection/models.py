@@ -278,7 +278,7 @@ class Leds_Db(models.Model):
                         max_digits=3,
                         decimal_places=0)
 
-    brightness = models.DecimalField(
+    brightness_rgb = models.DecimalField(
                         null=True,
                         blank=True,
                         max_digits=3,

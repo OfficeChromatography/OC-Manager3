@@ -49,7 +49,7 @@ def basic_conf():
                 'red':100,
                 'blue':100,
                 'green':100,
-                'brightness':100,
+                'brightness_rgb':100,
                 }
     return basic_conf
 
@@ -145,7 +145,7 @@ def led_control(led_config=None):
                 visible_ligth += f'G{value}'
             if key == 'blue':
                 visible_ligth += f'B{value}'
-            if key == 'brightness':
+            if key == 'brightness_rgb':
                 visible_ligth += f'I{value}'
         OC_LAB.send_now(visible_ligth)
     else:
