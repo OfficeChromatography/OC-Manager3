@@ -199,7 +199,14 @@ def manipulate(path):
     dst = dst[y:y+h, x:x+w]
 
     new_path = f'{os.path.splitext(path)[0]}_corrected{os.path.splitext(path)[1]}'
-    cv2.imwrite(new_path,dst)
 
+    new_image = rotate_image(dst,-1.2)
+
+    cv2.imwrite(new_path, new_image)
     return new_path
 
+def rotate_image(image, angle):
+    image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+    return result

@@ -55,7 +55,7 @@ class Capture_View(View):
             form['UserControlsForm'] = UserControlsForm(initial=initial)
             form['LedsControlsForm'] = LedsControlsForm(initial=initial)
             form['list_load'] = Images_Db.objects.filter(uploader=request.user).order_by('-id')
-
+            OC_LAB.send('G0Y183')
             image_info={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
             return render(
                             request,
