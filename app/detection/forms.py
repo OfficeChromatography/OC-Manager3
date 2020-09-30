@@ -406,4 +406,4 @@ class LedsControlsForm(forms.ModelForm):
             return null_to_zero(self.cleaned_data['blue'])
 
         def clean_brightness_rgb(self):
-            return null_to_zero(self.cleaned_data['brightness'])
+            return null_to_zero(self.cleaned_data['brightness_rgb'])
