@@ -2,13 +2,14 @@ import os
 import sys
 def create_desktop_launcher():
     path = sys.argv[1]
+    print(path)
     directory = os.path.join(os.environ['HOME'], 'Desktop')
     f = open(directory+'/OC-Manager.desktop','w+')
-    f.write(f.'[Desktop Entry]\n \
+    f.write('[Desktop Entry]\n \
             Keywords=Chromatography\n \
             Name=OC-Manager\n \
             Comment=Chromatography-Manager Software\n \
-            Exec=cd {}'+'run.sh'+' %F\n \
+            Exec=cd '+'run.sh'+' %F\n \
             Terminal=true\n \
             Type=Application\n \
             MimeType=text/plain\n \
