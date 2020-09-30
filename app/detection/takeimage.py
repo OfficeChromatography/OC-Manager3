@@ -88,9 +88,7 @@ def take_photo(request):
         conf.pop('resolution')
 
         # set resolution
-        subprocess.run([f'v4l2-ctl --set-fmt-video=width={width}',
-                        f'height={height}'],stdout=subprocess.DEVNULL,
-                        shell=True)
+        subprocess.run([f'v4l2-ctl --set-fmt-video=width={width},height={height}'],stdout=subprocess.DEVNULL,shell=True)
 
         # set format
         subprocess.call(['v4l2-ctl','--set-fmt-video',f'pixelformat={pixelformat}'],
@@ -189,7 +187,6 @@ def manipulate(path):
     mtx=np.array([[2009.9439533949294, 0.0, 1099.0825337234287], [0.0, 1981.8528472526064, 719.3003764740773], [0.0, 0.0, 1.0]])
     dist=np.array([[-0.4452686852311272, 0.16206091566188818, 0.0018999163210796088, -0.002555211352544398, -0.007024199063685075]])
 
-    print(path)
     img = cv2.imread(path)
 
     h,w = img.shape[:2]
@@ -201,7 +198,8 @@ def manipulate(path):
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
 
-    cv2.imwrite(f'{os.path.splitext(path)[0]}_corrected{os.path.splitext(path)[1]}',dst)
+    new_path = f'{os.path.splitext(path)[0]}_corrected{os.path.splitext(path)[1]}'
+    cv2.imwrite(new_path,dst)
 
-    return path
+    return new_path
 
