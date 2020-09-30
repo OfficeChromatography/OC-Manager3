@@ -170,7 +170,7 @@ def get_metadata(image_in_Db):
         # decode bytes
         if isinstance(data, bytes):
             data = data.decode()
-        img_data+=f"{tag}: {data}\n"
+        img_data += f"{tag}: {data}\n"
         dic[tag]=str(data)
     return filter_data(dic)
 
@@ -200,7 +200,8 @@ def manipulate(path):
     # crop the image
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
-    cv2.imwrite(path,dst)
+
+    cv2.imwrite(f'{os.path.splitext(path)[0]}_corrected{os.path.splitext(path)[1]}',dst)
 
     return path
 
