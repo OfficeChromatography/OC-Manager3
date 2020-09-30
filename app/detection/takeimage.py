@@ -30,7 +30,7 @@ def basic_conf():
                 'rotate':0,
                 'color_effects_cbcr':32896,
 
-                'resolution':'1280x720',
+                'resolution':'2028x1520',
                 'pixelformat':3,
 
                 'auto_exposure':0,
