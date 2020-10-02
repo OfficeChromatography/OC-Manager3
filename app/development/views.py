@@ -189,7 +189,7 @@ def calculateDevelopment(data):
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left),3), float(data.offset_bottom)]
     endPoint = [round(float(data.offset_left) + float(length),3), float(data.offset_bottom)]
-    zMovement = round(float(data.volume) * 58/1000,3)
+    zMovement = round(float(data.volume) * 60/1000,3)
     #time in seconds
     time = zMovement / speed * 60
 
@@ -218,7 +218,7 @@ def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBoth
 
     gcode.append('G91')
     jj = 0   
-    for x in range(int(applications)):
+    for x in range(int(applications)*2):
         if (x%2)==0:
             # gcode.append('G40')
             glineX = f'G1X{length}Z{zMovement/float(applications)}F{speed}'

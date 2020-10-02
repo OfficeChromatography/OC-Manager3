@@ -54,7 +54,7 @@ class PlateProperties_Form(forms.ModelForm):
 class DevelopmentBandSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['volume'] = 100
+        initial['volume'] = 1000
         initial['applications'] = 10
         initial['fluid'] = 'Methanol'
         kwargs['initial'] = initial
