@@ -203,6 +203,7 @@ def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBoth
 
     startPX = str(startPoint[0]+float(zeroPosition[0]))
     endPX = str(endPoint[0]+float(zeroPosition[0]))
+    length = str((endPoint[0]+float(zeroPosition[0])) - (startPoint[0]+float(zeroPosition[0])))
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
@@ -215,30 +216,28 @@ def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBoth
     gcode.append(glineX)
     gcode.append('M400')
 
-    jj = 0
+    gcode.append('G91')
+    jj = 0   
     for x in range(int(applications)):
-        gcode.append('G40') #open
-        glineX = 'G1X{}Z{}F{}'.format(endPX, str(-zMovement/float(applications)), speed)
-        gcode.append(glineX)
-        gcode.append('M400')
-        gcode.append('G40') #close
-        jj += 1
-        if (x%2)!=0:
+        if (x%2)==0:
+            # gcode.append('G40')
+            glineX = f'G1X{length}Z{zMovement/float(applications)}F{speed}'
+            gcode.append(glineX)
+            # gcode.append('G40')
+            jj += 1
+        else:
             if printBothways == 'On':
-                gcode.append('G40') #open
-                glineX = 'G1X{}Z{}F{}'.format(startPX, str(-zMovement/float(applications)), speed)
+                # gcode.append('G40')
+                glineX = f'G1X-{length}Z{zMovement/float(applications)}F{speed}'
                 gcode.append(glineX)
-                gcode.append('M400')
-                gcode.append('G40') #close
+                # gcode.append('G40')
                 jj += 1
             else:
-                glineX = 'G1X{}F{}'.format(startPX, speed)
-                gcode.append('M400')
+                glineX = f'G1X-{length}F{speed}'
                 gcode.append(glineX)
         if jj >= int(applications):
-            break
-           
-    gcode.append('M400')
+            break     
+    gcode.append('G90')
     gcode.append('G28XY')
     return gcode
 
