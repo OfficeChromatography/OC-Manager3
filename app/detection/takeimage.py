@@ -112,14 +112,14 @@ def shoot(format):
     # Take picture
     format=format.lower()
     name = datetime.now().strftime("%Y.%m.%d-%H.%M.%S")
-    photo_path='.'+MEDIA_ROOT+'/images/'+name+'.'+format
+    photo_path=MEDIA_ROOT+'/images/'+name+'.'+format
     subprocess.call(['v4l2-ctl','--stream-mmap','--stream-count=1','--stream-skip=3','--stream-to='+photo_path])
     return photo_path
 
 def save_photo_db(path_to_photo,user):
     with open(path_to_photo,'rb') as f:
         image = Images_Db()
-        image.photo = File(f)
+        image.photo.save(os.path.basename(path_to_photo), File(f))
         image.save()
         image.filename = image.file_name()
         image.uploader = user

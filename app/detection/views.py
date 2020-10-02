@@ -35,11 +35,11 @@ class Capture_View(View):
             print(id)
             image = Images_Db.objects.get(pk=id)
             metadata = {}
-            me = get_metadata(image)
-            print(me)
+            # me = get_metadata(image)
+            # print(me)
             response = {**{'url':image.photo.url,
                         'filename':image.filename,
-                        'meta':me,
+                        # 'meta':me,
                         'id': image.id}}
             return JsonResponse(response)
 
