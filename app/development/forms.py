@@ -54,14 +54,15 @@ class PlateProperties_Form(forms.ModelForm):
 class DevelopmentBandSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['volume'] = 100
+        initial['volume'] = 1000
+        initial['applications'] = 10
         initial['fluid'] = 'Methanol'
         kwargs['initial'] = initial
         super(DevelopmentBandSettings_Form, self).__init__(*args, **kwargs)
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','printBothways','density','viscosity']
+        fields = ['volume','fluid','applications','printBothways','density','viscosity']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -81,17 +82,18 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
                 ('Water','Water'),
                 ('Specific','Specific')
             ]),
+            'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'volume'         : _('Volume'),
             'fluid'         : _('Fluid'),
+            'applications'   : _('Applications')
         }
 
         def clean(self):
             fluid = self.cleaned_data.get("fluid")
             density = self.cleaned_data.get("density")
             viscosity = self.cleaned_data.get("viscosity")
-            print('helloforms')
             if fluid == 'Specific':
                 if density == "null" or viscosity == "null":
                     raise forms.ValidationError(
@@ -99,47 +101,18 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
                     )
             return self.cleaned_data
             
-
-class MovementSettings_Form(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        initial = kwargs.get('initial', {})
-        initial['motor_speed'] = 3000
-        initial['delta_x'] = 0.5
-        kwargs['initial'] = initial
-        super(MovementSettings_Form, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = MovementSettings_Dev_Db
-        fields = ['motor_speed','delta_x']
-        widgets = {
-            'motor_speed'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'delta_x'       : forms.NumberInput(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'motor_speed' : _('MotorSpeed'),
-            'delta_x'     : _('Delta X'),
-        }
-
-        def clean_motor_speed(self):
-            motor_speed = self.motor_speed
-            return int(motor_speed)
-
-
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['pressure'] = 21
-        initial['frequency'] = 1400
+        initial['pressure'] = 25
         initial['temperature'] = 0
         kwargs['initial'] = initial
         super(PressureSettings_Form, self).__init__(*args, **kwargs)
 
     class Meta:
         model = PressureSettings_Dev_Db
-        fields = ['pressure','frequency', 'temperature','nozzlediameter']
+        fields = ['temperature','nozzlediameter','pressure']
         widgets = {
-            'pressure'              : forms.NumberInput(attrs={'class': 'form-control'}),
-            'frequency'             : forms.NumberInput(attrs={'class': 'form-control'}),
             'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
             'nozzlediameter'        : forms.Select(attrs={'class': 'form-control'}, choices=[
                 ('0.25','0.25'),
@@ -149,6 +122,11 @@ class PressureSettings_Form(forms.ModelForm):
                 ('0.08','0.08'),
                 ('0.05','0.05'),
             ]),
+            'pressure'           : forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+        labels = {
+            'pressure'         : _('Max Pressure')
         }
 
         def clean_temperature(self):

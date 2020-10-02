@@ -286,7 +286,7 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentplay/'
   $.ajax({
   method: 'POST',
@@ -298,20 +298,20 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
+  $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
   $endpoint = window.location.origin+'/developmentsave/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
   data:   $formData,
   success: saveMethodSuccess,
-  error: saveMethodError,stopbttn
+  error: saveMethodError,
   })
 })
 $('#list-load a').on('click', function (e) {
 e.preventDefault()
 data={'filename':$(this)[0].innerHTML}
-console.log(data);
+//console.log(data);
 $.ajax({
   method: 'GET',
   url:    window.location.origin+'/developmentsave/',
@@ -355,11 +355,11 @@ function startMethodError(jqXHR, textStatus, errorThrown){}
 
 function loadMethodSuccess(data, textStatus, jqXHR){
   // Load all the fields with the ones get in the database
-  $("#id_motor_speed").val(data.motor_speed)
+  // $("#id_motor_speed").val(data.motor_speed)
   $("#id_pressure").val(data.pressure)
-  $("#id_frequency").val(data.frequency)
+  // $("#id_frequency").val(data.frequency)
   $("#id_temperature").val(data.temperature)
-  $("#id_delta_x").val(data.delta_x)
+  // $("#id_delta_x").val(data.delta_x)
   $('#id_nozzlediameter').val(data.nozzlediameter)
 
   $("#id_zero_x").val(data.zero_x)
@@ -374,6 +374,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_offset_bottom").val(data.offset_bottom)
 
   $("#id_volume").val(data.volume)
+  $("#id_applications").val(data.applications)
 
   if (data.printBothways=='On') {
     $("#printBothwaysButton").text('On');
@@ -429,6 +430,7 @@ function getSpecificFluid(toString){
   data['volume'] = $('#id_volume').val()
   data['density'] = $('#densityval').text()
   data['viscosity'] = $('#viscosityval').text()
+  data['applications'] = $('#id_applications').val()
 
   if(toString){
     data = '&devBandSettings='+JSON.stringify(data)
@@ -458,15 +460,15 @@ function checkSpecificValues() {
 } 
 
 function calcVol(){
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getSpecificFluid(true)
-  $endpoint = window.location.origin+'/developmentcalc/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: calcMethodSuccess,
-  error: saveMethodError
-  })
+  // $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getSpecificFluid(true)
+  // $endpoint = window.location.origin+'/developmentcalc/'
+  // $.ajax({
+  // method: 'POST',
+  // url:    $endpoint,
+  // data:   $formData,
+  // success: calcMethodSuccess,
+  // error: saveMethodError
+  // })
 }
 
 function calcMethodSuccess(data, textStatus, jqXHR){
