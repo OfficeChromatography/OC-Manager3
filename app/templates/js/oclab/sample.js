@@ -114,6 +114,7 @@ $("#id_main_property").change(
         break;
     }
     loadResumeTable()
+    createBandsTable()
     calcVol()
   }
 )
@@ -168,6 +169,7 @@ $("#id_main_property").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    createBandsTable()
     calcVol()
   }
 )
@@ -175,7 +177,9 @@ $("#id_value").change(
   function(){
     mainCalculations()
     loadResumeTable()
+    createBandsTable()
     calcVol()
+    
   }
 )
 $("#id_height").change(
@@ -203,7 +207,15 @@ $('#table').change(function(){
     }
   })
 })
-
+function createBandsTable(){
+  number_bands = parseFloat($("#id_value").val());
+  property = $("#id_main_property").val();
+  gap_size = parseFloat($("#id_gap").val());
+  band_size = parseFloat($("#id_value").val());
+  working_area = nBandsWorkingArea(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size)
+  if (property=='2'){number_bands = Math.trunc(working_area[0]/(band_size+gap_size))}
+  newComponentsTable(number_bands);
+}
 // MAIN
 function mainCalculations(){
   plate_x_size = parseFloat($("#id_size_x").val());
@@ -273,7 +285,6 @@ function mainCalculations(){
     addData2Chart(plotPreview,i,'black', newdata)
   }
   plotPreview.update();
-  newComponentsTable(number_bands);
 }
 
 //  ERROR DISPLAY MANAGER
@@ -757,6 +768,7 @@ function calcMethodSuccess(data, textStatus, jqXHR){
 }
 
 $(document).ready(function() {
+  createBandsTable()
   calcVol();
   $(document).on("blur", ".vol", function() {
     calcVol();
