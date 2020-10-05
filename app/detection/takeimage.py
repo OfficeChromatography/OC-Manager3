@@ -200,7 +200,7 @@ def manipulate(path):
 
     new_path = f'{os.path.splitext(path)[0]}_corrected{os.path.splitext(path)[1]}'
 
-    new_image = rotate_image(dst,-1.2)
+    new_image = rotate_image(dst,1.2)
 
     cv2.imwrite(new_path, new_image)
     return new_path
