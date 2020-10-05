@@ -25,6 +25,7 @@ var plotPreview = new Chart(ctx, {
           ticks: {
             min: 0, // minimum value
             max: 100, // maximum value
+            reverse: true,
           },
         }],
         xAxes: [{
@@ -212,6 +213,12 @@ function createBandsTable(){
   property = $("#id_main_property").val();
   gap_size = parseFloat($("#id_gap").val());
   band_size = parseFloat($("#id_value").val());
+  plate_x_size = parseFloat($("#id_size_x").val());
+  plate_y_size = parseFloat($("#id_size_y").val());
+  offset_left_size = parseFloat($("#id_offset_left").val());
+  offset_right_size = parseFloat($("#id_offset_right").val());
+  offset_top_size = parseFloat($("#id_offset_top").val());
+  offset_bottom_size = parseFloat($("#id_offset_bottom").val());
   working_area = nBandsWorkingArea(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size)
   if (property=='2'){number_bands = Math.trunc(working_area[0]/(band_size+gap_size))}
   newComponentsTable(number_bands);
