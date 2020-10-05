@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, MovementSettings_Form, PressureSettings_Form
-from .models import Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, MovementSettings_Dev_Db, PressureSettings_Dev_Db
+from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form
+from .models import Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -19,7 +19,6 @@ forms = {
     'Development_Form': Development_Form(),
     'PlateProperties_Form': PlateProperties_Form(),
     'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
-    'MovementSettings_Form': MovementSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
     'ZeroPosition_Form': ZeroPosition_Form()
     }
@@ -59,7 +58,6 @@ class DevelopmentPlay(View):
             else:
                 # Run the form validations and return the clean data
                 forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
-                                    movement_settings_form   =   MovementSettings_Form(request.POST),
                                     pressure_settings_form   =   PressureSettings_Form(request.POST),
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
@@ -91,13 +89,13 @@ class DevelopmentSaveAndLoad(View):
         #print(request.POST)
         development_form  =   Development_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
+        pressure_settings_form = PressureSettings_Form(request.POST)
         #developmentBandSettings_form       =   DevelopmentBandSettings_Form(request.POST)
-        movement_settings_form   =   MovementSettings_Form(request.POST)
-        pressure_settings_form   =   PressureSettings_Form(request.POST)
         zero_position_form       =   ZeroPosition_Form(request.POST)
+
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
-
+        #print(devBandSettings_data)
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
             plate_properties_object = plate_properties_form.save()
@@ -111,17 +109,13 @@ class DevelopmentSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check band properties'})
 
-        # Check Movement Settings Formular
-        if movement_settings_form.is_valid():
-            movement_settings_object = movement_settings_form.save()
-        else:
-            return JsonResponse({'error':'Check movement settings'})
-
         # Check Pressure Settings Formular
         if pressure_settings_form.is_valid():
             pressure_settings_object = pressure_settings_form.save()
         else:
+            print(pressure_settings_form)
             return JsonResponse({'error':'Check pressure settings'})
+            
 
         # Check Home Settings Formular
         if zero_position_form.is_valid():
@@ -140,7 +134,6 @@ class DevelopmentSaveAndLoad(View):
             else:
                 development_instance = development_form.save(commit=False)
                 development_instance.auth = request.user
-                development_instance.movement_settings = movement_settings_object
                 development_instance.pressure_settings = pressure_settings_object
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
@@ -159,13 +152,11 @@ class DevelopmentSaveAndLoad(View):
         development_conf=model_to_dict(Development_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Dev_Db.objects.get(id=development_conf['plate_properties']))
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
-        movement_settings_conf=model_to_dict(MovementSettings_Dev_Db.objects.get(id=development_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
-        development_conf.update(movement_settings_conf)
         development_conf.update(pressure_settings_conf)
         development_conf.update(zero_position_conf)
         
@@ -185,79 +176,81 @@ def data_validations(**kwargs):
     return forms_data
 
 def calculateDevelopment(data):
-    #dropvolume in uL
-    dropVolume = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], frequency = float(data['frequency']), fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcVolume()
-    print("dropVolume: "+str(dropVolume))
-    #dropVolume = 0.025
+    # #flow in uL/s
+    flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
+    # #syringe movement in mm/s
+    flow = flow / 58
+    # #maximum speed in mm/min
+    speed = flow * 60
+    
+
     data = SimpleNamespace(**data)
-    
+    #print(data)
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
+    startPoint = [round(float(data.offset_left),3), float(data.offset_bottom)]
+    endPoint = [round(float(data.offset_left) + float(length),3), float(data.offset_bottom)]
+    zMovement = round(float(data.volume) * 60/1000,3)
+    #time in seconds
+    time = zMovement / speed * 60
 
-    points = round(float(data.volume) / dropVolume)
-    pointsPerLine = round(length / float(data.delta_x))
-    lines = round(points / pointsPerLine)
-    #realVolume = lines * pointsPerLine * dropVolume
+    #add error for when time is greater than 3
 
-    applicationLine=[]
-    current_length=0
-    while current_length<=length:
-        applicationLine.append([round(float(data.offset_bottom),3), round(float(data.offset_left)+current_length,3)])
-        current_length+=float(data.delta_x)
-
-    applicationLines=[]
-    line = 0
-    if (data.printBothways=='On'):
-        while line < lines:
-            if (line == 0) or (line%2 == 0):
-                applicationLines.extend(applicationLine)
-            else:
-                applicationLines.extend(applicationLine[::-1])
-            line+=1
-    else:
-        while line < lines:
-            applicationLines.extend(applicationLine)
-            line+=1
-    
-    # Creates the Gcode for the application and return it
-    #print(applicationLines)
-    return GcodeGenDevelopment(applicationLines, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
+    return GcodeGenDevelopment(startPoint, endPoint, zMovement, data.applications, data.printBothways, speed, data.temperature, [data.zero_x,data.zero_y])
 
 
-def GcodeGenDevelopment(line, speed, frequency, temperature, pressure, zeroPosition):
+def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBothways, speed, temperature, zeroPosition):
     gcode=list()
+
+    startPX = str(startPoint[0]+float(zeroPosition[0]))
+    endPX = str(endPoint[0]+float(zeroPosition[0]))
+    length = str((endPoint[0]+float(zeroPosition[0])) - (startPoint[0]+float(zeroPosition[0])))
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
     
     gcode.append('G28XY')
-    glineY = 'G1Y{}F{}'.format(str(line[0][0]+float(zeroPosition[1])), speed)
+    glineY = 'G1Y{}F{}'.format(str(startPoint[1]+float(zeroPosition[1])), speed)
     gcode.append(glineY)
-    gcode.append(f'G97 P{pressure}')
-    for point in line:
-        glineX = 'G1X{}F{}'.format(str(point[1]+float(zeroPosition[0])), speed)
-        gcode.append(glineX)
-        gcode.append('M400')
-        gcode.append(f'G97 P{pressure}')
-        gcode.append(f'G98 F{frequency}')
-        gcode.append('M400')
+    
+    glineX = 'G1X{}F{}'.format(startPX, speed)
+    gcode.append(glineX)
+    gcode.append('M400')
+
+    gcode.append('G91')
+    jj = 0   
+    for x in range(int(applications)*2):
+        if (x%2)==0:
+            # gcode.append('G40')
+            glineX = f'G1X{length}Z{zMovement/float(applications)}F{speed}'
+            gcode.append(glineX)
+            # gcode.append('G40')
+            jj += 1
+        else:
+            if printBothways == 'On':
+                # gcode.append('G40')
+                glineX = f'G1X-{length}Z{zMovement/float(applications)}F{speed}'
+                gcode.append(glineX)
+                # gcode.append('G40')
+                jj += 1
+            else:
+                glineX = f'G1X-{length}F{speed}'
+                gcode.append(glineX)
+        if jj >= int(applications):
+            break     
+    gcode.append('G90')
     gcode.append('G28XY')
     return gcode
 
-class DevelopmentCalc(View):
-    def post(self, request):
-        data = SimpleNamespace(**request.POST)
-        results = returnDropEstimateVol(data)
-        return JsonResponse({'results':results})
+# class DevelopmentCalc(View):
+#     def post(self, request):
+#         data = SimpleNamespace(**request.POST)
+#         results = returnFlow(data)
+#         return JsonResponse({'results':results})
 
-def returnDropEstimateVol(data):
-    table = json.loads(data.devBandSettings[0])
+# def returnFlow(data):
+#     table = json.loads(data.devBandSettings[0])
     
-    dropVolume = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], frequency = float(data.frequency[0]), fluid=table['fluid'], density=table['density'], viscosity=table['viscosity']).calcVolume()
+#     flow = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], fluid=table['fluid'], density=table['density'], viscosity=table['viscosity']).calcFlow()
         
-    length = float(data.size_x[0])-float(data.offset_left[0])-float(data.offset_right[0])
-    points = round(float(data.volume[0]) / dropVolume)
-    pointsPerLine = round(length / float(data.delta_x[0]))
-    lines = round(points / pointsPerLine)
-    realVolume = lines * pointsPerLine * dropVolume
 
-    return [dropVolume, realVolume]
+#     return flow

@@ -78,40 +78,13 @@
                     <div class="row">
                       <div class="col">
                         <!-- Editable table -->
-                        <form id='movementform'>
+                        <form id='pressureform'>
                           <div class="form-group row">
                             <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{MovementSettings_Form.motor_speed.label}}</label>
-                              {{MovementSettings_Form.motor_speed}}
-                              <div class="input-group-append">
-                                <span class="input-group-text">[mm/m]</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group row">
-                            <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" >{{PressureSettings_Form.pressure.label}}</label>
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.pressure.label}}</label>
                               {{PressureSettings_Form.pressure}}
                               <div class="input-group-append">
                                 <span class="input-group-text">[psi]</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group row">
-                            <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.frequency.label}}</label>
-                              {{PressureSettings_Form.frequency}}
-                              <div class="input-group-append">
-                                <span class="input-group-text">Hz</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group row">
-                            <div class="input-group">
-                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{MovementSettings_Form.delta_x.label}}</label>
-                              {{MovementSettings_Form.delta_x}}
-                              <div class="input-group-append">
-                                <span class="input-group-text">mm</span>
                               </div>
                             </div>
                           </div>
@@ -250,11 +223,12 @@
                                       <span class="input-group-text">[uL]</span>
                                     </div>
                                   </div>
+                                  
                                   <div class="input-group col">
                                     <div class="input-group-prepend">
-                                      <span class="input-group-text">{{DevelopmentBandSettings_Form.fluid.label}}</span>
+                                      <span class="input-group-text">{{DevelopmentBandSettings_Form.applications.label}}</span>
                                     </div>
-                                    {{DevelopmentBandSettings_Form.fluid}}   
+                                    {{DevelopmentBandSettings_Form.applications}}   
                                   </div>
                                 </div>
                                 <div style="display: none;" id="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
@@ -269,15 +243,14 @@
                                       <button class="btn btn-primary" id="printBothwaysButton">Off</button>
                                     </div>
                                 </div>
+                                <div class="input-group col">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">{{DevelopmentBandSettings_Form.fluid.label}}</span>
+                                  </div>
+                                  {{DevelopmentBandSettings_Form.fluid}}   
+                                </div>
                             </div>
-                            <div class="form-group mt-3 mb-1 row">
-                              <div class="input-group col small vol">
-                              <br>
-                              estimated vol:
-                              <br>
-                              estimated dropvol:
-                              </div>
-                            </div>
+
                           </div>
                         </form>
                       </div>
@@ -455,6 +428,7 @@
       </div>
       <div class="modal-body">
         Place the development chamber on top of the plate and select the bottom offset accordingly.
+        Place the magnet also
       </div>
     </div>
   </div>
