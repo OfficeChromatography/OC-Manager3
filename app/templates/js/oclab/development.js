@@ -34,7 +34,6 @@ var plotPreview = new Chart(ctx, {
             max: 100, // maximum value
           },
         }]
-
     }
    },
 });
@@ -50,21 +49,18 @@ $("#id_pressure").change(
   function(){
     console.log('pres');
     loadresume()
-    calcVol()
   }
 )
 $("#id_frequency").change(
   function(){
     console.log('dpre');
     loadresume()
-    calcVol()
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
     loadresume()
-    calcVol()
   }
 )
 
@@ -74,7 +70,6 @@ $("#id_size_x").change(
     changegraphsize()
     bandsmain()
     loadresume()
-    calcVol()
   }
 )
 $("#id_size_y").change(
@@ -83,7 +78,6 @@ $("#id_size_y").change(
     changegraphsize()
     bandsmain()
     loadresume()
-    calcVol()
   }
 );
 
@@ -91,28 +85,24 @@ $("#id_offset_left").change(
     function(){
       bandsmain()
       loadresume()
-      calcVol()
     }
 );
 $("#id_offset_right").change(
   function(){
     bandsmain()
     loadresume()
-    calcVol()
   }
 );
 $("#id_offset_bottom").change(
     function(){
       bandsmain()
       loadresume()
-      calcVol()
     }
 );
 $("#id_offset_top").change(
   function(){
     bandsmain()
     loadresume()
-    calcVol()
   }
 );
 
@@ -120,12 +110,10 @@ $("#id_volume").change(
   function(){
     bandsmain()
     loadresume()
-    calcVol()
   }
 );
 $("#id_fluid").change(
-  function(){
-    calcVol()
+  function(){   
     bandsmain()
     loadresume()
     if ($(this).val() == 'Specific') {
@@ -137,7 +125,6 @@ $("#id_fluid").change(
 );
 $("#id_nozzlediameter").change(
   function(){
-    calcVol()
   }
 );
 
@@ -399,7 +386,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   bandsmain()
   loadresume()
   changegraphsize()
-  calcVol()
+  
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -460,18 +447,6 @@ function checkSpecificValues() {
   }
 } 
 
-function calcVol(){
-  // $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getSpecificFluid(true)
-  // $endpoint = window.location.origin+'/developmentcalc/'
-  // $.ajax({
-  // method: 'POST',
-  // url:    $endpoint,
-  // data:   $formData,
-  // success: calcMethodSuccess,
-  // error: saveMethodError
-  // })
-}
-
 function calcMethodSuccess(data, textStatus, jqXHR){
   // console.log(typeof(data.error));
   if(data.error==undefined){
@@ -484,6 +459,6 @@ function calcMethodSuccess(data, textStatus, jqXHR){
 }
 
 $(document).ready(function() {
-  calcVol();
+  
   $('#devModal').modal('show');
 });
