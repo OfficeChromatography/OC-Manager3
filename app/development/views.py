@@ -230,7 +230,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 for yy in range(int(precision)):
                     gcode.append(f'G97 P{pressure}')
                     gcode.append('G40')
-                    glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
+                    glineX = f'G1X-{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
                     gcode.append(glineX)
                     gcode.append('G40')
                 jj += 1
