@@ -42,25 +42,25 @@ var datatable
 $("#id_motor_speed").change(
   function(){
     console.log('motor');
-    loadresume()
+    
   }
 )
 $("#id_pressure").change(
   function(){
     console.log('pres');
-    loadresume()
+    
   }
 )
 $("#id_frequency").change(
   function(){
     console.log('dpre');
-    loadresume()
+    
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
-    loadresume()
+    
   }
 )
 
@@ -69,7 +69,7 @@ $("#id_size_x").change(
     console.log('sizex');
     changegraphsize()
     bandsmain()
-    loadresume()
+    
   }
 )
 $("#id_size_y").change(
@@ -77,45 +77,45 @@ $("#id_size_y").change(
     console.log('sizey');
     changegraphsize()
     bandsmain()
-    loadresume()
+    
   }
 );
 
 $("#id_offset_left").change(
     function(){
       bandsmain()
-      loadresume()
+      
     }
 );
 $("#id_offset_right").change(
   function(){
     bandsmain()
-    loadresume()
+    
   }
 );
 $("#id_offset_bottom").change(
     function(){
       bandsmain()
-      loadresume()
+      
     }
 );
 $("#id_offset_top").change(
   function(){
     bandsmain()
-    loadresume()
+    
   }
 );
 
 $("#id_volume").change(
   function(){
     bandsmain()
-    loadresume()
+    
   }
 );
 $("#id_fluid").change(
   function(){   
     bandsmain()
-    loadresume()
+    
     if ($(this).val() == 'Specific') {
       $('#specificFluidTable').show()
     } else {
@@ -225,17 +225,6 @@ function theres_error(error_id, bolean_exp){
     $(error_id).fadeOut();
     return false
   }
-}
-
-function loadresume(){
-  $('#motorspeed_resume').text($("#id_motor_speed").val())
-  $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
-  $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
-  $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
-  $('#delta_resume').text($("#id_delta_x").val())
-  $('#volume_resume').text($("#id_volume").val())
-  $('#fluid_resume').text($("#id_fluid").val())
-  $('#printBothways_resume').text($('#printBothwaysButton').text());
 }
 
 function changegraphsize(){
@@ -363,6 +352,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
 
   $("#id_volume").val(data.volume)
   $("#id_applications").val(data.applications)
+  $("#id_precision").val(data.precision)
 
   if (data.printBothways=='On') {
     $("#printBothwaysButton").text('On');
@@ -384,9 +374,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $('#id_load_sucess').html(data.file_name+' successfully loaded!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
   bandsmain()
-  loadresume()
   changegraphsize()
-  
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -419,6 +407,7 @@ function getSpecificFluid(toString){
   data['density'] = $('#densityval').text()
   data['viscosity'] = $('#viscosityval').text()
   data['applications'] = $('#id_applications').val()
+  data['precision'] = $('#id_precision').val()
 
   if(toString){
     data = '&devBandSettings='+JSON.stringify(data)

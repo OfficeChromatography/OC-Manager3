@@ -32,7 +32,7 @@
 </head>
 
 
-<body id="page-top" onload="bandsmain(); loadresume()">
+<body id="page-top" onload="bandsmain();">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -230,6 +230,12 @@
                                     </div>
                                     {{DevelopmentBandSettings_Form.applications}}   
                                   </div>
+                                  <div class="input-group col">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">{{DevelopmentBandSettings_Form.precision.label}}</span>
+                                    </div>
+                                    {{DevelopmentBandSettings_Form.precision}}   
+                                  </div>
                                 </div>
                                 <div style="display: none;" id="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
                                   <tr class="hide"><td class="pt-3-half">density [g/cm³]</td><td class="pt-3-half" id="densityval" contenteditable="true"></td></tr>
@@ -269,61 +275,6 @@
                         <!-- Editable table -->
                   <form class="resume-form" id='saveform' method="post">{% csrf_token %}
                     <div class="row">
-                      <!-- Table COL -->
-                      <div class="col-xl">
-                        <label for="colFormLabelSm">Resume</label>
-                        <div class="input-group">
-                          <table class="table table-sm" id='resumetable'>
-                          <thead>
-                            <tr>
-                              <th scope="col">#</th>
-                              <th scope="col">Value</th>
-                              <th scope="col">Units</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <th scope="row">MotorSpeed</th>
-                              <td class='val' id='motorspeed_resume'></td>
-                              <td>[mm/m]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">App const</th>
-                              <td class='val'  id='appconst_resume'></td>
-                              <td>[psi, Hz]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Sizes</th>
-                              <td class='val' id='sizes_resume'></td>
-                              <td>[mm]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Delta</th>
-                                <td id='delta_resume'></td>
-                              <td>[mm]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Offsets</th>
-                              <td class='val' id='offsets_resume'></td>
-                              <td>[mm]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Volume</th>
-                              <td class='val' id='volume_resume'></td>
-                              <td>[uL]</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Fluid</th>
-                              <td class='val' id='fluid_resume'></td>
-                            </tr>
-                            <tr>
-                              <th scope="row">print bothways</th>
-                              <td class='val' id='printBothways_resume'></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        </div>
-                      </div>
                       <div class="col-xl">
                         <label>Save</label>
                         <div class="alert alert-success alert-dismissible collapse m-1" id='id_save_sucess' role="alert"></div>
