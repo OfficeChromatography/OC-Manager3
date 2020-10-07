@@ -177,11 +177,11 @@ def data_validations(**kwargs):
 
 def calculateDevelopment(data):
     # #flow in uL/s
-    volume = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
+    flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
     # #syringe movement in mm/s
     flow = flow / 58
     # #maximum speed in mm/min
-    speed = flow * 60
+    speed = round(flow * 60,3)
     
 
     data = SimpleNamespace(**data)
@@ -221,7 +221,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             for yy in range(int(precision)):
                 gcode.append(f'G97 P{pressure}')
                 gcode.append('G40')
-                glineX = f'G1X{length/float(precision)}Z{zMovement/float(applications)/float(precision)}F{speed}'
+                glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
                 gcode.append(glineX)
                 gcode.append('G40')
             jj += 1
@@ -230,7 +230,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 for yy in range(int(precision)):
                     gcode.append(f'G97 P{pressure}')
                     gcode.append('G40')
-                    glineX = f'G1X-{length/float(precision)}Z{zMovement/float(applications)/float(precision)}F{speed}'
+                    glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
                     gcode.append(glineX)
                     gcode.append('G40')
                 jj += 1
@@ -241,6 +241,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             break     
     gcode.append('G90')
     gcode.append('G28XY')
+    print(gcode)
     return gcode
 
 # class DevelopmentCalc(View):

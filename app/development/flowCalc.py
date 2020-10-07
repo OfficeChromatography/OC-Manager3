@@ -2,7 +2,7 @@ import math
 #from scipy.interpolate import interp2d
 
 class FlowCalc:
-    def __init__(self, pressure, nozzleDiameter, fluid, density, viscosity, time):
+    def __init__(self, pressure, nozzleDiameter, fluid, density, viscosity):
         '''
         density [g/cm^3]
         pressure [psi]
@@ -35,7 +35,7 @@ class FlowCalc:
             viscosity = float(viscosity)
             empiricCorrectionFactor = fluidDensity_empiricCorrectionFactor["Water"][1] / viscosity
 
-        self.time = time
+        # self.time = time
         self.pressure = pressure
         self.density = density
         self.empiricCorrectionFactor = empiricCorrectionFactor
@@ -63,13 +63,13 @@ class FlowCalc:
         flowRateI = self.empiricCorrectionFactor * unitConversionKonstantK / lohms * math.sqrt( self.pressure / self.density ) / 60. * 1000
         return flowRateI
 
-    def calcVolume(self):
-        '''
-        calculates the volume for one opening of the valve
-        volume [ul]
-        '''
-        volume = self.calcFlow() * self.time
-        return volume
+    # def calcVolume(self):
+    #     '''
+    #     calculates the volume for one opening of the valve
+    #     volume [ul]
+    #     '''
+    #     volume = self.calcFlow() * self.time
+    #     return volume
 
 
 
