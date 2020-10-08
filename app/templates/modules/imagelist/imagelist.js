@@ -42,6 +42,7 @@ $('.list-group-item').on('click', function (e) {
 function loadImageMethodSuccess(data, textStatus, jqXHR){
 $("#image_id").attr("src",data.url);
 $("#image_id").attr("alt",data.id);
+$("#image_id").attr("name",data.filename);
 $("#new_filename").val(data.filename)
 }
 function loadImageMethodError(jqXHR, textStatus, errorThrown){}
@@ -84,6 +85,18 @@ function removeFileMethodSuccess(data, textStatus, jqXHR){
 function removeFileMethodError(jqXHR, textStatus, errorThrown){
     console.log(data)
 }
+
+//Export Button
+$('#exportbttn').on('click', function (e) {
+    event.preventDefault()
+    var element = document.createElement('a');
+    element.setAttribute('href', $('#image_id').attr('src'));
+    element.setAttribute('download', $('#image_id').attr('name'));
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+})
 
 // fadeIn/Out Remove Button
 $('#new_filename').on('focusin',function(e){
