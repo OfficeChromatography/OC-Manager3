@@ -90,7 +90,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'volume'         : _('Volume'),
             'fluid'         : _('Fluid'),
             'applications'   : _('Applications'),
-            'precision'   : _('Precision')
+            'precision'   : _('Pressure Checks')
         }
 
         def clean(self):
@@ -107,7 +107,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['pressure'] = 25
+        initial['pressure'] = 10
         initial['temperature'] = 0
         kwargs['initial'] = initial
         super(PressureSettings_Form, self).__init__(*args, **kwargs)

@@ -645,8 +645,9 @@ $('#downloadfilebttn').on('click', function (e) {
 
   var plate = getFormData($('#plateform'))
   var movement = getFormData($('#movementform'))
+  var zero = getFormData($('#zeroform'))
   var table = {bands:getTableValues(false)}
-  items = Object.assign(plate,movement,table)
+  items = Object.assign(plate,movement,table,zero)
 
   content = JSON.stringify(items);
   filename = new Date().toLocaleString()+".json"

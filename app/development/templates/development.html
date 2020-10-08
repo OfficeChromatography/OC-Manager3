@@ -238,9 +238,9 @@
                                       <span class="input-group-text">{{DevelopmentBandSettings_Form.precision.label}}</span>
                                     </div>
                                     {{DevelopmentBandSettings_Form.precision}}
-                                    <div class="input-group-append">
+                                    <!-- <div class="input-group-append">
                                       <span class="input-group-text">[1/n]</span>
-                                    </div>   
+                                    </div>    -->
                                   </div>
                                 </div>
                                 <div style="display: none;" id="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
@@ -300,6 +300,35 @@
                               <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.file_name }}</a>
                           {% endfor %}
                         </div>
+                        <br>
+                        <label for="colFormLabelSm">Import/Export Data</label>
+                        <div class="d-flex flex-row align-items-center" id='uploadform'>
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                              <div class="btn btn-primary btn-icon-split" id="downloadfilebttn">
+                                <span class="icon">
+                                  <i class="fas fa-cloud-download-alt"></i>
+                                </span>
+                              </div>
+                              <div class="btn btn-primary btn-icon-split" id="removefilebttn">
+                                <span class="icon">
+                                  <i class="fas fa-trash-alt"></i>
+                                </span>
+                              </div>
+                              <div class="btn btn-primary btn-icon-split" id="loadfilebttn">
+                                <span class="icon">
+                                  <i class="fas fa-cloud-upload-alt"></i>
+                                </span>
+                              </div>
+                            </div>
+                            <div class="custom-file" id>
+                              <input type="file" class="form-control custom-file-input" name="file" id='file' aria-describedby="inputGroupFileAddon01">
+                              <label class="custom-file-label" id='upload_label' for="GFile">Choose file</label>
+                            </div>
+                          </div>
+                        </div>
+                        
+                      
                         <label for="list-load" class="mt-4">Control</label>
                         <div class="input-group">
                           <div class="input-group-prepend">
