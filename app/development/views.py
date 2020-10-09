@@ -180,8 +180,8 @@ def calculateDevelopment(data):
     flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
     # #syringe movement in mm/s
     flow = flow / 58
-    # #maximum speed in mm/min
-    speed = round(flow * 60,3)
+    #speed in mm/min * 2
+    speed = round(flow * 60,3 * 2)
     
 
     data = SimpleNamespace(**data)
