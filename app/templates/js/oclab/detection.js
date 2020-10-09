@@ -21,3 +21,30 @@ function shootMethodSuccess(data, textStatus, jqXHR){
 function shootMethodError(jqXHR, textStatus, errorThrown){}
 
 
+function changeRGB(){
+  red = $("#id_red").val()
+  green = $("#id_green").val()
+  blue = $("#id_blue").val()
+  $("#rgbPicture").css("background-color", 'rgb(' + red + ',' + green + ',' + blue + ')')
+  console.log(red,green,blue)
+}
+
+$("#id_red").change(
+  function(){
+    changeRGB()
+  }
+)
+$("#id_green").change(
+  function(){
+    changeRGB()
+  }
+)
+$("#id_blue").change(
+  function(){
+    changeRGB()
+  }
+)
+
+$(document).ready(function() {
+  changeRGB()
+});
