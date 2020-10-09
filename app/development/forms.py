@@ -56,13 +56,14 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
         initial = kwargs.get('initial', {})
         initial['volume'] = 1000
         initial['applications'] = 10
+        initial['precision'] = 10
         initial['fluid'] = 'Methanol'
         kwargs['initial'] = initial
         super(DevelopmentBandSettings_Form, self).__init__(*args, **kwargs)
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','printBothways','density','viscosity']
+        fields = ['volume','fluid','applications','precision','printBothways','density','viscosity']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -83,11 +84,13 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
                 ('Specific','Specific')
             ]),
             'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'precision'   : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'volume'         : _('Volume'),
             'fluid'         : _('Fluid'),
-            'applications'   : _('Applications')
+            'applications'   : _('Applications'),
+            'precision'   : _('Pressure Checks')
         }
 
         def clean(self):
@@ -104,7 +107,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['pressure'] = 25
+        initial['pressure'] = 10
         initial['temperature'] = 0
         kwargs['initial'] = initial
         super(PressureSettings_Form, self).__init__(*args, **kwargs)
@@ -126,7 +129,7 @@ class PressureSettings_Form(forms.ModelForm):
         }
 
         labels = {
-            'pressure'         : _('Max Pressure')
+            'pressure'         : _('Pressure')
         }
 
         def clean_temperature(self):

@@ -34,7 +34,6 @@ var plotPreview = new Chart(ctx, {
             max: 100, // maximum value
           },
         }]
-
     }
    },
 });
@@ -43,28 +42,25 @@ var datatable
 $("#id_motor_speed").change(
   function(){
     console.log('motor');
-    loadresume()
+    
   }
 )
 $("#id_pressure").change(
   function(){
     console.log('pres');
-    loadresume()
-    calcVol()
+    
   }
 )
 $("#id_frequency").change(
   function(){
     console.log('dpre');
-    loadresume()
-    calcVol()
+    
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
-    loadresume()
-    calcVol()
+    
   }
 )
 
@@ -73,8 +69,7 @@ $("#id_size_x").change(
     console.log('sizex');
     changegraphsize()
     bandsmain()
-    loadresume()
-    calcVol()
+    
   }
 )
 $("#id_size_y").change(
@@ -82,52 +77,45 @@ $("#id_size_y").change(
     console.log('sizey');
     changegraphsize()
     bandsmain()
-    loadresume()
-    calcVol()
+    
   }
 );
 
 $("#id_offset_left").change(
     function(){
       bandsmain()
-      loadresume()
-      calcVol()
+      
     }
 );
 $("#id_offset_right").change(
   function(){
     bandsmain()
-    loadresume()
-    calcVol()
+    
   }
 );
 $("#id_offset_bottom").change(
     function(){
       bandsmain()
-      loadresume()
-      calcVol()
+      
     }
 );
 $("#id_offset_top").change(
   function(){
     bandsmain()
-    loadresume()
-    calcVol()
+    
   }
 );
 
 $("#id_volume").change(
   function(){
     bandsmain()
-    loadresume()
-    calcVol()
+    
   }
 );
 $("#id_fluid").change(
-  function(){
-    calcVol()
+  function(){   
     bandsmain()
-    loadresume()
+    
     if ($(this).val() == 'Specific') {
       $('#specificFluidTable').show()
     } else {
@@ -137,7 +125,6 @@ $("#id_fluid").change(
 );
 $("#id_nozzlediameter").change(
   function(){
-    calcVol()
   }
 );
 
@@ -238,17 +225,6 @@ function theres_error(error_id, bolean_exp){
     $(error_id).fadeOut();
     return false
   }
-}
-
-function loadresume(){
-  $('#motorspeed_resume').text($("#id_motor_speed").val())
-  $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
-  $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
-  $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
-  $('#delta_resume').text($("#id_delta_x").val())
-  $('#volume_resume').text($("#id_volume").val())
-  $('#fluid_resume').text($("#id_fluid").val())
-  $('#printBothways_resume').text($('#printBothwaysButton').text());
 }
 
 function changegraphsize(){
@@ -376,6 +352,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
 
   $("#id_volume").val(data.volume)
   $("#id_applications").val(data.applications)
+  $("#id_precision").val(data.precision)
 
   if (data.printBothways=='On') {
     $("#printBothwaysButton").text('On');
@@ -397,9 +374,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $('#id_load_sucess').html(data.file_name+' successfully loaded!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
   bandsmain()
-  loadresume()
   changegraphsize()
-  calcVol()
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -432,6 +407,7 @@ function getSpecificFluid(toString){
   data['density'] = $('#densityval').text()
   data['viscosity'] = $('#viscosityval').text()
   data['applications'] = $('#id_applications').val()
+  data['precision'] = $('#id_precision').val()
 
   if(toString){
     data = '&devBandSettings='+JSON.stringify(data)
@@ -460,18 +436,6 @@ function checkSpecificValues() {
   }
 } 
 
-function calcVol(){
-  // $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+getSpecificFluid(true)
-  // $endpoint = window.location.origin+'/developmentcalc/'
-  // $.ajax({
-  // method: 'POST',
-  // url:    $endpoint,
-  // data:   $formData,
-  // success: calcMethodSuccess,
-  // error: saveMethodError
-  // })
-}
-
 function calcMethodSuccess(data, textStatus, jqXHR){
   // console.log(typeof(data.error));
   if(data.error==undefined){
@@ -482,8 +446,83 @@ function calcMethodSuccess(data, textStatus, jqXHR){
   }
   
 }
+// Import/Export DATA
+$('#downloadfilebttn').on('click', function (e) {
+  event.preventDefault()
+  var element = document.createElement('a');
+
+  var plate = getFormData($('#plateform'))
+  var pressure = getFormData($('#pressureform'))
+  var zero = getFormData($('#zeroform'))
+  var table = getSpecificFluid(false)
+  
+  items = Object.assign(plate,pressure,table,zero)
+
+  content = JSON.stringify(items);
+  filename = new Date().toLocaleString()+".json"
+
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+})
+$('#loadfilebttn').on('click', function (e) {
+  event.preventDefault()
+  var file = $('#file')[0].files[0];
+  getAsText(file);
+})
+$('#removefilebttn').on('click', function (e) {
+  $('#file').next('.custom-file-label').html('');
+  $('#file').val('')
+  $('#sizesfile').html('')
+})
+$('#file').on('change',function(e){
+                //get the file name
+                var fileName = e.target.files[0];
+                $(this).next('.custom-file-label').html(fileName.name);
+            })
+
+// Return form data as Object
+function getFormData($form){
+  var unindexed_array = $form.serializeArray();
+  var indexed_array = {};
+
+  $.map(unindexed_array, function(n, i){
+      indexed_array[n['name']] = n['value'];
+  });
+
+  return indexed_array;
+}
+
+// Method that control the file load
+function getAsText(readFile) {
+
+  var reader = new FileReader();
+
+  // Read file into memory as UTF-16
+  reader.readAsText(readFile, "UTF-8");
+
+  // Handle progress, success, and errors
+  reader.onload = loaded;
+  reader.onerror = errorHandler;
+
+  function loaded(evt) {
+    var fileString = evt.target.result;
+    console.log(fileString);
+    jsonObject = JSON.parse(fileString)
+    loadMethodSuccess(jsonObject)
+    console.log(jsonObject)
+  }
+  function errorHandler(evt) {
+    if(evt.target.error.name == "NotReadableError") {
+      // The file could not be read
+    }
+  }
+}
 
 $(document).ready(function() {
-  calcVol();
+  
   $('#devModal').modal('show');
 });

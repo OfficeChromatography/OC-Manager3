@@ -180,39 +180,37 @@ def calculateDevelopment(data):
     flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
     # #syringe movement in mm/s
     flow = flow / 58
-    # #maximum speed in mm/min
-    speed = flow * 60
+    #speed in mm/min * 2
+    speed = round(flow * 60,3 * 2)
     
 
     data = SimpleNamespace(**data)
     #print(data)
+    
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
-    startPoint = [round(float(data.offset_left),3), float(data.offset_bottom)]
-    endPoint = [round(float(data.offset_left) + float(length),3), float(data.offset_bottom)]
+    startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
+    
     zMovement = round(float(data.volume) * 60/1000,3)
     #time in seconds
     time = zMovement / speed * 60
 
     #add error for when time is greater than 3
 
-    return GcodeGenDevelopment(startPoint, endPoint, zMovement, data.applications, data.printBothways, speed, data.temperature, [data.zero_x,data.zero_y])
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, speed, data.temperature, data.precision, data.pressure)
 
 
-def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBothways, speed, temperature, zeroPosition):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure):
     gcode=list()
 
-    startPX = str(startPoint[0]+float(zeroPosition[0]))
-    endPX = str(endPoint[0]+float(zeroPosition[0]))
-    length = str((endPoint[0]+float(zeroPosition[0])) - (startPoint[0]+float(zeroPosition[0])))
     # No HEATBED CASE
     if temperature!=0:
         gcode=[f'M190 R{temperature}']
     
     gcode.append('G28XY')
-    glineY = 'G1Y{}F{}'.format(str(startPoint[1]+float(zeroPosition[1])), speed)
+    glineY = f'G1Y{startPoint[1]}F{speed}'
     gcode.append(glineY)
     
-    glineX = 'G1X{}F{}'.format(startPX, speed)
+    glineX = f'G1X{startPoint[0]}F{speed}'
     gcode.append(glineX)
     gcode.append('M400')
 
@@ -220,17 +218,21 @@ def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBoth
     jj = 0   
     for x in range(int(applications)*2):
         if (x%2)==0:
-            # gcode.append('G40')
-            glineX = f'G1X{length}Z{zMovement/float(applications)}F{speed}'
-            gcode.append(glineX)
-            # gcode.append('G40')
+            for yy in range(int(precision)):
+                gcode.append(f'G97 P{pressure}')
+                gcode.append('G40')
+                glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
+                gcode.append(glineX)
+                gcode.append('G40')
             jj += 1
         else:
             if printBothways == 'On':
-                # gcode.append('G40')
-                glineX = f'G1X-{length}Z{zMovement/float(applications)}F{speed}'
-                gcode.append(glineX)
-                # gcode.append('G40')
+                for yy in range(int(precision)):
+                    gcode.append(f'G97 P{pressure}')
+                    gcode.append('G40')
+                    glineX = f'G1X-{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
+                    gcode.append(glineX)
+                    gcode.append('G40')
                 jj += 1
             else:
                 glineX = f'G1X-{length}F{speed}'
@@ -239,6 +241,7 @@ def GcodeGenDevelopment(startPoint, endPoint, zMovement, applications, printBoth
             break     
     gcode.append('G90')
     gcode.append('G28XY')
+    print(gcode)
     return gcode
 
 # class DevelopmentCalc(View):
