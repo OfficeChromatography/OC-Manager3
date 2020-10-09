@@ -20,6 +20,7 @@ FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
 
 
 class SaveShot(forms.Form):
+
     name = forms.CharField(label='Name',
                     required=True,
                     max_length = 9,

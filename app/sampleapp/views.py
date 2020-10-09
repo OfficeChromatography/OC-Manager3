@@ -1,23 +1,22 @@
-from django.shortcuts import render
-from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import FormView,View
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from .forms import *
-from .models import *
-import math
+from django.shortcuts import render
 from django.forms.models import model_to_dict
-from connection.forms import OC_LAB
-# Create your views here.
+
+import json
+import numpy as np
+import math
+from scipy.optimize import minimize
 from printrun import printcore, gcoder
 from types import SimpleNamespace
-import json
-from decimal import *
-import numpy as np
-from scipy.optimize import minimize
+
+from .forms import *
+from .models import *
 from .flowCalc import FlowCalc
+
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
+from connection.forms import OC_LAB
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -31,11 +30,11 @@ forms = {
 
 class Sample(FormView):
     def get(self, request):
-        # LIST LOADING
+        # Load the list with all the saved data
         if 'LISTLOAD' in request.GET:
             sample_application = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
-            names = [i.file_name for i in sample_application]
-            return JsonResponse(names, safe=False)
+            data_saved = [[i.file_name,i.id] for i in sample_application]
+            return JsonResponse(data_saved, safe=False)
         else:
             forms['list_load'] = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
             return render(request,'sample.html',forms)
@@ -43,99 +42,69 @@ class Sample(FormView):
 
 class SampleAppPlay(View):
     def post(self, request):
-        #print(request.POST)
-        # Treatment for play button
+        # Play button
         if 'START' in request.POST:
             if OC_LAB.paused == True:
                 OC_LAB.resume()
             else:
                 # Run the form validations and return the clean data
-                forms_data = data_validations(   plate_properties_form    =   PlateProperties_Form(request.POST),
-                                    band_settings_form       =   BandSettings_Form(request.POST),
-                                    movement_settings_form   =   MovementSettings_Form(request.POST),
-                                    pressure_settings_form   =   PressureSettings_Form(request.POST),
-                                    zero_position_form       =   ZeroPosition_Form(request.POST))
-                table = request.POST.get('table')
-                table_data = json.loads(table)
+                forms_data = data_validations(  plate_properties_form    =   PlateProperties_Form(request.POST),
+                                                band_settings_form       =   BandSettings_Form(request.POST),
+                                                movement_settings_form   =   MovementSettings_Form(request.POST),
+                                                pressure_settings_form   =   PressureSettings_Form(request.POST),
+                                                zero_position_form       =   ZeroPosition_Form(request.POST))
 
-                forms_data.update({'table':table_data})
-                #print(forms_data)
+
+                # Add table data
+                forms_data.update({'table':json.loads(request.POST.get('table'))})
+
                 # With the data, gcode is generated
                 gcode = calculate(forms_data)
+
                 # Printrun
                 light_gcode = gcoder.LightGCode(gcode)
                 OC_LAB.startprint(light_gcode)
                 return JsonResponse({'error':'f.errors'})
+
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
             return JsonResponse({'message':'stopped'})
+
         if 'PAUSE' in request.POST:
             OC_LAB.pause()
             return JsonResponse({'message':'paused'})
 
 class SampleAppSaveAndLoad(View):
     def post(self, request):
-        #print(request.POST)
+        # Check the data receive and save it
         sample_application_form  =   SampleApplication_Form(request.POST, request.user)
-        plate_properties_form    =   PlateProperties_Form(request.POST)
-        band_settings_form       =   BandSettings_Form(request.POST)
-        movement_settings_form   =   MovementSettings_Form(request.POST)
-        pressure_settings_form   =   PressureSettings_Form(request.POST)
-        zero_position_form       =   ZeroPosition_Form(request.POST)
+        objects_save = data_validations_and_save(
+            plate_properties    =   PlateProperties_Form(request.POST),
+            band_settings       =   BandSettings_Form(request.POST),
+            movement_settings   =   MovementSettings_Form(request.POST),
+            pressure_settings   =   PressureSettings_Form(request.POST),
+            zero_position       =   ZeroPosition_Form(request.POST)
 
-        table = request.POST.get('table')
-        table_data = json.loads(table)
+        )
 
-        # Check Plate Property Formular
-        if plate_properties_form.is_valid():
-            plate_properties_object = plate_properties_form.save()
-        else:
-            return JsonResponse({'error':'Check plate properties'})
-
-        # Check Band Settings Formular
-        if band_settings_form.is_valid():
-            band_settings_object = band_settings_form.save()
-        else:
-            return JsonResponse({'error':'Check band properties'})
-
-        # Check Movement Settings Formular
-        if movement_settings_form.is_valid():
-            movement_settings_object = movement_settings_form.save()
-        else:
-            return JsonResponse({'error':'Check movement settings'})
-
-        # Check Pressure Settings Formular
-        if pressure_settings_form.is_valid():
-            pressure_settings_object = pressure_settings_form.save()
-        else:
-            return JsonResponse({'error':'Check pressure settings'})
-
-        # Check Home Settings Formular
-        if zero_position_form.is_valid():
-            zero_position_object = zero_position_form.save()
-        else:
-            return JsonResponse({'error':'Check home settings'})
-
-        
-
+        table_data = json.loads(request.POST.get('table'))
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
             filename = sample_application_form.cleaned_data['file_name']
             in_db=SampleApplication_Db.objects.filter(file_name=filename).filter(auth_id=request.user)
-
             # Check if theres
             if len(in_db)>0:
                 return JsonResponse({'error':'File Name already exists!'})
             else:
                 sample_application_instance = sample_application_form.save(commit=False)
                 sample_application_instance.auth = request.user
-                sample_application_instance.movement_settings = movement_settings_object
-                sample_application_instance.pressure_settings = pressure_settings_object
-                sample_application_instance.plate_properties = plate_properties_object
-                sample_application_instance.band_settings = band_settings_object
-                sample_application_instance.zero_position = zero_position_object
-                new_sample_application=sample_application_instance.save()
+                sample_application_instance.movement_settings = objects_save['movement_settings']
+                sample_application_instance.pressure_settings = objects_save['pressure_settings']
+                sample_application_instance.plate_properties = objects_save['plate_properties']
+                sample_application_instance.band_settings = objects_save['band_settings']
+                sample_application_instance.zero_position = objects_save['zero_position']
+                new_sample_application = sample_application_instance.save()
 
 
                 for i in table_data:
@@ -160,15 +129,13 @@ class SampleAppSaveAndLoad(View):
 
     def get(self, request):
         file_name=request.GET.get('filename')
-
-        # print(file_name)
+        print(file_name)
         sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sample_application_conf['plate_properties']))
         band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
         movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
-
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
 
         bands=dict()
@@ -203,6 +170,18 @@ def data_validations(**kwargs):
             print(f'Error on {key_form}')
             return
     return forms_data
+
+
+# returns a dictionary with all objects saved.
+def data_validations_and_save(**kwargs):
+    objects_saved = {}
+    for key_form, form in kwargs.items():
+        if form.is_valid():
+            objects_saved[key_form] = form.save()
+        else:
+            return JsonResponse({'error':f'Check {key_form}'})
+    return objects_saved
+
 
 def calculateDeltaX(length,height,maxPoints):
     '''calculates the distance of the points if deltaX == deltaY'''

@@ -49,24 +49,27 @@ var tablevalues
 jQuery.fn.pop = [].pop;
 jQuery.fn.shift = [].shift;
 
+
+$( document ).ready(function(){
+  loadlistofsampleapps()
+})
+
+
 // Execute every time something happens
 $("#id_motor_speed").change(
   function(){
     console.log('motor');
-    loadResumeTable()
   }
 )
 $("#id_pressure").change(
   function(){
     console.log('pres');
-    loadResumeTable()
     calcVol()
   }
 )
 
 $("#id_nozzlediameter").change(
   function(){
-    loadResumeTable()
     calcVol()
   }
 )
@@ -74,21 +77,18 @@ $("#id_nozzlediameter").change(
 $("#id_frequency").change(
   function(){
     console.log('dpre');
-    loadResumeTable()
     calcVol()
   }
 )
 $("#id_delta_y").change(
   function(){
     console.log('dey');
-    loadResumeTable()
     calcVol()
   }
 )
 $("#id_delta_x").change(
   function(){
     console.log('dex');
-    loadResumeTable()
     calcVol()
   }
 )
@@ -114,7 +114,6 @@ $("#id_main_property").change(
           $("#valueLabel").text('Length')
         break;
     }
-    loadResumeTable()
     createBandsTable()
     calcVol()
   }
@@ -124,7 +123,6 @@ $("#id_size_x").change(
   function(){
     console.log('sizex');
     changeGraphSize()
-    loadResumeTable()
     calcVol()
   }
 )
@@ -132,7 +130,6 @@ $("#id_size_y").change(
   function(){
     console.log('sizey');
     changeGraphSize()
-    loadResumeTable()
     calcVol()
   }
 );
@@ -140,28 +137,24 @@ $("#id_size_y").change(
 $("#id_offset_left").change(
     function(){
       mainCalculations()
-      loadResumeTable()
       calcVol()
     }
 );
 $("#id_offset_right").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     calcVol()
   }
 );
 $("#id_offset_bottom").change(
     function(){
       mainCalculations()
-      loadResumeTable()
       calcVol()
     }
 );
 $("#id_offset_top").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     calcVol()
   }
 );
@@ -169,7 +162,6 @@ $("#id_offset_top").change(
 $("#id_main_property").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     createBandsTable()
     calcVol()
   }
@@ -177,7 +169,6 @@ $("#id_main_property").change(
 $("#id_value").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     createBandsTable()
     calcVol()
     
@@ -186,14 +177,12 @@ $("#id_value").change(
 $("#id_height").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     calcVol()
   }
 )
 $("#id_gap").change(
   function(){
     mainCalculations()
-    loadResumeTable()
     calcVol()
   }
 )
@@ -354,20 +343,6 @@ function addData2Chart(chart, label, color, data) {
       showLine: true,
     });
     chart.update();
-}
-
-// load resume table with fields data
-function loadResumeTable(){
-  $('#motorspeed_resume').text($("#id_motor_speed").val())
-  $('#appconst_resume').text($("#id_pressure").val()+','+$("#id_frequency").val())
-  $('#sizes_resume').text($("#id_size_x").val()+','+$("#id_size_y").val())
-  $('#offsets_resume').text($("#id_offset_left").val()+','+$("#id_offset_right").val()+','+$("#id_offset_top").val()+','+$("#id_offset_bottom").val())
-  $('#band_properties_resume').text($("#id_main_property option:selected").text())
-  $('#n_bands_resume').text($("#id_value").val())
-  $('#length_resume').text($("#id_value").val())
-  $('#delta_resume').text($("#id_delta_x").val()+','+$("#id_delta_y").val())
-  $('#height_resume').text($("#id_height").val())
-  $('#gap_resume').text($("#id_gap").val())
 }
 
 // Create a new Table with a given number of rows
@@ -567,7 +542,7 @@ function loadlistofsampleapps(){
   function loadlistMethodSuccess(data, textStatus, jqXHR){
     $('#list-load').empty()
     $.each(data, function(key, value) {
-        $('#list-load').append('<a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">'+value+'</a>')
+        $('#list-load').append('<a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" value_saved="'+value[1]+'"aria-controls="home">'+value[0]+'</a>')
       })
   }
   function loadlistMethodError(jqXHR, textStatus, errorThrown){}
@@ -628,7 +603,7 @@ $('#savebttn').on('click', function (e) {
 
 $('#list-load').on('click','#list-home-list', function (e) {
 e.preventDefault()
-data={'filename':$(this)[0].innerHTML}
+data={'filename':$(this)[0].attr("value_saved")}
 console.log(data);
 $.ajax({
   method: 'GET',
