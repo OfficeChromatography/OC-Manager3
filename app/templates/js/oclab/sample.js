@@ -430,7 +430,8 @@ function loadFieldsValues(data){
   $("#id_height").val(data.height)
   $("#id_gap").val(data.gap)
 
-  $( "#id_value" ).trigger( "change" );
+  $("#id_file_name").val(data.file_name)
+  $("#id_value").trigger( "change" );
   $('#id_load_sucess').html(data.file_name+' successfully loaded!')
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
 }

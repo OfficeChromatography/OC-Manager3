@@ -88,14 +88,35 @@ class SampleAppSaveAndLoad(View):
         )
 
         table_data = json.loads(request.POST.get('table'))
-
+        print(table_data)
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
             filename = sample_application_form.cleaned_data['file_name']
             in_db=SampleApplication_Db.objects.filter(file_name=filename).filter(auth_id=request.user)
             # Check if theres
             if len(in_db)>0:
-                return JsonResponse({'error':'File Name already exists!'})
+                in_db[0].movement_settings = objects_save['movement_settings']
+                in_db[0].pressure_settings = objects_save['pressure_settings']
+                in_db[0].plate_properties = objects_save['plate_properties']
+                in_db[0].band_settings = objects_save['band_settings']
+                in_db[0].zero_position = objects_save['zero_position']
+                in_db[0].save()
+                BandsComponents_Db.objects.filter(sample_application=in_db[0]).delete()
+                for i in table_data:
+                    # Format data
+                    i['band_number'] = i['band']
+                    i['volume'] = i['volume (ul)']
+
+                    bands_components_form = BandsComponents_Form(i)
+
+                    if bands_components_form.is_valid():
+                        bands_components_instance=bands_components_form.save(commit=False)
+                        bands_components_instance.sample_application = in_db[0]
+                        bands_components_instance.save()
+                    else:
+                        JsonResponse({'error':bands_components_form.errors})
+
+                return JsonResponse({'message':'Data updated!!'})
             else:
                 sample_application_instance = sample_application_form.save(commit=False)
                 sample_application_instance.auth = request.user
@@ -113,12 +134,11 @@ class SampleAppSaveAndLoad(View):
                     i['volume'] = i['volume (ul)']
 
                     bands_components_form = BandsComponents_Form(i)
-                    
+
                     if bands_components_form.is_valid():
                         bands_components_instance=bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = sample_application_instance
                         bands_components_instance.save()
-                        bands_components_instance
                     else:
                         JsonResponse({'error':bands_components_form.errors})
           
