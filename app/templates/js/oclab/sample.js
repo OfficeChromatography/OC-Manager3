@@ -542,9 +542,29 @@ function loadlistofsampleapps(){
   function loadlistMethodSuccess(data, textStatus, jqXHR){
     $('#list-load').empty()
     $.each(data, function(key, value) {
-        $('#list-load').append('<a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" value_saved="'+value[1]+'"aria-controls="home">'+value[0]+'</a>')
-      })
-  }
+        element = $("<a></a>").text(value[0])
+        element.attr('value_saved',value[1])
+        element.addClass('list-group-item list-group-item-action py-1')
+        element.attr('id',value[1])
+        element.attr('role','tab')
+        element.attr('href','#list-home')
+        element.attr('data-toggle','list')
+        element.attr('aria-controls',"home")
+        $('#list-load').append(element)
+        })
+    $('.list-group-item').on('click', function (e) {
+            e.preventDefault()
+            data={'filename':$(this).attr('value_saved')}
+            console.log(data);
+            $.ajax({
+              method: 'GET',
+              url:    window.location.origin+'/samplesave/',
+              data:   data,
+              success: loadMethodSuccess,
+              error: loadMethodError,
+            })
+            })
+    }
   function loadlistMethodError(jqXHR, textStatus, errorThrown){}
 }
 
@@ -601,18 +621,6 @@ $('#savebttn').on('click', function (e) {
   })
 })
 
-$('#list-load').on('click','#list-home-list', function (e) {
-e.preventDefault()
-data={'filename':$('.list-group-item.list-group-item-action.py-1.active').attr('value_saved')}
-console.log(data);
-$.ajax({
-  method: 'GET',
-  url:    window.location.origin+'/samplesave/',
-  data:   data,
-  success: loadMethodSuccess,
-  error: loadMethodError,
-})
-})
 // Import/Export DATA
 $('#downloadfilebttn').on('click', function (e) {
   event.preventDefault()
