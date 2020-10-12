@@ -128,15 +128,14 @@ class SampleAppSaveAndLoad(View):
             return JsonResponse({'error':'Please fill in the filename!'})
 
     def get(self, request):
-        file_name=request.GET.get('filename')
-        print(file_name)
-        sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
+        id_object=request.GET.get('filename')
+        sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sample_application_conf['plate_properties']))
         band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
         movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
-        bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
+        bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
 
         bands=dict()
         for i, band in enumerate(bands_components):

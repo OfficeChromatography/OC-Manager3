@@ -603,7 +603,7 @@ $('#savebttn').on('click', function (e) {
 
 $('#list-load').on('click','#list-home-list', function (e) {
 e.preventDefault()
-data={'filename':$(this)[0].attr("value_saved")}
+data={'filename':$('.list-group-item.list-group-item-action.py-1.active').attr('value_saved')}
 console.log(data);
 $.ajax({
   method: 'GET',
