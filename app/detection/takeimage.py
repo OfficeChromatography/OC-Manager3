@@ -45,11 +45,10 @@ def basic_conf():
                 'scene_mode':0,
 
                 'uv365_power':0,
-                'uv278_power':0,
-                'red':100,
-                'blue':100,
-                'green':100,
-                'brightness_rgb':100,
+                'uv255_power':0,
+                'red':0,
+                'blue':0,
+                'green':0,
                 }
     return basic_conf
 
@@ -131,11 +130,10 @@ def led_control(led_config=None):
 # Wavelength: 255,365,visible
     if led_config != None:
         visible_ligth = "G93"
-        print(led_config)
         for key, value in led_config.items():
             if key == 'uv365_power':
                 OC_LAB.send_now(f'M42 P4 S{value}')
-            if key == 'uv278_power':
+            if key == 'uv255_power':
                 OC_LAB.send_now(f'M42 P5 S{value}')
             if key == 'red':
                 visible_ligth += f'R{value}'
@@ -143,8 +141,8 @@ def led_control(led_config=None):
                 visible_ligth += f'G{value}'
             if key == 'blue':
                 visible_ligth += f'B{value}'
-            if key == 'brightness_rgb':
-                visible_ligth += f'I{value}'
+        visible_ligth += f'I{0}'
+        print(visible_ligth)
         OC_LAB.send_now(visible_ligth)
     else:
         OC_LAB.send_now(f'M42 P4 S0')

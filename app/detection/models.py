@@ -243,9 +243,11 @@ class Images_Db(models.Model):
                 )
     photo = models.ImageField(default='/default.jpeg')
     datetime = models.DateTimeField(auto_now_add=True, null=True)
+    note = models.TextField(blank=True, default="")
 
     def file_name(self):
         return os.path.splitext(os.path.basename(self.photo.name))[0]
+
 
 class Leds_Db(models.Model):
     uv365_power = models.DecimalField(
@@ -273,12 +275,6 @@ class Leds_Db(models.Model):
                         decimal_places=0)
 
     green = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
-
-    brightness_rgb = models.DecimalField(
                         null=True,
                         blank=True,
                         max_digits=3,

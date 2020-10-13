@@ -32,7 +32,6 @@ class Capture_View(View):
         # FILE LOADING
         if 'LOADFILE' in request.GET:
             id = int(request.GET.get('id'))
-            print(id)
             image = Images_Db.objects.get(pk=id)
             metadata = {}
             # me = get_metadata(image)
@@ -47,6 +46,12 @@ class Capture_View(View):
             images = Images_Db.objects.filter(uploader=request.user).order_by('-id')
             names = [[i.filename,i.id] for i in images]
             return JsonResponse(names, safe=False)
+
+        if 'LOAD_NOTE' in request.GET:
+            id = int(request.GET.get('id'))
+            user_images = Images_Db.objects.filter(uploader=request.user)
+            photo = user_images.get(pk=id)
+            return JsonResponse({'note':photo.note}, safe=False)
 
         else:
             initial = basic_conf()
@@ -72,6 +77,15 @@ class Capture_View(View):
             photo.filename = request.POST['filename']
             photo.save()
             return JsonResponse({'success':'File saved!'})
+
+        if 'SAVE_NOTE' in request.POST:
+            print(request.POST)
+            user_images = Images_Db.objects.filter(uploader=request.user)
+            photo = user_images.get(pk=request.POST['id'])
+            print()
+            photo.note = request.POST['note']
+            photo.save()
+            return JsonResponse({'success':'Note saved!'})
 
         if 'REMOVE' in request.POST:
             try:

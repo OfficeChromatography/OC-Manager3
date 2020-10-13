@@ -126,37 +126,23 @@
                 </div>
                 <div class="card-body show" id='ledcontrolcontent'>
                   <form id="ledsControlsForm">
-                    <div class="form-group row" id="uv_light">
-                      <div class="col">
+                    <div class="form-group" id="uv_light">
+                      <div class="d-flex justify-content-between py-2">
                         {{ LedsControlsForm.uv365_power.label }}
                         {{ LedsControlsForm.uv365_power }}
+                        <input type="number" class='form-control' value='0' id='uv365text' min="0" max="255" style="width: 6em"/>
                       </div>
-                      <div class="col">
-                        {{ LedsControlsForm.uv278_power.label }}
-                        {{ LedsControlsForm.uv278_power }}
+                      <div class="d-flex justify-content-between py-2">
+                      {{ LedsControlsForm.uv255_power.label }}
+                      {{ LedsControlsForm.uv255_power }}
+                      <input type="number" class='form-control' value='0' id='uv255text' min="0" max="255" style="width: 6em"/>
                       </div>
                     </div>
                     <hr>
-                    <div class="form-group row" id="uv_light">
-                      <div class="col">
-                        {{ LedsControlsForm.red.label }}
-                        {{ LedsControlsForm.red }}
-                      </div>
-                      <div class="col">
-                        {{ LedsControlsForm.green.label }}
-                        {{ LedsControlsForm.green }}
-                      </div>
-                      <div class="col">
-                        {{ LedsControlsForm.blue.label }}
-                        {{ LedsControlsForm.blue }}
-                      </div>
-                      <div class="col">
-                        {{ LedsControlsForm.brightness_rgb.label }}
-                        {{ LedsControlsForm.brightness_rgb }}
-                      </div>
+                    <div class="d-flex flex-row justify-content-center">
+                    <div id="picker"></div>
                     </div>
                   </form>
-                  <div class="w3-col m7" id="rgbPicture" style="background-color: rgb(100, 255, 255); height: 20px;"></div>
                 </div>
               </div>
               <!-- FORMAT CONTROL -->
@@ -204,7 +190,7 @@
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
   </a>
-  <script src="{% static 'js/oclab/detection.js' %}" charset="utf-8"></script>
+
   <!-- Logout Modal-->
   <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -228,6 +214,8 @@
   {% include 'modules/detectionhome/detectionhome.html' %}
   <script src="{% static 'js/oclab/topbar.js' %}"></script>
   {% include 'modules/csrftoken/csrftoken.html' %}
+  <script src="{% static 'modules/colpick/colpick.js' %}" type="text/javascript"></script>
+  <link rel="stylesheet" href="{% static 'modules/colpick/colpick.css' %}" type="text/css"/>
+  <script src="{% static 'js/oclab/detection.js' %}" charset="utf-8"></script>
 </body>
-
 </html>
