@@ -52,34 +52,41 @@ def basic_conf():
                 }
     return basic_conf
 
-def take_photo(request):
-    format_config = ShootConfigurationForm(request.POST or None)
-    camera_config = CameraControlsForm(request.POST or None)
+def set_user_conf(request):
     user_config = UserControlsForm(request.POST or None)
-    led_config = LedsControlsForm(request.POST or None)
-
-    data={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
-    if camera_config.is_valid():
-        for key, value in camera_config.cleaned_data.items():
-            subprocess.run([f'v4l2-ctl -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
-    else:
-        print(camera_config.errors)
-
     if user_config.is_valid():
+        object_in_db = user_config.save()
         for key, value in user_config.cleaned_data.items():
             subprocess.run([f'v4l2-ctl -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
     else:
         print(user_config.errors)
+    return object_in_db
 
+def set_camera_conf(request):
+    camera_config = CameraControlsForm(request.POST or None)
+    if camera_config.is_valid():
+        object_in_db = camera_config.save()
+        for key, value in camera_config.cleaned_data.items():
+            subprocess.run([f'v4l2-ctl -c {key}={value}'],stdout=subprocess.DEVNULL, shell=True)
+    else:
+        print(camera_config.errors)
+    return object_in_db
+
+def set_LEDs_conf(request):
+    led_config = LedsControlsForm(request.POST or None)
     if led_config.is_valid():
+        object_in_db = led_config.save()
         led_control(led_config.cleaned_data)
         time.sleep(1)
     else:
         print(led_config.errors)
+    return object_in_db
 
+def set_format_conf(request):
+    format_config = ShootConfigurationForm(request.POST or None)
     if format_config.is_valid():
         conf = format_config.cleaned_data
-#         print("ESta es la conf/n"conf)
+        #         print("ESta es la conf/n"conf)
         width = conf['resolution'][0]
         height = conf['resolution'][1]
         pixelformat = conf['pixelformat']
@@ -100,12 +107,7 @@ def take_photo(request):
         except KeyError:
             print('Error trying to configure. Wrong Camera?')
 
-    photo_path = shoot(pixelformat)
-
-    # Turn off leds
-    led_control()
-
-    return photo_path
+    return pixelformat
 
 def shoot(format):
     # Take picture
@@ -115,13 +117,37 @@ def shoot(format):
     subprocess.call(['v4l2-ctl','--stream-mmap','--stream-count=1','--stream-skip=3','--stream-to='+photo_path])
     return photo_path
 
-def save_photo_db(path_to_photo,user):
+def take_photo(request):
+    # Apply config to the camera.
+    camera_conf = set_camera_conf(request)
+    user_conf = set_user_conf(request)
+    leds_conf = set_LEDs_conf(request)
+    pixelformat = set_format_conf(request)
+
+    # Shoot the camera
+    photo_path = shoot(pixelformat)
+
+    # It Turn off the all the LEDs after image was taken
+    led_control()
+
+    photo_path = manipulate(photo_path)
+
+    image = save_photo_db(photo_path,request.user,camera_conf, user_conf, leds_conf)
+
+    return image
+
+
+
+def save_photo_db(path_to_photo,user,camera_conf, user_conf, leds_conf):
     with open(path_to_photo,'rb') as f:
         image = Images_Db()
         image.photo.save(os.path.basename(path_to_photo), File(f))
         image.save()
         image.filename = image.file_name()
         image.uploader = user
+        image.user_conf = user_conf
+        image.leds_conf = leds_conf
+        image.camera_conf = camera_conf
         image.save()
         return image
 
@@ -200,7 +226,9 @@ def manipulate(path):
 
     new_image = rotate_image(dst,1.2)
 
-    cv2.imwrite(new_path, new_image)
+    crop_img = new_image[100:500, 300:900]
+
+    cv2.imwrite(new_path, crop_img)
     return new_path
 
 def rotate_image(image, angle):

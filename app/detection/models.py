@@ -231,6 +231,36 @@ class UserControls_Db(models.Model):
                         blank=True,
                         max_digits=5,
                         decimal_places=0)
+class Leds_Db(models.Model):
+    uv365_power = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=3,
+        decimal_places=0)
+
+    uv255_power = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=3,
+        decimal_places=0)
+
+    red = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=3,
+        decimal_places=0)
+
+    blue = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=3,
+        decimal_places=0)
+
+    green = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=3,
+        decimal_places=0)
 
 class Images_Db(models.Model):
     id = models.AutoField(primary_key=True)
@@ -241,44 +271,23 @@ class Images_Db(models.Model):
                 on_delete=models.CASCADE,
                 blank=True,
                 )
-    photo = models.ImageField(default='/default.jpeg')
+    photo = models.ImageField(upload_to ='images/',default='/default.jpeg')
     datetime = models.DateTimeField(auto_now_add=True, null=True)
     note = models.TextField(blank=True, default="")
+
+    user_conf = models.OneToOneField(UserControls_Db, on_delete=models.CASCADE, null=True)
+    leds_conf = models.OneToOneField(Leds_Db, on_delete=models.CASCADE, null=True)
+    camera_conf = models.OneToOneField(CameraControls_Db, on_delete=models.CASCADE, null=True)
+
 
     def file_name(self):
         return os.path.splitext(os.path.basename(self.photo.name))[0]
 
-
-class Leds_Db(models.Model):
-    uv365_power = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
-
-    uv278_power = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
-
-    red = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
-
-    blue = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
-
-    green = models.DecimalField(
-                        null=True,
-                        blank=True,
-                        max_digits=3,
-                        decimal_places=0)
+    def delete(self, *args, **kwargs):
+        self.user_conf.delete()
+        self.leds_conf.delete()
+        self.camera_conf.delete()
+        return super(self.__class__, self).delete(*args, **kwargs)
 
 
 class Detection_ZeroPosition(models.Model):
