@@ -181,7 +181,7 @@ def calculateDevelopment(data):
     # #syringe movement in mm/s
     flow = flow / 58
     #speed in mm/min * 2
-    speed = round(flow * 60,3 * 2)
+    speed = round(flow * 60,3)
     
 
     data = SimpleNamespace(**data)
