@@ -167,7 +167,7 @@ def led_control(led_config=None):
                 visible_ligth += f'G{value}'
             if key == 'blue':
                 visible_ligth += f'B{value}'
-        visible_ligth += f'I{0}'
+        visible_ligth += f'I{100}'
         print(visible_ligth)
         OC_LAB.send_now(visible_ligth)
     else:
