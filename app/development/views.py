@@ -192,7 +192,7 @@ def calculateDevelopment(data):
     
     zMovement = round(float(data.volume) * 60/1000,3)
     #time in seconds
-    time = zMovement / speed * 60
+    #time = zMovement / speed * 60
 
     #add error for when time is greater than 3
 
