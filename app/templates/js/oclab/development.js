@@ -353,6 +353,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_volume").val(data.volume)
   $("#id_applications").val(data.applications)
   $("#id_precision").val(data.precision)
+  $("#id_waitTime").val(data.waitTime)
 
   if (data.printBothways=='On') {
     $("#printBothwaysButton").text('On');
@@ -408,6 +409,7 @@ function getSpecificFluid(toString){
   data['viscosity'] = $('#viscosityval').text()
   data['applications'] = $('#id_applications').val()
   data['precision'] = $('#id_precision').val()
+  data['waitTime'] = $('#id_waitTime').val()
 
   if(toString){
     data = '&devBandSettings='+JSON.stringify(data)

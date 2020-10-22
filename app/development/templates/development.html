@@ -242,6 +242,12 @@
                                       <span class="input-group-text">[1/n]</span>
                                     </div>    -->
                                   </div>
+                                  <div class="input-group col">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">{{DevelopmentBandSettings_Form.waitTime.label}}</span>
+                                    </div>
+                                    {{DevelopmentBandSettings_Form.waitTime}}
+                                  </div>
                                 </div>
                                 <div style="display: none;" id="specificFluidTable"><table class="table table-bordered table-responsive-md table-striped text-center">
                                   <tr class="hide"><td class="pt-3-half">density [g/cm³]</td><td class="pt-3-half" id="densityval" contenteditable="true"></td></tr>
@@ -414,7 +420,6 @@
       </div>
       <div class="modal-body">
         Place the development chamber on top of the plate and select the bottom offset accordingly.
-        Place the magnet also
       </div>
     </div>
   </div>

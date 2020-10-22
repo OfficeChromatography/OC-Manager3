@@ -196,10 +196,10 @@ def calculateDevelopment(data):
 
     #add error for when time is greater than 3
 
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, speed, data.temperature, data.precision, data.pressure)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, speed, data.temperature, data.precision, data.pressure, data.waitTime)
 
 
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure, waitTime):
     gcode=list()
 
     # No HEATBED CASE
@@ -224,6 +224,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
                 gcode.append(glineX)
                 gcode.append('G40')
+            gcode.append(f'G4 S{waitTime}')
             jj += 1
         else:
             if printBothways == 'On':
@@ -233,6 +234,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                     glineX = f'G1X-{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
                     gcode.append(glineX)
                     gcode.append('G40')
+                gcode.append(f'G4 S{waitTime}')
                 jj += 1
             else:
                 glineX = f'G1X-{length}F{speed}'
@@ -241,7 +243,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             break     
     gcode.append('G90')
     gcode.append('G28XY')
-    print(gcode)
+    #print(gcode)
     return gcode
 
 # class DevelopmentCalc(View):

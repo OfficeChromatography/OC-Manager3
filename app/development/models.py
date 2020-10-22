@@ -19,6 +19,7 @@ class BandSettings_Dev_Db(models.Model):
     viscosity = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     applications = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     precision = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
+    waitTime = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
 
 class Development_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)

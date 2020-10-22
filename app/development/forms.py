@@ -27,7 +27,7 @@ class PlateProperties_Form(forms.ModelForm):
         initial['offset_left'] = 1
         initial['offset_right'] = 1
         initial['offset_top'] = 1
-        initial['offset_bottom'] = 50
+        initial['offset_bottom'] = 2
         kwargs['initial'] = initial
         super(PlateProperties_Form, self).__init__(*args, **kwargs)
 
@@ -58,12 +58,13 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
         initial['applications'] = 10
         initial['precision'] = 10
         initial['fluid'] = 'Methanol'
+        initial['waitTime'] = 0
         kwargs['initial'] = initial
         super(DevelopmentBandSettings_Form, self).__init__(*args, **kwargs)
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','precision','printBothways','density','viscosity']
+        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -85,12 +86,14 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             ]),
             'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'precision'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'waitTime'   : forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'volume'         : _('Volume'),
             'fluid'         : _('Fluid'),
             'applications'   : _('Applications'),
-            'precision'   : _('Pressure Checks')
+            'precision'   : _('Pressure Checks'),
+            'waitTime'    : _('Waiting Time'),
         }
 
         def clean(self):
