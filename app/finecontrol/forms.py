@@ -68,8 +68,8 @@ class CleaningProcessForm(forms.ModelForm):
 class ZeroPosition_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['zero_x'] = 4
-        initial['zero_y'] = 19
+        initial['zero_x'] = 5
+        initial['zero_y'] = 18
         kwargs['initial'] = initial
         super(ZeroPosition_Form, self).__init__(*args, **kwargs)
     class Meta:
