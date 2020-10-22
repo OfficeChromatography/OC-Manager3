@@ -332,7 +332,7 @@ function startMethodError(jqXHR, textStatus, errorThrown){}
 
 function loadMethodSuccess(data, textStatus, jqXHR){
   // Load all the fields with the ones get in the database
-  // $("#id_motor_speed").val(data.motor_speed)
+  $("#id_speed").val(data.speed)
   $("#id_pressure").val(data.pressure)
   // $("#id_frequency").val(data.frequency)
   $("#id_temperature").val(data.temperature)

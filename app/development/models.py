@@ -10,6 +10,7 @@ class PressureSettings_Dev_Db(models.Model):
     pressure = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
     nozzlediameter = models.CharField(max_length=120, default='0.08')
+    speed = models.DecimalField(null=True, decimal_places=1, max_digits=5)
 
 class BandSettings_Dev_Db(models.Model):
     volume = models.DecimalField(null=True, decimal_places=1, max_digits=5)

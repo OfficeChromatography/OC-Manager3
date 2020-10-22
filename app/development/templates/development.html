@@ -81,6 +81,15 @@
                         <form id='pressureform'>
                           <div class="form-group row">
                             <div class="input-group">
+                              <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.speed.label}}</label>
+                              {{PressureSettings_Form.speed}}
+                              <div class="input-group-append">
+                                <span class="input-group-text">[mm/s]</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <div class="input-group">
                               <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{PressureSettings_Form.pressure.label}}</label>
                               {{PressureSettings_Form.pressure}}
                               <div class="input-group-append">
