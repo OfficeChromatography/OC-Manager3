@@ -45,5 +45,8 @@ function monitorEndpointRequest(){
 }
 function monitorEndpointSucess(data, textStatus, jqXHR){
   writeOnTextBox(data['monitortext'])
+  console.log(data)
+  $('#id_device_info').text(data.oc_lab)
+  $('#id_baudrate_info').text(data.baudrate)
 }
 function monitorEndpointError(jqXHR, textStatus, errorThrown){}
