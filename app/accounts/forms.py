@@ -13,11 +13,11 @@ User = get_user_model()
 class UserLoginForm(forms.Form):
     username = forms.CharField(
         label=False,
-        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user'})
+        widget=forms.TextInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Username'})
     )
     password = forms.CharField(
         label=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user'}))
+        widget=forms.PasswordInput(attrs={'class': 'form-group form-control form-control-user', 'placeholder':'Password'}))
 
     def clean(self, *args, **kwargs):
         username = self.cleaned_data.get("username")
