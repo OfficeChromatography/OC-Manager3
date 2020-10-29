@@ -87,30 +87,50 @@
                 </div>
                 <div class="card-body show" id='cameracontrolcontent'>
                   <form id="cameraControlsForm">
-                    <div class="form-group row">
+                    <div class="row">
                       <div class="col">
-                        {{ CameraControlsForm.auto_exposure.label }}
-                        {{ CameraControlsForm.auto_exposure }}
-                        {{ CameraControlsForm.exposure_dynamic_framerate.label }}
-                        {{ CameraControlsForm.exposure_dynamic_framerate }}
-                        {{ CameraControlsForm.auto_exposure_bias.label }}
-                        {{ CameraControlsForm.auto_exposure_bias }}
-                        {{ CameraControlsForm.exposure_time_absolute.label }}
-                        {{ CameraControlsForm.exposure_time_absolute }}
-                        {{ CameraControlsForm.exposure_metering_mode.label }}
-                        {{ CameraControlsForm.exposure_metering_mode }}
+                        <div class="form-group" id="form_auto_exposure">
+                          {{ CameraControlsForm.auto_exposure.label }}
+                          {{ CameraControlsForm.auto_exposure }}
+                        </div>
+                        <div class="form-group" id="form_exposure_dynamic_framerate">
+                          {{ CameraControlsForm.exposure_dynamic_framerate.label }}
+                          {{ CameraControlsForm.exposure_dynamic_framerate }}
+                        </div>
+                        <div class="form-group" id="form_auto_exposure_bias">
+                          {{ CameraControlsForm.auto_exposure_bias.label }}
+                          {{ CameraControlsForm.auto_exposure_bias }}
+                        </div>
+                        <div class="form-group" id="form_exposure_time_absolute">
+                          {{ CameraControlsForm.exposure_time_absolute.label }}
+                          {{ CameraControlsForm.exposure_time_absolute }}
+                        </div>
+                        <div class="form-group" id="form_exposure_metering_mode">
+                          {{ CameraControlsForm.exposure_metering_mode.label }}
+                          {{ CameraControlsForm.exposure_metering_mode }}
+                        </div>
                       </div>
                       <div class="col">
-                        {{ CameraControlsForm.white_balance_auto_preset.label }}
-                        {{ CameraControlsForm.white_balance_auto_preset }}
-                        {{ CameraControlsForm.scene_mode.label }}
-                        {{ CameraControlsForm.scene_mode }}
-                        {{ CameraControlsForm.image_stabilization.label }}
-                        {{ CameraControlsForm.image_stabilization }}
-                        {{ CameraControlsForm.iso_sensitivity_auto.label }}
-                        {{ CameraControlsForm.iso_sensitivity_auto }}
-                        {{ CameraControlsForm.iso_sensitivity.label }}
-                        {{ CameraControlsForm.iso_sensitivity }}
+                        <div class="form-group" id="form_white_balance_auto_preset">
+                          {{ CameraControlsForm.white_balance_auto_preset.label }}
+                          {{ CameraControlsForm.white_balance_auto_preset }}
+                        </div>
+                        <div class="form-group" id="form_scene_mode">
+                          {{ CameraControlsForm.scene_mode.label }}
+                          {{ CameraControlsForm.scene_mode }}
+                        </div>
+                        <div class="form-group" id="form_image_stabilization">
+                          {{ CameraControlsForm.image_stabilization.label }}
+                          {{ CameraControlsForm.image_stabilization }}
+                        </div>
+                        <div class="form-group" id="form_iso_sensitivity_auto">
+                          {{ CameraControlsForm.iso_sensitivity_auto.label }}
+                          {{ CameraControlsForm.iso_sensitivity_auto }}
+                        </div>
+                        <div class="form-group" id="form_iso_sensitivity">
+                          {{ CameraControlsForm.iso_sensitivity.label }}
+                          {{ CameraControlsForm.iso_sensitivity }}
+                        </div>
                       </div>
                     </div>
                   </form>

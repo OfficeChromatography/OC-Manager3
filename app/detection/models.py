@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import os
-AWB_MODES = (('0', 'off'),
+AWB_MODES = [('0', 'off'),
             ('1', 'auto'),
             ('2', 'sunlight'),
             ('3', 'cloudy'),
@@ -10,10 +10,10 @@ AWB_MODES = (('0', 'off'),
             ('6', 'fluorescent'),
             ('7', 'incandescent'),
             ('8', 'flash'),
-            ('9', 'horizon'))
+            ('9', 'horizon')]
 
-AUTO_EXPOSURE = (('0', 'auto'),
-                ('1', 'off'))
+AUTO_EXPOSURE = [('0', 'auto'),
+                ('1', 'off')]
 
 ISO_SENSITIVITY =   (('0',0),
                     ('1',100000),
@@ -132,33 +132,39 @@ class PlatePhoto_Db(models.Model):
     photo = models.FileField(upload_to='media/')
 
 class CameraControls_Db(models.Model):
-    auto_exposure = models.CharField(max_length=255, choices=AUTO_EXPOSURE, null=True, blank=True)
+    auto_exposure = models.CharField(max_length=255, choices=AUTO_EXPOSURE, default=AUTO_EXPOSURE[0], null=True, blank=False)
 
-    exposure_dynamic_framerate = models.BooleanField(null=True, blank=True)
+    exposure_dynamic_framerate = models.BooleanField(default=False, null=True, blank=False)
 
     auto_exposure_bias = models.DecimalField(
                             null=True,
-                            blank=True,
+                            blank=False,
+                            default=12,
                             max_digits=2,
                             decimal_places=0)
 
     exposure_time_absolute = models.DecimalField(
                             null=True,
-                            blank=True,
+                            blank=False,
+                            default=1000,
                             max_digits=5,
                             decimal_places=0)
 
-    white_balance_auto_preset = models.CharField(max_length=255, choices=AWB_MODES, null=True, blank=True)
+    white_balance_auto_preset = models.CharField(max_length=255, choices=AWB_MODES,
+                                                 default=AWB_MODES[0], null=True, blank=False)
 
     image_stabilization = models.BooleanField(null=True, blank=True)
 
-    iso_sensitivity = models.CharField(max_length=255, choices = ISO_SENSITIVITY, null=True, blank=True)
+    iso_sensitivity = models.CharField(max_length=255, choices = ISO_SENSITIVITY,
+                                       null=True, blank=False, default= ISO_SENSITIVITY[0])
 
-    iso_sensitivity_auto = models.CharField(max_length=255, choices = ISO_SENSITIVITY_AUTO, null=True, blank=True)
+    iso_sensitivity_auto = models.CharField(max_length=255, choices = ISO_SENSITIVITY_AUTO, null=True, blank=False,
+                                            default=ISO_SENSITIVITY_AUTO[0])
 
-    exposure_metering_mode = models.CharField(max_length=255, choices = EXPOSURE_METERING_MODES, null=True, blank=True)
+    exposure_metering_mode = models.CharField(max_length=255, choices = EXPOSURE_METERING_MODES,
+                                              null=True, blank=False, default=EXPOSURE_METERING_MODES[0])
 
-    scene_mode = models.CharField(max_length=255, choices = SCENE_MODE, null=True, blank=True)
+    scene_mode = models.CharField(max_length=255, choices = SCENE_MODE, null=True, blank=False, default=SCENE_MODE[0])
 
 class UserControls_Db(models.Model):
 
