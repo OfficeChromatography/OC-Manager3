@@ -12,8 +12,8 @@ AWB_MODES = (('0', 'off'),
             ('8', 'flash'),
             ('9', 'horizon'))
 
-AUTO_EXPOSURE = (('0', 'off'),
-                ('1', 'auto'))
+AUTO_EXPOSURE = (('0', 'auto'),
+                ('1', 'off'))
 
 ISO_SENSITIVITY =   (('0',0),
                     ('1',100000),
