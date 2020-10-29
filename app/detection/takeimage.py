@@ -33,7 +33,7 @@ def basic_conf():
                 'resolution':'2028x1520',
                 'pixelformat':3,
 
-                'auto_exposure':0,
+                'auto_exposure':1,
                 'exposure_dynamic_framerate':0,
                 'auto_exposure_bias':12,
                 'exposure_time_absolute':1000,
