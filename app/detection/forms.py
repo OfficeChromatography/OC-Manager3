@@ -38,6 +38,7 @@ class SaveShot(forms.Form):
 
 class CameraControlsForm(forms.ModelForm):
     # Camera Controls
+    # forms.ChoiceField(label='Formats', choices = FORMATS, widget=forms.Select(attrs={'class':'form-control'}))
         class Meta:
             model = CameraControls_Db
 
@@ -72,7 +73,6 @@ class CameraControlsForm(forms.ModelForm):
                         'exposure_metering_mode':       _('Exposure Metering Mode'),
                         'scene_mode':                   _('Scene Mode'),
             }
-
 
         auto_exposure_bias = forms.DecimalField(label='Auto Exposure Bias',
                                 required=False,
