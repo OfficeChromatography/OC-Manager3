@@ -13,18 +13,11 @@ $('#pump_manual').on('click',function(e){
     function staticCleanMethodError(jqXHR, textStatus, errorThrown){}
   }
 )
-$('#steprange').on('change',function(e){
-  $('#steptext').val($(this).val())
-})
-$('#steptext').on('change',function(e){
-  $('#steprange').val($(this).val())
-})
-
 
 $("#next_bttn_stat").on('click',function(e){
   $.when($("#staticpurgecard").fadeOut()).done(function() {
          $("#stepscounter").text('Step 2/3')
          $("#dinamicpurgecard").fadeIn();
+         $("#next_bttn_stat").hide()
   });
 })
-

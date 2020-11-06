@@ -109,11 +109,12 @@ class Cleaning(object):
             self.duration += self.time_window
         return dinamic_clean
 
-    def static_cleaning(self, volume):
+    def static_cleaning(self, volume, speed):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
         zMovement = round((60*volume/1000), 2)
-        gcode = ['G28XY','G91','G40', f'G1Z{zMovement}F60', 'G40', 'G90']
+        speed = round(speed * 60, 2)
+        gcode = ['G28XY','G91','G40', f'G1Z{zMovement}F{speed}', 'G40', 'G90']
         print(gcode)
         return gcode
 
@@ -159,8 +160,8 @@ clean = Cleaning();
 
 class StaticPurge(View):
     def post(self, request):
-        if request.POST.get('cycles'):
-            gcode = clean.static_cleaning(int(request.POST.get('cycles')))
+        if request.POST.get('volume'):
+            gcode = clean.static_cleaning(int(request.POST.get('volume')),int(request.POST.get('speed')))
             light_gcode = gcoder.LightGCode(gcode)
             OC_LAB.startprint(light_gcode)
         return JsonResponse({'message': 'ok'})
