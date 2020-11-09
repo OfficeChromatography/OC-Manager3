@@ -64,7 +64,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity']
+        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity','description']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -87,6 +87,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'precision'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'waitTime'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'volume'         : _('Volume'),
@@ -94,6 +95,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'applications'   : _('Applications'),
             'precision'   : _('Pressure Checks'),
             'waitTime'    : _('Waiting Time'),
+            'description' : _('Description')
         }
 
         def clean(self):
