@@ -77,7 +77,6 @@ class Capture_View(View):
                             )
 
     def post(self, request):
-        print(request.POST)
         # SAVE IMAGE
         if 'RENAME' in request.POST:
             user_images = Images_Db.objects.filter(uploader=request.user)
@@ -108,13 +107,18 @@ class Capture_View(View):
             return JsonResponse({'success':'File removed!'})
 
         else:
-            image = take_photo(request)
-            image_info = {
-                'url':request.META['HTTP_ORIGIN']+image.photo.url,
-                'new_name':image.photo.url,
-                'id':image.id,
+            photo = PhotoShoot(request)
+            photo.are_shoot_options_correct()
+            photo.set_camera_configurations()
+            photo.shoot()
+            photo.photo_correction()
+            photo_object = photo.save_photo_in_db()
+            photo_info = {
+                'url':request.META['HTTP_ORIGIN']+photo_object.photo.url,
+                'new_name':photo_object.photo.url,
+                'id':photo_object.id,
             }
-            return JsonResponse(image_info)
+            return JsonResponse(photo_info)
 
 class Hdr_View(View):
     def get(self,request):
