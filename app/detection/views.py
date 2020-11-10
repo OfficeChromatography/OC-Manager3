@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
-from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
 from connection.forms import OC_LAB
 from app.settings import STATIC_ROOT, MEDIA_ROOT
 from .models import Images_Db, Detection_ZeroPosition
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
+from django.forms.models import model_to_dict
 
 import cv2 as cv
 import numpy as np
@@ -33,19 +33,27 @@ class Capture_View(View):
         if 'LOADFILE' in request.GET:
             id = int(request.GET.get('id'))
             image = Images_Db.objects.get(pk=id)
-            metadata = {}
-            # me = get_metadata(image)
-            # print(me)
             response = {**{'url':image.photo.url,
-                        'filename':image.filename,
-                        # 'meta':me,
-                        'id': image.id}}
+                            'filename':image.filename,
+                            'id': image.id}}
             return JsonResponse(response)
 
         if 'LISTLOAD' in request.GET:
             images = Images_Db.objects.filter(uploader=request.user).order_by('-id')
             names = [[i.filename,i.id] for i in images]
             return JsonResponse(names, safe=False)
+
+        if 'GETCONFIG' in request.GET:
+            id = int(request.GET.get('id'))
+            image = Images_Db.objects.get(pk=id)
+            user_conf = model_to_dict(image.user_conf, fields=[field.name for field in image.user_conf._meta.fields])
+            leds_conf = model_to_dict(image.leds_conf, fields=[field.name for field in image.leds_conf._meta.fields])
+            camera_conf = model_to_dict(image.camera_conf, fields=[field.name for field in image.camera_conf._meta.fields])
+            response = {**{'user_conf':user_conf,
+                           'leds_conf':leds_conf,
+                           'camera_conf':camera_conf
+                           }}
+            return JsonResponse(response)
 
         if 'LOAD_NOTE' in request.GET:
             id = int(request.GET.get('id'))
@@ -71,7 +79,7 @@ class Capture_View(View):
     def post(self, request):
         print(request.POST)
         # SAVE IMAGE
-        if 'SAVE' in request.POST:
+        if 'RENAME' in request.POST:
             user_images = Images_Db.objects.filter(uploader=request.user)
             photo = user_images.get(id=request.POST['id'])
             photo.filename = request.POST['filename']
@@ -90,7 +98,8 @@ class Capture_View(View):
         if 'REMOVE' in request.POST:
             try:
                 file = Images_Db.objects.get(id=request.POST.get('id'),uploader=request.user)
-                path = os.path.join('./', str(file.photo))
+                print(file.photo)
+                path = os.path.join(MEDIA_ROOT,str(file.photo))
                 if os.path.exists(path):
                     os.remove(path)
                     file.delete()
@@ -99,10 +108,7 @@ class Capture_View(View):
             return JsonResponse({'success':'File removed!'})
 
         else:
-            photo_path = take_photo(request)
-            photo_path = manipulate(photo_path)
-            image = save_photo_db(photo_path,request.user)
-
+            image = take_photo(request)
             image_info = {
                 'url':request.META['HTTP_ORIGIN']+image.photo.url,
                 'new_name':image.photo.url,

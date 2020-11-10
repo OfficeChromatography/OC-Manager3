@@ -11,7 +11,7 @@ from printrun import printcore, gcoder
 from types import SimpleNamespace
 import json
 from decimal import *
-from .flowCalc import FlowCalc
+#from .flowCalc import FlowCalc
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 
@@ -177,11 +177,11 @@ def data_validations(**kwargs):
 
 def calculateDevelopment(data):
     # #flow in uL/s
-    flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
+    #flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
     # #syringe movement in mm/s
-    flow = flow / 58
+    #flow = flow / 58
     #speed in mm/min * 2
-    speed = round(flow * 60,3)
+    #speed = round(flow * 60,3)
     
 
     data = SimpleNamespace(**data)
@@ -192,11 +192,11 @@ def calculateDevelopment(data):
     
     zMovement = round(float(data.volume) * 60/1000,3)
     #time in seconds
-    time = zMovement / speed * 60
+    #time = zMovement / speed * 60
 
     #add error for when time is greater than 3
 
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, speed, data.temperature, data.precision, data.pressure, data.waitTime)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.precision, data.pressure, data.waitTime)
 
 
 def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure, waitTime):

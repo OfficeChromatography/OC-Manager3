@@ -2,7 +2,7 @@ $(document).ready(function() {
     loadlistofimages()
 });
 
-//Load List of images and select the first one
+// Load List of images and select the first one
 function loadlistofimages(){
   $.ajax({
     method: 'GET',
@@ -12,23 +12,27 @@ function loadlistofimages(){
     error: loadlistMethodError,
   })
   function loadlistMethodSuccess(data, textStatus, jqXHR){
-    console.log(data)
-    $('#list-load').empty()
-    $.each(data, function(key, value) {
-        console.log(value[0])
-        $('#list-load').append('<a class="list-group-item list-group-item-action py-1" id='+value[1]+' data-toggle="list" href="#list-home" role="tab" aria-controls="home">'+value[0]+'</a>')
-      })
-    listener4LoadedImages()
-    $('#list-load a:first-child').click()
-    return
-  }
+        $('#list-load').empty()
+
+        $.each(data, function(key, value) {
+            row = $('<a class="list-group-item list-group-item-action py-1" data-toggle="list" href="#list-home" role="tab" aria-controls="home"></a>')
+            row.text(value[0])
+            row.attr('id',value[1])
+            $('#list-load').append(row)
+          })
+
+        listener4LoadedImages()
+        $('.list-group-item:first-child').click()
+    }
   function loadlistMethodError(jqXHR, textStatus, errorThrown){}
 }
-// Action on list element clicking
+
+
+// Action when list element is clicked
 function listener4LoadedImages(){
 $('.list-group-item').on('click', function (e) {
     e.preventDefault()
-    data={'id':$(this)[0].id, 'LOADFILE':''}
+    data={'id':this.id, 'LOADFILE':''}
     console.log(data)
     console.log(data);
     $.ajax({
@@ -38,34 +42,34 @@ $('.list-group-item').on('click', function (e) {
     success: loadImageMethodSuccess,
     error: loadImageMethodError,
     })
-    })
+})
 function loadImageMethodSuccess(data, textStatus, jqXHR){
 $("#image_id").attr("src",data.url);
 $("#image_id").attr("alt",data.id);
 $("#image_id").attr("name",data.filename);
 $("#new_filename").val(data.filename)
+
 }
 function loadImageMethodError(jqXHR, textStatus, errorThrown){}
 }
 
-//Save Button
-$('#savebttn').on('click', function (e) {
+//Save name Button
+$('#renamebttn').on('click', function (e) {
   event.preventDefault()
   $.ajax({
   method: 'POST',
   url:    captureEndpoint,
-  data:   '&SAVE&id='+$('#image_id').attr('alt')+'&filename='+$('#new_filename').val(),
-  success: savefileMethodSuccess,
-  error: savefileMethodError,
+  data:   '&RENAME&id='+$('#image_id').attr('alt')+'&filename='+$('#new_filename').val(),
+  success: renamefileMethodSuccess,
+  error: renamefileMethodError,
   })
 })
-function savefileMethodSuccess(data, textStatus, jqXHR){
+function renamefileMethodSuccess(data, textStatus, jqXHR){
   loadlistofimages()
   $('#removebttn').fadeIn()
 }
-function savefileMethodError(jqXHR, textStatus, errorThrown){}
-
-//Remove Button
+function renamefileMethodError(jqXHR, textStatus, errorThrown){}
+// Remove image Button
 $('#removebttn').on('click', function (e) {
   event.preventDefault()
   $endpoint = window.location.origin+'/capture/'
@@ -79,14 +83,11 @@ $('#removebttn').on('click', function (e) {
 })
 function removeFileMethodSuccess(data, textStatus, jqXHR){
   loadlistofimages()
-  $('#list-load a:first-child').click()
   console.log(data)
 }
-function removeFileMethodError(jqXHR, textStatus, errorThrown){
-    console.log(data)
-}
+function removeFileMethodError(jqXHR, textStatus, errorThrown){}
 
-//Export Button
+// Export Button
 $('#exportbttn').on('click', function (e) {
     event.preventDefault()
     var element = document.createElement('a');
@@ -104,4 +105,39 @@ $('#new_filename').on('focusin',function(e){
 })
 $('#new_filename').on('focusout',function(e){
     $('#removebttn').fadeIn()
+})
+
+// Open image in new tab when clicked
+$('#image_new_tab_bttn').on('click', function (e) {
+    event.preventDefault()
+    window.open($('#image_id').attr('src'))
+})
+
+// Load image config
+$('#load_config').on('click', function (e) {
+    $.ajax({
+        method: 'GET',
+        url:    window.location.origin+'/capture/',
+        data:   {'GETCONFIG':'','id':$("#image_id").attr('alt')},
+        success: getConfigMethodSuccess,
+        error: getConfigMethodError,
+    })
+
+    function getConfigMethodSuccess(data, textStatus, jqXHR){
+        //Load User Controls
+
+        for (var [key, value] of Object.entries(data.user_conf)) {
+            $("#id_"+key).val(String(value))
+        }
+        // Load LEDs conf
+        $("#id_uv255_power").val(data.leds_conf.uv255_power).change()
+        $("#id_uv365_power").val(data.leds_conf.uv365_power).change()
+        $('#picker').colpickSetColor({r:data.leds_conf.red, g:data.leds_conf.green, b:data.leds_conf.blue})
+
+        // Load Camera conf
+        for (var [key, value] of Object.entries(data.camera_conf)) {
+            $("#id_"+key).val(String(value))
+        }
+    }
+    function getConfigMethodError(jqXHR, textStatus, errorThrown){}
 })

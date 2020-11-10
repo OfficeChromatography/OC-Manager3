@@ -332,7 +332,7 @@ function startMethodError(jqXHR, textStatus, errorThrown){}
 
 function loadMethodSuccess(data, textStatus, jqXHR){
   // Load all the fields with the ones get in the database
-  // $("#id_motor_speed").val(data.motor_speed)
+  $("#id_speed").val(data.speed)
   $("#id_pressure").val(data.pressure)
   // $("#id_frequency").val(data.frequency)
   $("#id_temperature").val(data.temperature)
@@ -354,6 +354,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $("#id_applications").val(data.applications)
   $("#id_precision").val(data.precision)
   $("#id_waitTime").val(data.waitTime)
+  $("#id_description").val(data.description)
 
   if (data.printBothways=='On') {
     $("#printBothwaysButton").text('On');
@@ -410,6 +411,7 @@ function getSpecificFluid(toString){
   data['applications'] = $('#id_applications').val()
   data['precision'] = $('#id_precision').val()
   data['waitTime'] = $('#id_waitTime').val()
+  data['description'] = $('#id_description').val()
 
   if(toString){
     data = '&devBandSettings='+JSON.stringify(data)

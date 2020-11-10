@@ -1,10 +1,5 @@
 
-$('#steprangeRins').on('change',function(e){
-    $('#steptextRins').val($(this).val())
-})
-$('#steptextRins').on('change',function(e){
-    $('#steprangeRins').val($(this).val())
-})
+
 $("#pump_manual").on('click',function(e){
     event.preventDefault();
     console.log($("#static-form").serialize());

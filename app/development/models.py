@@ -10,6 +10,7 @@ class PressureSettings_Dev_Db(models.Model):
     pressure = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
     nozzlediameter = models.CharField(max_length=120, default='0.08')
+    speed = models.DecimalField(null=True, decimal_places=1, max_digits=5)
 
 class BandSettings_Dev_Db(models.Model):
     volume = models.DecimalField(null=True, decimal_places=1, max_digits=5)
@@ -20,6 +21,7 @@ class BandSettings_Dev_Db(models.Model):
     applications = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     precision = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     waitTime = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
+    description = models.CharField(max_length=120, default='')
 
 class Development_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)

@@ -64,7 +64,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity']
+        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity','description']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -87,6 +87,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'precision'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'waitTime'   : forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'volume'         : _('Volume'),
@@ -94,6 +95,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'applications'   : _('Applications'),
             'precision'   : _('Pressure Checks'),
             'waitTime'    : _('Waiting Time'),
+            'description' : _('Description')
         }
 
         def clean(self):
@@ -111,13 +113,14 @@ class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
         initial['pressure'] = 10
+        initial['speed'] = 25
         initial['temperature'] = 0
         kwargs['initial'] = initial
         super(PressureSettings_Form, self).__init__(*args, **kwargs)
 
     class Meta:
         model = PressureSettings_Dev_Db
-        fields = ['temperature','nozzlediameter','pressure']
+        fields = ['temperature','nozzlediameter','pressure','speed']
         widgets = {
             'temperature'           : forms.NumberInput(attrs={'class': 'form-control'}),
             'nozzlediameter'        : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -129,10 +132,12 @@ class PressureSettings_Form(forms.ModelForm):
                 ('0.05','0.05'),
             ]),
             'pressure'           : forms.NumberInput(attrs={'class': 'form-control'}),
+            'speed'           : forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
         labels = {
-            'pressure'         : _('Pressure')
+            'pressure'         : _('Pressure'),
+            'speed'         : _('Speed')
         }
 
         def clean_temperature(self):

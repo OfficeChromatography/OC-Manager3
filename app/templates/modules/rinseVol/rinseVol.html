@@ -9,24 +9,24 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Place the magnet on top of the valve!</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
+               
                   <form id='static-form' method="post"> {% csrf_token %}
-                    <div class="form-row align-items-center">
-                      <div class="col-3">
-                        <span class="text-center mx-3">Volume [uL]</span>
-                      </div>
-                      <div class="col-6">
-                        <input class="custom-range form-control px-1" name='cycles' value='150' type="range" min="0" max="1000" id='steprangeRins'/>
-                      </div>
-                      <div class="col-2">
-                        <input type="number" class='form-control px-1' value="150" id='steptextRins'/>
+                    <div class="input-group">
+                      <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Volume</label>
+                      <input type="number" name="volume" class='form-control px-1' value="150" id='id_volume'/>
+                      <div class="input-group-append">
+                          <span class="input-group-text">uL</span>
                       </div>
                     </div>
+                  </br>
+                    <div class="input-group">
+                      <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Speed</label>
+                      <input type="number" name="speed" value="1" class="form-control" step="0.1" required="" id="id_speed">
+                      <div class="input-group-append">
+                          <span class="input-group-text">mm/s</span>
+                      </div>
+                    </div>
+                  </br>
                   </form>
             </div>
             <div class="modal-footer">

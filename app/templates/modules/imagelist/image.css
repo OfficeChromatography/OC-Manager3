@@ -14,13 +14,18 @@ div.show-image button {
     position:absolute;
     display:none;
 }
-div.show-image button.note {
+div.show-image button.image-note {
     position: absolute;
     top: 8px;
     left: 16px;
 }
-div.show-image input.delete {
+div.show-image button.image-open {
     position: absolute;
     top: 8px;
+    right: 16px;
+}
+div.show-image button.image-config-load {
+    position: absolute;
+    bottom: 8px;
     right: 16px;
 }
