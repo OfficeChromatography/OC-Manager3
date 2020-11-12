@@ -1,22 +1,13 @@
-from app.settings import STATIC_ROOT, MEDIA_ROOT
-from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, \
-    LedsControlsForm
-from .models import Images_Db
+from .forms import *
+from .models import *
+from .Camera import *
 
 from django.core.files import File
 from PIL import Image
-import PIL.ExifTags
 from PIL.ExifTags import TAGS
-import time
-import subprocess
 import os
-from datetime import datetime
-
 import cv2
 import numpy as np
-
-from connection.forms import OC_LAB
-from .Camera import Camera, UvLed, VisibleLed
 
 
 def basic_conf():
@@ -72,6 +63,7 @@ def get_metadata(image_in_Db):
             data = data.decode()
         img_data += f"{tag}: {data}\n"
         dic[tag] = str(data)
+    print(filter_data(dic))
     return filter_data(dic)
 
 
@@ -85,7 +77,7 @@ def filter_data(data):
 '''New Code'''
 
 
-class PhotoShoot:
+class PhotoShootManager:
 
     def __init__(self, request):
 
@@ -147,7 +139,7 @@ class PhotoShoot:
     def save_photo_in_db(self):
         with open(self.path_photo, 'rb') as f:
             image = Images_Db()
-            image.photo.save(os.path.basename(self.path_photo), File(f))
+            image.image.save(os.path.basename(self.path_photo), File(f))
             image.save()
             image.filename = image.file_name()
             image.uploader = self.user
@@ -188,7 +180,8 @@ class FixDistortionImage:
         self.undistort()
 
     def undistort(self):
-        # Using the fixed values mtx and dist, it straighten the image and also cut the black borders
+        # Using the fixed values mtx and dist, it straighten the image
+        # and also cut the black borders
         h, w = self.img.shape[:2]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.correction_mtx,
                                                           self.correction_dist,

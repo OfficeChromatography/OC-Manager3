@@ -11,7 +11,6 @@ $('#list-of-images').multiSelect({
   },
   afterDeselect: function(values){
     // eliminate images
-    console.log(values[0])
     $("#card-"+values[0]).remove()
   }
 });
@@ -32,7 +31,7 @@ function getImages(values){
     });
 //    text+=</table>
     $('.card-columns').append(`<div class="card" id="card-`+data.id+`">
-      <img class="card-img-top" src="`+data.url+`" alt="Card image cap">
+      <img class="card-img-top" src="`+data.url+`" alt="`+data.id+`">
       <div class="card-body">
         <h5 class="card-title">`+data.filename+`</h5>
         <p class="card-text">`+text+`</p>
@@ -66,10 +65,10 @@ $('#processbttn').on('click',function(e){
   event.preventDefault()
   $endpoint = window.location.origin+'/hdr/'
   $formData ={  AligmentConfigurationForm:$('#AligmentConfigurationForm').serialize(),
-                url:new Array()}
+                id:new Array()}
   i=0;
   $('.card-img-top').each(function(){
-      $formData.url.push($(this).attr('src'))
+      $formData.id.push($(this).attr('alt'))
       });
   $.ajax({
     method: 'POST',
@@ -91,13 +90,22 @@ $('#processbttn').on('click',function(e){
           </div>
         </div>`)
       });
+      $('#options-card').fadeOut( 800 )
       // Show the new image
     }
-    function processMethodError(jqXHR, textStatus, errorThrown){}
+    function processMethodError(jqXHR, textStatus, errorThrown){
+        $('#id_error_alert_hdr').text(jqXHR.responseText)
+        $( "#id_error_alert_hdr" ).fadeIn().delay( 800 ).fadeOut( 400 );
+        eliminateAllCards()
+    }
 })
-function toZero(){
 
+
+function eliminateAllCards(){
+    $('#list-of-images').multiSelect('deselect_all')
+    $('.card-columns').empty()
 }
+
 // $('#processbttn').on('click', function (e) {
 //   event.preventDefault()
 //   $formData =

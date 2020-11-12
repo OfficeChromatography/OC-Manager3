@@ -268,7 +268,8 @@ class Leds_Db(models.Model):
         max_digits=3,
         decimal_places=0)
 
-class Images_Db(models.Model):
+
+class Images(models.Model):
     id = models.AutoField(primary_key=True)
     filename = models.CharField(max_length=100, null=True)
     uploader = models.ForeignKey(
@@ -277,23 +278,26 @@ class Images_Db(models.Model):
                 on_delete=models.CASCADE,
                 blank=True,
                 )
-    photo = models.ImageField(upload_to ='images/',default='/default.jpeg')
-    datetime = models.DateTimeField(auto_now_add=True, null=True)
-    note = models.TextField(blank=True, default="")
+    datetime = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    note = models.TextField(default="", null=True, blank=True)
 
+class Images_Db(Images):
+    image = models.ImageField(upload_to ='images/', default='/default.jpeg')
     user_conf = models.OneToOneField(UserControls_Db, on_delete=models.CASCADE, null=True)
     leds_conf = models.OneToOneField(Leds_Db, on_delete=models.CASCADE, null=True)
     camera_conf = models.OneToOneField(CameraControls_Db, on_delete=models.CASCADE, null=True)
 
-
     def file_name(self):
-        return os.path.splitext(os.path.basename(self.photo.name))[0]
+        return os.path.splitext(os.path.basename(self.image.name))[0]
 
     def delete(self, *args, **kwargs):
         self.user_conf.delete()
         self.leds_conf.delete()
         self.camera_conf.delete()
         return super(self.__class__, self).delete(*args, **kwargs)
+
+class Hdr_Image(Images):
+    image = models.ImageField(upload_to ='hdr/', default='/default.jpeg', null=True, blank=True)
 
 
 class Detection_ZeroPosition(models.Model):

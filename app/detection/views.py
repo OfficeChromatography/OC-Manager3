@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from connection.forms import OC_LAB
 from app.settings import STATIC_ROOT, MEDIA_ROOT
-from .models import Images_Db, Detection_ZeroPosition
+from .models import *
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.forms.models import model_to_dict
-
-import cv2 as cv
+from .hdr import *
+import cv2
 import numpy as np
 from  django.http import QueryDict
 import json
@@ -31,11 +31,13 @@ class Capture_View(View):
     def get(self, request):
         # FILE LOADING
         if 'LOADFILE' in request.GET:
+
             id = int(request.GET.get('id'))
             image = Images_Db.objects.get(pk=id)
-            response = {**{'url':image.photo.url,
+            response = {**{'url':image.image.url,
                             'filename':image.filename,
                             'id': image.id}}
+
             return JsonResponse(response)
 
         if 'LISTLOAD' in request.GET:
@@ -46,12 +48,15 @@ class Capture_View(View):
         if 'GETCONFIG' in request.GET:
             id = int(request.GET.get('id'))
             image = Images_Db.objects.get(pk=id)
-            user_conf = model_to_dict(image.user_conf, fields=[field.name for field in image.user_conf._meta.fields])
-            leds_conf = model_to_dict(image.leds_conf, fields=[field.name for field in image.leds_conf._meta.fields])
-            camera_conf = model_to_dict(image.camera_conf, fields=[field.name for field in image.camera_conf._meta.fields])
-            response = {**{'user_conf':user_conf,
-                           'leds_conf':leds_conf,
-                           'camera_conf':camera_conf
+            user_conf = model_to_dict(image.user_conf,
+                                      fields=[field.name for field in image.user_conf._meta.fields])
+            leds_conf = model_to_dict(image.leds_conf,
+                                      fields=[field.name for field in image.leds_conf._meta.fields])
+            camera_conf = model_to_dict(image.camera_conf,
+                                    fields=[field.name for field in image.camera_conf._meta.fields])
+            response = {**{'user_conf': user_conf,
+                           'leds_conf': leds_conf,
+                           'camera_conf': camera_conf
                            }}
             return JsonResponse(response)
 
@@ -69,7 +74,7 @@ class Capture_View(View):
             form['LedsControlsForm'] = LedsControlsForm(initial=initial)
             form['list_load'] = Images_Db.objects.filter(uploader=request.user).order_by('-id')
             OC_LAB.send('G0Y183F3000')
-            image_info={'url':'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
+            image_info={'url': 'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
             return render(
                             request,
                             "capture.html",
@@ -86,129 +91,80 @@ class Capture_View(View):
             return JsonResponse({'success':'File saved!'})
 
         if 'SAVE_NOTE' in request.POST:
-            print(request.POST)
             user_images = Images_Db.objects.filter(uploader=request.user)
             photo = user_images.get(pk=request.POST['id'])
-            print()
             photo.note = request.POST['note']
             photo.save()
-            return JsonResponse({'success':'Note saved!'})
+            return JsonResponse({'success': 'Note saved!'})
 
         if 'REMOVE' in request.POST:
             try:
-                file = Images_Db.objects.get(id=request.POST.get('id'),uploader=request.user)
-                print(file.photo)
-                path = os.path.join(MEDIA_ROOT,str(file.photo))
+                file = Images_Db.objects.get(id=request.POST.get('id'), uploader=request.user)
+                path = os.path.join(MEDIA_ROOT, str(file.image))
                 if os.path.exists(path):
                     os.remove(path)
                     file.delete()
             except:
-                return JsonResponse({'warning':'Something went wrong!'})
-            return JsonResponse({'success':'File removed!'})
+                return JsonResponse({'warning': 'Something went wrong!'})
+            return JsonResponse({'success': 'File removed!'})
 
         else:
-            photo = PhotoShoot(request)
-            photo.are_shoot_options_correct()
-            photo.set_camera_configurations()
-            photo.shoot()
-            photo.photo_correction()
-            photo_object = photo.save_photo_in_db()
+            photo_shoot = PhotoShootManager(request)
+            photo_shoot.are_shoot_options_correct()
+            photo_shoot.set_camera_configurations()
+            photo_shoot.shoot()
+            photo_shoot.photo_correction()
+            photo_object = photo_shoot.save_photo_in_db()
             photo_info = {
-                'url':request.META['HTTP_ORIGIN']+photo_object.photo.url,
-                'new_name':photo_object.photo.url,
-                'id':photo_object.id,
+                'url': request.META['HTTP_ORIGIN']+photo_object.image.url,
+                'new_name': photo_object.image.url,
+                'id': photo_object.id,
             }
             return JsonResponse(photo_info)
 
 class Hdr_View(View):
-    def get(self,request):
+    def get(self, request):
         form = {
-            'AligmentConfigurationForm':AligmentConfigurationForm(initial={
-                    'number_of_iterations':5000,
-                    'warp_mode':0,
+            'AligmentConfigurationForm': AligmentConfigurationForm(initial={
+                    'number_of_iterations': 5000,
+                    'warp_mode': 0,
             }),
         }
-        return render(request,"hdr.html",form)
+        return render(request, "hdr.html", form)
 
     def post(self, request):
         fs = FileSystemStorage()
-
         form = AligmentConfigurationForm(QueryDict(request.POST.getlist('AligmentConfigurationForm')[0]))
-        urls = request.POST.getlist('url[]')
-
-        if not form.is_valid() or not urls:
-            print("Error")
-            print(form.errors)
-            return JsonResponse({'message':'No images selected'})
+        ids = request.POST.getlist('id[]')
+        if not form.is_valid():
+            # Check the form values
+            return HttpResponseBadRequest("Wrong Parameters")
+        elif len(ids)<2:
+            # Check theres at least 2 image
+            return HttpResponseBadRequest("Select at least 2 Valid Pictures")
         else:
-            paths = []
-            print(form.cleaned_data)
-            for url in urls:
-                paths.append(fs.path(url[url.rfind('/')+1:]))
-            img_list = [cv.imread(path) for path in paths]
-            test_mertens(   img_list,
-                            form.cleaned_data.get('warp_mode'),
-                            form.cleaned_data.get('number_of_iterations'))
+            try:
+                img_list = [cv2.imread(Images_Db.objects.get(id=id).image.path) for id in ids]
+            except ValueError:
+                return HttpResponseBadRequest("Select valid Pictures")
 
-
-            fs_results = FileSystemStorage()
-            with open(f'{MEDIA_ROOT}/hdr/results/fusion_mertens_aligned.jpeg', 'rb') as f:
-                new_name = fs_results.save(f'hdr/results/fusion_mertens_aligned.jpeg', File(f))
-                data = {
-                    'url':request.META['HTTP_ORIGIN']+fs_results.url(new_name),
-                    'new_name':new_name,
-                    'method': MOTION_MODEL[form.cleaned_data.get('warp_mode')][1]
-                }
-                print(data)
-                data=null
-            return JsonResponse(data)
-
-def test_mertens(images, warp_mode, iterations):
-    """MOTION_MODELS = ((0, 'Translation'),
-                        (1, 'Euclidean'),
-                        (2, 'Affine'),
-                        (3, 'Homography'))"""
-    # Convert to grey scale
-    grey_images = []
-    for i in images:
-        grey_images.append(cv.cvtColor(i,cv.COLOR_BGR2GRAY))
-
-    # Find size of 1 of the images
-    sz = grey_images[0].shape
-
-    # Define 2x3 or 3x3 matrices and initialize the matrix to identity
-    if warp_mode == cv.MOTION_HOMOGRAPHY :
-        warp_matrix = np.eye(3, 3, dtype=np.float32)
-    else :
-        warp_matrix = np.eye(2, 3, dtype=np.float32)
-
-    # Specify the threshold of the increment
-    # in the correlation coefficient between two iterations
-    termination_eps = 1e-10;
-    criteria = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, iterations,  termination_eps)
-
-	# Run the ECC algorithm. The results are stored in warp_matrix.
-    aligned_images = []
-    for i in range(1,len(images)):
-        (cc, warp_matrix) = cv.findTransformECC(grey_images[0],grey_images[i],warp_matrix, warp_mode, criteria, grey_images[0], 5)
-
-        if warp_mode == cv.MOTION_HOMOGRAPHY :
-            aligned_images.append(cv.warpPerspective (images[i], warp_matrix, (sz[1],sz[0]), flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP))
-        else:
-            aligned_images.append(cv.warpAffine(images[i], warp_matrix, (sz[1],sz[0]), flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP))
-        cv.imwrite(f'{MEDIA_ROOT}/hdr/aligned/aligned_image{i}.jpeg', aligned_images[i-1])
-        cv.imwrite(f'{MEDIA_ROOT}/hdr/aligned/aligned_image0.jpeg', images[0])
-
-    img_fn=[]
-    for i in range(0,len(images)):
-        img_fn.append(f'aligned_image{i}.jpeg')
-    img_list = [cv.imread(f'{MEDIA_ROOT}/hdr/aligned/'+fn) for fn in img_fn]
-
-    # Exposure fusion using Mertens
-    merge_mertens = cv.createMergeMertens()
-    res_mertens = merge_mertens.process(img_list)
-    res_mertens_8bit = np.clip(res_mertens*255, 0, 255).astype('uint8')
-    cv.imwrite(f'{MEDIA_ROOT}/hdr/results/fusion_mertens_aligned.jpeg', res_mertens_8bit)
+            processed_hdr = HDR(  img_list,
+                                form.cleaned_data.get('warp_mode'),
+                                form.cleaned_data.get('number_of_iterations')).process_images()
+            if processed_hdr is None:
+                return HttpResponseBadRequest('There was an error processing HDR on images')
+            else:
+                with open(processed_hdr, 'rb') as f:
+                    object = Hdr_Image()
+                    object.image.save(os.path.basename(processed_hdr), File(f))
+                    object.save()
+                    f.close()
+                    response = {
+                        'url':request.META['HTTP_ORIGIN']+object.image.url,
+                        'new_name':object.image.name,
+                        'method': MOTION_MODEL[form.cleaned_data.get('warp_mode')][1]
+                    }
+                return JsonResponse(response)
 
 class Detection_Homming(View):
     def post(self, request):

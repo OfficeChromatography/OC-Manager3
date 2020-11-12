@@ -34,7 +34,7 @@
             <div class="col-fixed-300 mx-4 mb-4" id='configrow'>
               <select multiple="multiple" id="list-of-images" name="my-select[]"></select>
               <hr>
-              <div class="card shadow">
+              <div class="card shadow" id="options-card">
                 <div class="card-header">
                   <div class="d-flex flex-row justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Options</h6>
@@ -54,7 +54,10 @@
               </div>
             </div>
             <div class="col">
-              <div class="card-columns"></div>
+              <div class="alert alert-danger alert-dismissible collapse m-1" id='id_error_alert_hdr' role="alert"></div>
+              <div class="card-columns">
+
+              </div>
             </div>
           </div>
         </div>
