@@ -14,7 +14,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 
-from connection.forms import OC_LAB
+from .Camera import *
 
 def basic_conf():
     basic_conf = {'brightness': 50,

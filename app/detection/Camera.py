@@ -6,7 +6,7 @@ import glob
 from connection.forms import OC_LAB
 
 
-class Camera():
+class Camera:
     @classmethod
     def list_cameras(cls):
         # Returns a list with all the video* devices
