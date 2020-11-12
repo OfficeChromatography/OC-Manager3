@@ -1,14 +1,20 @@
-from .forms import *
-from .models import *
-from .Camera import *
+from app.settings import STATIC_ROOT, MEDIA_ROOT
+from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
+from .models import Images_Db
 
 from django.core.files import File
 from PIL import Image
+import PIL.ExifTags
 from PIL.ExifTags import TAGS
+import time
+import subprocess
 import os
+from datetime import datetime
+
 import cv2
 import numpy as np
 
+from connection.forms import OC_LAB
 
 def basic_conf():
     basic_conf = {'brightness': 50,
