@@ -19,7 +19,7 @@ set -e
 #
 # Git commit from https://github.com/docker/docker-install when
 # the script was uploaded (Should only be modified by upload job):
-SCRIPT_COMMIT_SHA="442e66405c304fa92af8aadaa1d9b31bf4b0ad94"
+SCRIPT_COMMIT_SHA="26ff363bcf3b3f5a00498ac43694bf1c7d9ce16c"
 
 
 # The channel to install from:
@@ -79,6 +79,22 @@ is_dry_run() {
 	else
 		return 0
 	fi
+}
+
+is_wsl() {
+	case "$(uname -r)" in
+	*microsoft* ) true ;; # WSL 2
+	*Microsoft* ) true ;; # WSL 1
+	* ) false;;
+	esac
+}
+
+is_darwin() {
+	case "$(uname -s)" in
+	*darwin* ) true ;;
+	*Darwin* ) true ;;
+	* ) false;;
+	esac
 }
 
 deprecation_notice() {
@@ -199,15 +215,6 @@ semverParse() {
 	patch="${patch%%[-.]*}"
 }
 
-ee_notice() {
-	echo
-	echo
-	echo "  WARNING: $1 is now only supported by Docker EE"
-	echo "           Check https://store.docker.com for information on Docker EE"
-	echo
-	echo
-}
-
 do_install() {
 	echo "# Executing docker install script, commit: $SCRIPT_COMMIT_SHA"
 
@@ -283,6 +290,18 @@ do_install() {
 	lsb_dist=$( get_distribution )
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
+	if is_wsl; then
+		echo
+		echo "WSL DETECTED: We recommend using Docker Desktop for Windows."
+		echo "Please get Docker Desktop from https://www.docker.com/products/docker-desktop"
+		echo
+		cat >&2 <<-'EOF'
+
+			You may press Ctrl+C now to abort this script.
+		EOF
+		( set -x; sleep 20 )
+	fi
+
 	case "$lsb_dist" in
 
 		ubuntu)
@@ -309,16 +328,11 @@ do_install() {
 			esac
 		;;
 
-		centos)
+		centos|rhel)
 			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
 				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
 			fi
 		;;
-
-		rhel|ol|sles)
-			ee_notice "$lsb_dist"
-			exit 1
-			;;
 
 		*)
 			if command_exists lsb_release; then
@@ -394,7 +408,7 @@ do_install() {
 			echo_docker_as_nonroot
 			exit 0
 			;;
-		centos|fedora)
+		centos|fedora|rhel)
 			yum_repo="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
 			if ! curl -Ifs "$yum_repo" > /dev/null; then
 				echo "Error: Unable to curl repository file $yum_repo, is it valid?"
@@ -465,6 +479,15 @@ do_install() {
 			exit 0
 			;;
 		*)
+			if [ -z "$lsb_dist" ]; then
+				if is_darwin; then
+					echo
+					echo "ERROR: Unsupported operating system 'macOS'"
+					echo "Please get Docker Desktop from https://www.docker.com/products/docker-desktop"
+					echo
+					exit 1
+				fi
+			fi
 			echo
 			echo "ERROR: Unsupported distribution '$lsb_dist'"
 			echo

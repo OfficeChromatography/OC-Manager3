@@ -23,7 +23,7 @@ git clone https://github.com/lucassing/OC-Lab-2.0.git
 ```
 
 
-### 2. Execute 'install.sh'
+### 2. Execute 'install.py'
 The next step is to execute a bash script which contains, the necessary softwares to run the OC-Manager. If you close the Terminal open it again (remember, `Ctrl+t`). Now go to the folder that contains the OC-Lab files, it is
 
 *cd* follow by the path to the folder.
@@ -33,7 +33,7 @@ cd /path/to/your/OC-files
 ```
 Then execute,
 ```bash
-./install.sh
+python install.py
 ```
 
 this will install:
