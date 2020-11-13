@@ -35,7 +35,7 @@ def create_desktop_executable():
             Keywords=Chromatography\n \
             Name=OC-Manager\n \
             Comment=Chromatography-Manager Software\n \
-            Exec=cd ' + path_to_oc + '/run.sh' + ' %F\n \
+            Exec=python ' + path_to_oc + '/run.py' + ' %F\n \
             Terminal=true\n \
             Type=Application\n \
             MimeType=text/plain\n \
@@ -62,7 +62,7 @@ class InstallationProcess:
         }
 
         title(self.main_title)
-        self.installation_process()
+        # self.installation_process()
         create_desktop_executable()
 
     def __str__(self):

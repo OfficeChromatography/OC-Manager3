@@ -3,15 +3,16 @@ version: "3"
 services:
   redis:
     restart: always
-    container_name: OC_redis_cont
+    container_name: oc_redis_cont
     image: redis:latest
     command: redis-server
     ports:
       - '6379:6379'
 
   app:
-    restart: always
+    restart: "no"
     build: .
+    container_name: oc_manager_cont
     image: oc-image:octag
     depends_on:
       - redis
@@ -28,6 +29,4 @@ services:
       - '/dev:/dev'
     command: >
       sh -c " python -m pip install opencv-python &&
-              python manage.py makemigrations &&
-              python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
