@@ -17,6 +17,7 @@ from .flowCalc import FlowCalc
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 from connection.forms import OC_LAB
+from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
@@ -280,41 +281,37 @@ def calculate(data):
             current_height+=deltaY
 
     # Creates the Gcode for the application and return it
-    return GcodeGen(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
+    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
 
-def GcodeGen(listoflines, speed, frequency, temperature, pressure, zeroPosition):
-    gcode=list()
+
+def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition):
+    generate = GcodeGenerator(True)
+
     # No HEATBED CASE
-    if temperature!=0:
-        gcode=[f'M190 R{temperature}']
-    # Move to the home
-    gcode.append('G28XY')
-    gline = 'G1Y{}X{}F{}'.format(str(round(zeroPosition[1],3)), str(round(zeroPosition[0],3)), speed)
-    gcode.append(gline)
-    gcode.append('G92X0Y0')
-    gcode.append('M400')
-    # Only MOVEMENT CASE
-    if pressure==0 and frequency==0:
-        gcode.append(f'G94 P{pressure}')
-        for listofpoints in listoflines:
-            for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(round(point[0],3)), str(round(point[1],3)), speed)
-                gcode.append(gline)
-                gcode.append('M400')
+    if temperature != 0:
+        generate.wait_bed_temperature(temperature)
 
-    # Normal Application
-    else:
-        gcode.append(f'G97 P{pressure}')
-        for listofpoints in listoflines:
-            for point in listofpoints:
-                gline = 'G1Y{}X{}F{}'.format(str(round(point[0],3)), str(round(point[1],3)), speed)
-                gcode.append(gline)
-                gcode.append('M400')
-                gcode.append(f'G97 P{pressure}')
-                gcode.append(f'G98 F{frequency}')
-                gcode.append('M400')
-    gcode.append('G28XY')
-    return gcode
+    # Move to the home
+    generate.homming("XY")
+    generate.linear_move_xy(zeroPosition[0], zeroPosition[1], speed)
+    generate.set_position_xy(0, 0)
+    generate.finish_moves()
+
+    # Application
+    generate.pressurize(pressure)
+    for list_of_points in list_of_lines:
+        for point in list_of_points:
+            generate.linear_move_xy(point[1], point[0], speed)
+            generate.finish_moves()
+            generate.pressurize(pressure)
+            generate.toggle_valve(frequency)
+            generate.finish_moves()
+    generate.homming("XY")
+    return generate.list_of_gcodes
+
+
+
+
 
 def returnDropEstimateVol(data):
 

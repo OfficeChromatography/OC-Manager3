@@ -5,7 +5,7 @@ class GcodeGenerator:
         self.save_in_list = save_in_list
 
     def check_return(self, gcode):
-        if self.list_of_gcodes:
+        if self.save_in_list:
             self.list_of_gcodes.append(gcode)
             return
         else:
@@ -93,29 +93,6 @@ class GcodeGenerator:
         up an unused pin and use M42 to control it."""
         return self.check_return(f"M42P{pin}S{state}")
 
-def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition):
-    generate = GcodeGenerator(True)
 
-    # No HEATBED CASE
-    if temperature != 0:
-        generate.wait_bed_temperature(temperature)
-
-    # Move to the home
-    generate.homming("XY")
-    generate.linear_move_xy(zeroPosition[0], zeroPosition[1], speed)
-    generate.set_position_xy(0, 0)
-    generate.finish_moves()
-
-    # Application
-    generate.pressurize(pressure)
-    for list_of_points in list_of_lines:
-        for point in list_of_points:
-            generate.linear_move_xy(point[1], point[0], speed)
-            generate.finish_moves()
-            generate.pressurize(pressure)
-            generate.toggle_valve(frequency)
-            generate.finish_moves()
-    generate.homming("XY")
-    return generate.list_of_gcodes
 
 
