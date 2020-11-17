@@ -21,9 +21,7 @@ $('#down_arrowN').on('click',function(){
   sendToMachine(gcode)
 })
 $('#hommingN').on('click',function(){
-  gcode = 'G41'
-  sendToMachine(gcode)
-  gcode = 'G92E0'
+  gcode = 'G41\nG92E0'
   sendToMachine(gcode)
   zero_position = 0
   $('#currentPositionN').text('e: ' + zero_position)
