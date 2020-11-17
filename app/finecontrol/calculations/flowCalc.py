@@ -2,12 +2,14 @@ import math
 #from scipy.interpolate import interp2d
 
 class FlowCalc:
-    def __init__(self, pressure, nozzleDiameter, fluid, density, viscosity):
+    def __init__(self, pressure, nozzleDiameter, timeOrFrequency, fluid, density, viscosity):
         '''
         density [g/cm^3]
         pressure [psi]
         nozzleDiameter ['0.xxmm']
-        frequency [Hz]
+        timeOrFrequency [s] or [Hz]
+            used in sample app as frequency [Hz]
+            used in development as time [s]
         '''
 
         """density [g/cm**3] / kinematic viscosity [cSt] Correction Factor"""
@@ -27,7 +29,6 @@ class FlowCalc:
             'Ethanol': (0.789, 10),
             'Pyridine': (0.982, 10)
         }
-
         if (fluid!='Specific'):
             [density, empiricCorrectionFactor] = fluidDensity_empiricCorrectionFactor[fluid]
         else:
@@ -35,8 +36,8 @@ class FlowCalc:
             viscosity = float(viscosity)
             empiricCorrectionFactor = fluidDensity_empiricCorrectionFactor["Water"][1] / viscosity
 
-        # self.time = time
         self.pressure = pressure
+        self.timeOrFrequency = timeOrFrequency
         self.density = density
         self.empiricCorrectionFactor = empiricCorrectionFactor
         if nozzleDiameter=='0.25':
@@ -63,13 +64,18 @@ class FlowCalc:
         flowRateI = self.empiricCorrectionFactor * unitConversionKonstantK / lohms * math.sqrt( self.pressure / self.density ) / 60. * 1000
         return flowRateI
 
-    # def calcVolume(self):
-    #     '''
-    #     calculates the volume for one opening of the valve
-    #     volume [ul]
-    #     '''
-    #     volume = self.calcFlow() * self.time
-    #     return volume
-
-
-
+    def calcVolumeFrequency(self):
+        '''
+        calculates the volume for one opening of the valve
+        volume [ul] (SampleApp)
+        '''
+        volume = self.calcFlow() * (0.5 / self.timeOrFrequency)
+        return volume
+    
+    def calcVolumeTime(self):
+        '''
+        calculates the volume for the valve opened for a duration of time
+        (development)
+        '''
+        volume = self.calcFlow() * self.timeOrFrequency
+        return volume

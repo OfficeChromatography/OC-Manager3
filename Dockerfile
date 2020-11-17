@@ -14,6 +14,9 @@ COPY ./app /app
 
 RUN export PYTHONPATH='/usr/lib/python3/dist-packages'
 ENV PYTHONPATH='/usr/lib/python3/dist-packages'
+RUN export PYTHONPATH='/usr/local/lib/python3.8/site-packages'
+ENV PYTHONPATH='/usr/local/lib/python3.8/site-packages'
+
 # -D is only to run the apps without root premision
 # RUN adduser user
 # RUN adduser -D user
