@@ -27,7 +27,6 @@ services:
       - SYS_ADMIN
     devices:
       - '/dev:/dev'
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+    command: sh -c " python -m pip install opencv-python && python manage.py runserver 0.0.0.0:8000"
 
 
