@@ -14,6 +14,7 @@ from decimal import *
 #from .flowCalc import FlowCalc
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
+from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 
 forms = {
     'Development_Form': Development_Form(),
@@ -190,7 +191,7 @@ def calculateDevelopment(data):
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
     
-    zMovement = round(float(data.volume) * 30/2000,3)
+    zMovement = volumeToZMovement(data.volume)
     #time in seconds
     #time = zMovement / speed * 60
 
