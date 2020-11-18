@@ -1,9 +1,7 @@
 from django import forms
 from .models import Connection_Db
 from monitor.models import Monitor_Db
-import serial.tools.list_ports
-from printrun.printcore import printcore
-from django.contrib.auth.models import User
+from .OcLab import OcLab
 
 def db_list_4_tuple(*args):
     merged_list = []
@@ -28,7 +26,7 @@ LIST_OF_BAUDRATES = [
 BAUDRATES = db_list_4_tuple(LIST_OF_BAUDRATES, LIST_OF_BAUDRATES)
 TIMEOUTS = db_list_4_tuple([i for i in range(6)])
 
-OC_LAB = printcore()
+OC_LAB = OcLab()
 
 
 # Formular to connect the Arduino based on Connection_Db
@@ -68,7 +66,7 @@ class ConnectionForm(forms.ModelForm):
 
     # Connect to the Arduino and wait for response also save the response in the DB
     def update(self):
-        self.devices = self.devices_connected()
+        self.devices = OcLab.get_devices()
         if not self.devices:
             self.devices = ['Plug an OC-Lab']
         self.fields['oc_lab'].choices = db_list_4_tuple(self.devices)
@@ -97,10 +95,3 @@ class ConnectionForm(forms.ModelForm):
         except:
             raise forms.ValidationError('Imposible to connect to {}'.format(selected_port))
 
-    def devices_connected(self):
-        list = []
-        a = serial.tools.list_ports.comports()
-        for devices in a:
-            if str(devices.description) != 'n/a':
-                list.append(devices)
-        return list
