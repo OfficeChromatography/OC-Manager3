@@ -1,27 +1,22 @@
-# IMPORTS FOR CLASS BASED View
 from connection.forms import OC_LAB
-from connection.models import Connection_Db
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
-from django.core import serializers
-from .forms import CleaningProcessForm, ZeroPosition_Form
+from .forms import *
 from .models import *
-from printrun import printcore, gcoder
-import time
 import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 
-form ={}
+
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
                             'steps':50,
                             'pressure':20}
-
+form ={}
 
 class SyringeLoad(View):
     # def post:
@@ -163,8 +158,7 @@ class StaticPurge(View):
     def post(self, request):
         if request.POST.get('volume'):
             gcode = clean.static_cleaning(int(request.POST.get('volume')),int(request.POST.get('speed')))
-            light_gcode = gcoder.LightGCode(gcode)
-            OC_LAB.startprint(light_gcode)
+            OC_LAB.print_from_list(gcode)
         return JsonResponse({'message': 'ok'})
 
     def get(self, request):
@@ -182,8 +176,8 @@ class CleanControl(View):
                                                clean_param['stop_frequency'],
                                                clean_param['steps'],
                                                clean_param['pressure'])
-                light_gcode = gcoder.LightGCode(gcode)
-                OC_LAB.startprint(light_gcode)
+
+                OC_LAB.print_from_list(gcode)
 
                 data = {'message': f'Cleaning process in progress, please wait! \n'}
                 data.update({'duration': clean.duration})
@@ -326,9 +320,7 @@ class GcodeEditor(View):
                 file = GcodeFile.objects.get(filename=filename, uploader=request.user)
                 if file:
                     with open(f'{file.gcode}', 'r') as f:
-                        lines_gcode = [code_line.strip() for code_line in f]
-                        light_gcode = gcoder.LightGCode(lines_gcode)
-                        OC_LAB.startprint(light_gcode)
+                        OC_LAB.print_from_file(f)
                         return JsonResponse({'success': 'Printing!'})
             except DoesNotExist:
                 return JsonResponse({'danger': 'File Not Found'})
