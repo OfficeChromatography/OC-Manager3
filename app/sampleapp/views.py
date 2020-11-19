@@ -337,7 +337,7 @@ def returnDropEstimateVol(data):
             pointsX = np.round(float(length)/float(data.delta_x[0]))
             pointsY = 1
             if data.height[0] != "0":
-                pointsY = np.round(float(data.height[0])/float(data.delta_y[0]))
+                pointsY = np.round(float(data.height[0])/float(data.delta_y[0]))+1
             realVolume = pointsX * pointsY * dropVolume
 
         else:
