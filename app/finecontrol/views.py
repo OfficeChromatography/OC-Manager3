@@ -11,8 +11,6 @@ import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
-
-
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
                             'steps':50,
@@ -41,7 +39,7 @@ class SyringeLoad(View):
 
         if 'DELETE' in request.POST:
             try:
-                SyringeLoad_Db.objects.filter(volume=request.POST['DELETE']).filter(author=request.user)[0].delete()
+                SyringeLoad_Db.objects.filter(volumeoc=request.POST['DELETE']).filter(author=request.user)[0].delete()
                 return JsonResponse("Volume Deleted!", safe=False)
             except IndexError:
                 return JsonResponse("Volume doesn't exist!", safe=False)
