@@ -9,6 +9,7 @@ from .forms import *
 from .models import *
 import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
+from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 
 
@@ -329,3 +330,26 @@ class GcodeEditor(View):
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
             return JsonResponse({'danger': 'STOP'})
+
+class Temperature(View):
+    # Manage the GET request
+    def get(self, request):
+        return render(
+            request,
+            "./temperature.html",
+            form)
+
+class TempControl(View):
+    def post(self, request):
+        if request.POST.get('temp'):
+            generate = GcodeGenerator(True)
+            generate.wait_bed_temperature(request.POST.get('temp'))
+            generate.hold_bed_temperature(request.POST.get('temp'))
+            generate.wait(round(float(request.POST.get('time'))*60,3))
+            generate.hold_bed_temperature(0)
+            OC_LAB.print_from_list(generate.list_of_gcodes)
+        return JsonResponse({'message': 'ok'})
+
+    def get(self, request):
+        return JsonResponse({'message': 'ok'})
+

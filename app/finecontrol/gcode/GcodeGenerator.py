@@ -43,6 +43,10 @@ class GcodeGenerator:
         to be reached before proceeding. """
         return self.check_return(f"M190R{temperature}")
 
+    def hold_bed_temperature(self, temperature):
+        '''This command sets a new bed temperature and proceeds without waiting. The temperature will be held in the background'''
+        return self.check_return(f"M140S{temperature}")
+
     def homming(self, axis):
         """Auto-home one or more axes, moving them towards their endstops until triggered."""
         return self.check_return(f"G28{axis.upper()}")
@@ -92,6 +96,11 @@ class GcodeGenerator:
         """For custom hardware not officially supported in Marlin, you can often just connect
         up an unused pin and use M42 to control it."""
         return self.check_return(f"M42P{pin}S{state}")
+    
+    def wait(self, time):
+        """waits for seconds to pass before proceeding"""
+        return self.check_return(f"G4S{time}")
+
 
 
 

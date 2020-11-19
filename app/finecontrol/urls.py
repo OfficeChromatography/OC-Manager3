@@ -8,4 +8,6 @@ urlpatterns = [
     path('gcode-editor/',GcodeEditor.as_view(), name='gcodeeditor'),
     # path('setuphomming/', HommingSetup.as_view(), name='homming'),
     path('syringeload/', SyringeLoad.as_view(), name='syringeload'),
+    path('temperature/', Temperature.as_view(), name='temperature'),
+    path('tempControl/', TempControl.as_view(), name='tempcontrol')
 ]
