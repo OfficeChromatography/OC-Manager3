@@ -7,7 +7,6 @@ import json
 import numpy as np
 import math
 from scipy.optimize import minimize
-from printrun import printcore, gcoder
 from types import SimpleNamespace
 
 from .forms import *
@@ -63,8 +62,7 @@ class SampleAppPlay(View):
                 gcode = calculate(forms_data)
 
                 # Printrun
-                light_gcode = gcoder.LightGCode(gcode)
-                OC_LAB.startprint(light_gcode)
+                OC_LAB.print_from_list(gcode)
                 return JsonResponse({'error':'f.errors'})
 
         if 'STOP' in request.POST:
@@ -308,9 +306,6 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
             generate.finish_moves()
     generate.homming("XY")
     return generate.list_of_gcodes
-
-
-
 
 
 def returnDropEstimateVol(data):

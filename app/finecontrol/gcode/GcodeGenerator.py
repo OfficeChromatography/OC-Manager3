@@ -15,9 +15,9 @@ class GcodeGenerator:
         """"A linear move traces a straight line from one point to another, ensuring that the specified axes will arrive
         simultaneously at the given coordinates (by linear interpolation). The speed may change over time following an
         acceleration curve, according to the acceleration and jerk settings of the given axes."""
-        pos_x = str(round(pos_x, 3))
-        pos_y = str(round(pos_y, 3))
-        pos_z = str(round(pos_z, 3))
+        pos_x = str(round(float(pos_x), 3))
+        pos_y = str(round(float(pos_y), 3))
+        pos_z = str(round(float(pos_z), 3))
         return self.check_return(f"G1X{pos_x}Y{pos_y}Z{pos_z}F{speed}")
 
     def linear_move_x(self, pos_x, speed):
