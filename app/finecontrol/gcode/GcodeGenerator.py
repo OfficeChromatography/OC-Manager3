@@ -88,9 +88,14 @@ class GcodeGenerator:
         """This command increase the pressure in the system"""
         return self.check_return(f"G97P{pressure}")
 
-    def toggle_valve(self, frequency):
+    def open_valve(self, frequency):
         """This command open and close the valve at a certain frequency"""
         return self.check_return(f"G98F{frequency}")
+
+    def toggle_valve(self):
+        """This command toggles the valve. 
+        open -> close, close -> open"""
+        return self.check_return(f"G40")
 
     def set_pin_state(self, pin, state):
         """For custom hardware not officially supported in Marlin, you can often just connect
@@ -98,8 +103,16 @@ class GcodeGenerator:
         return self.check_return(f"M42P{pin}S{state}")
     
     def wait(self, time):
-        """waits for seconds to pass before proceeding"""
+        """pauses the command queue and waits for a period of time in seconds"""
         return self.check_return(f"G4S{time}")
+    
+    def set_relative(self):
+        """In this mode all coordinates are interpreted as relative to the last position."""
+        return self.check_return(f"G91")
+
+    def set_absolute(self):
+        """In absolute mode all coordinates given in G-code are interpreted as positions in the logical coordinate space."""
+        return self.check_return(f"G90")
 
 
 

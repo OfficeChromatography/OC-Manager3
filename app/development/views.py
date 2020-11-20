@@ -15,6 +15,7 @@ from decimal import *
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
+from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 forms = {
     'Development_Form': Development_Form(),
@@ -201,51 +202,52 @@ def calculateDevelopment(data):
 
 
 def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure, waitTime):
-    gcode=list()
+    generate = GcodeGenerator(True)
 
     # No HEATBED CASE
-    if temperature!=0:
-        gcode=[f'M190 R{temperature}']
+    if temperature != 0:
+        generate.wait_bed_temperature(temperature)
+        generate.hold_bed_temperature(temperature)
     
-    gcode.append('G28XY')
-    glineY = f'G1Y{startPoint[1]}F{speed}'
-    gcode.append(glineY)
+    # Move to the home
+    generate.homming("XY")
+    generate.linear_move_y(startPoint[1],speed)
+    generate.linear_move_x(startPoint[0],speed)
+    generate.finish_moves()
     
-    glineX = f'G1X{startPoint[0]}F{speed}'
-    gcode.append(glineX)
-    gcode.append('M400')
-
-    gcode.append('G91')
+    generate.set_relative()
     jj = 0   
     for x in range(int(applications)*2):
         if (x%2)==0:
             for yy in range(int(precision)):
-                gcode.append(f'G97 P{pressure}')
-                gcode.append('G40')
-                glineX = f'G1X{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
-                gcode.append(glineX)
-                gcode.append('G40')
-            gcode.append(f'G4 S{waitTime}')
+                generate.pressurize(pressure)
+                generate.toggle_valve()
+                generate.linear_move_xz(round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
+                generate.toggle_valve() 
+            generate.wait(waitTime)
             jj += 1
         else:
             if printBothways == 'On':
                 for yy in range(int(precision)):
-                    gcode.append(f'G97 P{pressure}')
-                    gcode.append('G40')
-                    glineX = f'G1X-{round(length/float(precision),3)}Z{round(zMovement/float(applications)/float(precision),3)}F{speed}'
-                    gcode.append(glineX)
-                    gcode.append('G40')
-                gcode.append(f'G4 S{waitTime}')
+                    generate.pressurize(pressure)
+                    generate.toggle_valve()
+                    generate.linear_move_xz(-1*round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
+                    generate.toggle_valve()
+                generate.wait(waitTime)
                 jj += 1
             else:
-                glineX = f'G1X-{length}F{speed}'
-                gcode.append(glineX)
+                generate.linear_move_x(-1*length,speed)
         if jj >= int(applications):
-            break     
-    gcode.append('G90')
-    gcode.append('G28XY')
-    #print(gcode)
-    return gcode
+            break
+    #Stop heating
+    if (temperature !=0):
+        generate.hold_bed_temperature(0)
+    #set to absolute again
+    generate.set_absolute()    
+    #Homming
+    generate.homming("XY")
+    
+    return generate.list_of_gcodes
 
 # class DevelopmentCalc(View):
 #     def post(self, request):

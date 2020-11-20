@@ -267,7 +267,7 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
             generate.linear_move_xy(point[1], point[0], speed)
             generate.finish_moves()
             generate.pressurize(pressure)
-            generate.toggle_valve(frequency)
+            generate.open_valve(frequency)
             generate.finish_moves()
     #Stop heating
     if (temperature !=0):
