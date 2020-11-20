@@ -55,3 +55,7 @@ function sendToMachine(value){
   function setHommingEndpointSucess(data, textStatus, jqXHR){}
   function setHommingEndpointError(jqXHR, textStatus, errorThrown){}
 }
+
+$( document ).ready(function() {
+  sendToMachine("G28XY")
+});
