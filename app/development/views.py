@@ -11,7 +11,7 @@ from printrun import printcore, gcoder
 from types import SimpleNamespace
 import json
 from decimal import *
-#from .flowCalc import FlowCalc
+
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
@@ -24,20 +24,6 @@ forms = {
     'PressureSettings_Form':PressureSettings_Form(),
     'ZeroPosition_Form': ZeroPosition_Form()
     }
-
-# class HommingSetup(View):
-#     def post(self, request):
-#         try:
-#             x = Decimal(request.POST.get('x'))
-#             y = Decimal(request.POST.get('y'))
-#             # Calculate the movement
-#             x_mov = 50-(x/2)
-#             y_mov = 30+((100-y)/2)
-#             gcode = f'G28XY\nG0X{x_mov}Y{y_mov}\nG92X0Y0'
-#             OC_LAB.send(gcode)
-#             return JsonResponse({'message':'ok'})
-#         except ValueError:
-#             return JsonResponse({'error':'Error check values'})
 
 class Development(FormView):
     def get(self, request):
@@ -178,25 +164,12 @@ def data_validations(**kwargs):
     return forms_data
 
 def calculateDevelopment(data):
-    # #flow in uL/s
-    #flow = FlowCalc(pressure=float(data['pressure']), nozzleDiameter=data['nozzlediameter'], fluid=data['fluid'], density=data['density'], viscosity=data['viscosity']).calcFlow()
-    # #syringe movement in mm/s
-    #flow = flow / 58
-    #speed in mm/min * 2
-    #speed = round(flow * 60,3)
-    
-
     data = SimpleNamespace(**data)
-    #print(data)
     
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
     
     zMovement = volumeToZMovement(data.volume)
-    #time in seconds
-    #time = zMovement / speed * 60
-
-    #add error for when time is greater than 3
 
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.precision, data.pressure, data.waitTime)
 
@@ -214,10 +187,11 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     generate.linear_move_y(startPoint[1],speed)
     generate.linear_move_x(startPoint[0],speed)
     generate.finish_moves()
-    
+    #Set relative coordinates
     generate.set_relative()
     jj = 0   
     for x in range(int(applications)*2):
+        #moving to the end of the line
         if (x%2)==0:
             for yy in range(int(precision)):
                 generate.pressurize(pressure)
@@ -226,6 +200,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 generate.toggle_valve() 
             generate.wait(waitTime)
             jj += 1
+        #moving back to the start of the line
         else:
             if printBothways == 'On':
                 for yy in range(int(precision)):
@@ -248,17 +223,3 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     generate.homming("XY")
     
     return generate.list_of_gcodes
-
-# class DevelopmentCalc(View):
-#     def post(self, request):
-#         data = SimpleNamespace(**request.POST)
-#         results = returnFlow(data)
-#         return JsonResponse({'results':results})
-
-# def returnFlow(data):
-#     table = json.loads(data.devBandSettings[0])
-    
-#     flow = FlowCalc(pressure=float(data.pressure[0]), nozzleDiameter=data.nozzlediameter[0], fluid=table['fluid'], density=table['density'], viscosity=table['viscosity']).calcFlow()
-        
-
-#     return flow
