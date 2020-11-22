@@ -82,5 +82,5 @@ class VisibleLed:
     def __init__(self):
         pass
 
-    def set_power(self, red_power, blue_power, green_power):
-        OC_LAB.send_now(f'G93R{red_power}B{blue_power}G{green_power}I0')
+    def set_rgb(self, red_power, blue_power, green_power):
+        OC_LAB.send_now(f'G93R{red_power}B{blue_power}G{green_power}I100')

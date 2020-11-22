@@ -129,7 +129,7 @@ class PhotoShootManager:
     def shoot(self):
         self.nm_255.set_power(self.led_config_form.cleaned_data['uv255_power'])
         self.nm_365.set_power(self.led_config_form.cleaned_data['uv365_power'])
-        self.visible_leds.set_power(
+        self.visible_leds.set_rgb(
             self.led_config_form.cleaned_data['red'],
             self.led_config_form.cleaned_data['green'],
             self.led_config_form.cleaned_data['blue'],
@@ -140,7 +140,7 @@ class PhotoShootManager:
 
         self.nm_255.set_power(0)
         self.nm_365.set_power(0)
-        self.visible_leds.set_power(0, 0, 0)
+        self.visible_leds.set_rgb(0, 0, 0)
 
     def save_photo_in_db(self):
         with open(self.path_photo, 'rb') as f:
