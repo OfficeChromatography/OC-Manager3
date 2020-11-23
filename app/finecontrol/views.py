@@ -111,7 +111,7 @@ class Cleaning(object):
         # zMovement = round(volume * 58 / 1000, 2)
         zMovement = volumeToZMovement(volume)
         speed = round(speed * 60, 2)
-        gcode = ['G28XY','G91','G40', f'G1Z{zMovement}F{speed}', 'G40', 'G90']
+        gcode = ['G28XY','G1X120','G91','G40', f'G1Z{zMovement}F{speed}', 'G40', 'G90']
         print(gcode)
         return gcode
 
