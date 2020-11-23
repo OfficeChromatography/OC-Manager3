@@ -15,28 +15,31 @@ class GcodeGenerator:
         """"A linear move traces a straight line from one point to another, ensuring that the specified axes will arrive
         simultaneously at the given coordinates (by linear interpolation). The speed may change over time following an
         acceleration curve, according to the acceleration and jerk settings of the given axes."""
-        pos_x = str(round(float(pos_x), 3))
-        pos_y = str(round(float(pos_y), 3))
-        pos_z = str(round(float(pos_z), 3))
+        if pos_x != "":
+            pos_x = str(round(float(pos_x), 3))
+        if pos_y != "":
+            pos_y = str(round(float(pos_y), 3))
+        if pos_z != "":
+            pos_z = str(round(float(pos_z), 3))
         return self.check_return(f"G1X{pos_x}Y{pos_y}Z{pos_z}F{speed}")
 
     def linear_move_x(self, pos_x, speed):
-        return self.linear_move_xyz(pos_x, 0, 0, speed)
+        return self.linear_move_xyz(pos_x, "", "", speed)
 
     def linear_move_y(self, pos_y, speed):
-        return self.linear_move_xyz(0, pos_y, 0, speed)
+        return self.linear_move_xyz("", pos_y, "", speed)
 
     def linear_move_z(self, pos_z, speed):
-        return self.linear_move_xyz(0, 0, pos_z, speed)
+        return self.linear_move_xyz("", "", pos_z, speed)
 
     def linear_move_xy(self, pos_x, pos_y, speed):
-        return self.linear_move_xyz(pos_x, pos_y, 0, speed)
+        return self.linear_move_xyz(pos_x, pos_y, "", speed)
 
     def linear_move_xz(self, pos_x, pos_z, speed):
-        return self.linear_move_xyz(pos_x, 0, pos_z, speed)
+        return self.linear_move_xyz(pos_x, "", pos_z, speed)
 
     def linear_move_yz(self, pos_y, pos_z, speed):
-        return self.linear_move_xyz(0, pos_y, pos_z, speed)
+        return self.linear_move_xyz("", pos_y, pos_z, speed)
 
     def wait_bed_temperature(self, temperature):
         """This command optionally sets a new target bed temperature and waits for the target temperature
