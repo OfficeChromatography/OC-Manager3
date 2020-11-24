@@ -250,9 +250,9 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
-    if temperature != 0:
-        generate.wait_bed_temperature(temperature)
-        generate.hold_bed_temperature(temperature)
+    # if temperature != 0:
+    #     generate.wait_bed_temperature(temperature)
+    #     generate.hold_bed_temperature(temperature)
 
     # Move to the home
     generate.homming("XY")
@@ -270,8 +270,8 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
             generate.open_valve(frequency)
             generate.finish_moves()
     #Stop heating
-    if (temperature !=0):
-        generate.hold_bed_temperature(0)
+    # if (temperature !=0):
+    #     generate.hold_bed_temperature(0)
     #Homming
     generate.homming("XY")
     return generate.list_of_gcodes

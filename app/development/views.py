@@ -178,9 +178,9 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
-    if temperature != 0:
-        generate.wait_bed_temperature(temperature)
-        generate.hold_bed_temperature(temperature)
+    # if temperature != 0:
+    #     generate.wait_bed_temperature(temperature)
+    #     generate.hold_bed_temperature(temperature)
     
     # Move to the home
     generate.homming("XY")
@@ -215,8 +215,8 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
         if jj >= int(applications):
             break
     #Stop heating
-    if (temperature !=0):
-        generate.hold_bed_temperature(0)
+    # if (temperature !=0):
+    #     generate.hold_bed_temperature(0)
     #set to absolute again
     generate.set_absolute()    
     #Homming
