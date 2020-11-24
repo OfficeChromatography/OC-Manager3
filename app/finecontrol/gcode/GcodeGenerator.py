@@ -50,6 +50,15 @@ class GcodeGenerator:
         '''This command sets a new bed temperature and proceeds without waiting. The temperature will be held in the background'''
         return self.check_return(f"M140S{temperature}")
 
+    def report_bed_temperature(self, timeIntervall):
+        '''
+        It can be useful for host software to track temperatures, display and graph them over time, but polling with M105 is less than optimal. 
+        With M155 hosts simply set an interval and Marlin will keep sending data automatically. This method is preferred over polling with M105.
+        timeIntervall in seconds
+        '''
+        return self.check_return(f"M155S{timeIntervall}")
+
+
     def homming(self, axis):
         """Auto-home one or more axes, moving them towards their endstops until triggered."""
         return self.check_return(f"G28{axis.upper()}")
