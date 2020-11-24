@@ -341,13 +341,15 @@ class Temperature(View):
 
 class TempControl(View):
     def post(self, request):
-        if request.POST.get('temp'):
-            generate = GcodeGenerator(True)
-            generate.wait_bed_temperature(request.POST.get('temp'))
+        generate = GcodeGenerator(True)
+        active=request.POST.get('active')
+        if (active=='On'):
             generate.hold_bed_temperature(request.POST.get('temp'))
-            generate.wait(round(float(request.POST.get('time'))*60,3))
+            generate.report_bed_temperature(4)
+        elif (active=='Off'): 
             generate.hold_bed_temperature(0)
-            OC_LAB.print_from_list(generate.list_of_gcodes)
+            generate.report_bed_temperature(0)
+        OC_LAB.print_from_list(generate.list_of_gcodes)
         return JsonResponse({'message': 'ok'})
 
     def get(self, request):

@@ -253,6 +253,7 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
     if temperature != 0:
         generate.wait_bed_temperature(temperature)
         generate.hold_bed_temperature(temperature)
+        generate.report_bed_temperature(4)
 
     # Move to the home
     generate.homming("XY")
@@ -272,6 +273,7 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
+        generate.report_bed_temperature(0)
     #Homming
     generate.homming("XY")
     return generate.list_of_gcodes

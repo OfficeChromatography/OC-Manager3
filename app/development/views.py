@@ -181,6 +181,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     if temperature != 0:
         generate.wait_bed_temperature(temperature)
         generate.hold_bed_temperature(temperature)
+        generate.report_bed_temperature(4)
     
     # Move to the home
     generate.homming("XY")
@@ -217,6 +218,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
+        generate.report_bed_temperature(0)
     #set to absolute again
     generate.set_absolute()    
     #Homming
