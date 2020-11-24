@@ -14,20 +14,20 @@ class FlowCalc:
 
         """density [g/cm**3] / kinematic viscosity [cSt] Correction Factor"""
         fluidDensity_empiricCorrectionFactor = {
-            "Water": (1, 10),
-            "Methanol": (0.792, 10),
-            "Acetone": (0.784, 10),
-            'n-Hexane': (0.655, 10),
-            'Pentane': (0.6209, 10),
-            'Cyclohexane': (0.779, 10),
-            'Carbon Tetrachloride': (1.589, 10),
-            'Toluene': (0.867, 10),
-            'Chloroform': (1.49, 10),
-            'Dichloromethane': (1.33, 10),
-            'Diethyl ether': (0.713, 10),
-            'Ethyl acetate': (0.902, 10),
-            'Ethanol': (0.789, 10),
-            'Pyridine': (0.982, 10)
+            "Water": (1, 5),
+            "Methanol": (0.792, 5),
+            "Acetone": (0.784, 5),
+            'n-Hexane': (0.655, 5),
+            'Pentane': (0.6209, 5),
+            'Cyclohexane': (0.779, 5),
+            'Carbon Tetrachloride': (1.589, 5),
+            'Toluene': (0.867, 5),
+            'Chloroform': (1.49, 5),
+            'Dichloromethane': (1.33, 5),
+            'Diethyl ether': (0.713, 5),
+            'Ethyl acetate': (0.902, 5),
+            'Ethanol': (0.789, 5),
+            'Pyridine': (0.982, 5)
         }
         if (fluid!='Specific'):
             [density, empiricCorrectionFactor] = fluidDensity_empiricCorrectionFactor[fluid]
