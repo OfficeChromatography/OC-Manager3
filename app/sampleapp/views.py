@@ -210,20 +210,15 @@ def calculate(data):
         length = data.value
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
 
+    volEstimate = returnDropEstimateVol(data)
     applicationsurface = []
+    times = []
     for i in range(0,n_bands):
-        if data.table[i]['volume (ul)'] == "null" or data.table[i]['volume (ul)'] == "":
-            deltaX = float(data.delta_x)
-            deltaY = float(data.delta_y)
-        else:
-            [deltaX, realVolume] = minimizeDeltaX(float(length), float(data.height), float(data.table[i]['volume (ul)']), i, data)
-            if deltaX < 0.0002:
-                deltaX = 0.0002
-            deltaY = deltaX
-
-
-        print("deltaX: "+str(deltaX))
-
+        
+        deltaX = float(data.delta_x)
+        deltaY = float(data.delta_y)
+       
+        
         zeros=(i*(length+data.gap))+data.offset_left
         current_height = 0.
         while current_height <= data.height:
@@ -234,12 +229,14 @@ def calculate(data):
                 current_length+=deltaX
             applicationsurface.append(applicationline)
             current_height+=deltaY
+        
+        times.append(volEstimate[i][2])
 
     # Creates the Gcode for the application and return it
-    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
+    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y],times)
 
 
-def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition):
+def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition, times):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -256,13 +253,14 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
 
     # Application
     generate.pressurize(pressure)
-    for list_of_points in list_of_lines:
-        for point in list_of_points:
-            generate.linear_move_xy(point[1], point[0], speed)
-            generate.finish_moves()
-            generate.pressurize(pressure)
-            generate.open_valve(frequency)
-            generate.finish_moves()
+    for index, list_of_points in enumerate(list_of_lines):
+        for time in range(times[index]):
+            for point in list_of_points:
+                generate.linear_move_xy(point[1], point[0], speed)
+                generate.finish_moves()
+                generate.pressurize(pressure)
+                generate.open_valve(frequency)
+                generate.finish_moves()
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
