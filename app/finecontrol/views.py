@@ -19,6 +19,28 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'pressure':20}
 form ={}
 
+
+class OcLabControl(View):
+    def post(self,request):
+        if 'PAUSE' in request.POST:
+            OC_LAB.pause()
+            return JsonResponse({'message':'OcLab Paused!'})
+        if 'STOP' in request.POST:
+            OC_LAB.cancelprint()
+            return JsonResponse({'message':'OcLab Stopped!'})
+        if 'RESUME' in request.POST:
+            OC_LAB.resume()
+            return JsonResponse({'message':'OcLab Resumed!'})
+        if 'SEND' in request.POST:
+            OC_LAB.send(request.POST['message'])
+            return JsonResponse({'message':f'OcLab {request.POST["message"]} send !'})
+        if 'SEND_NOW' in request.POST:
+            OC_LAB.send_now(request.POST['message'])
+            return JsonResponse({'message':f'OcLab {request.POST["message"]} fast send !'})
+        if 'RESET' in request.POST:
+            OC_LAB.reset()
+            return JsonResponse({'message':f'OcLab {request.POST["message"]} reset !'})
+
 class SyringeLoad(View):
     # def post:
     def get(self, request):

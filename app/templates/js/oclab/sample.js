@@ -535,8 +535,7 @@ function getAsText(readFile) {
 function loadlistofsampleapps(){
   $.ajax({
     method: 'GET',
-    url:    window.location.origin+'/sample/',
-    data:   '&LISTLOAD',
+    url:    window.location.origin+'/sample/list',
     success: loadlistMethodSuccess,
     error: loadlistMethodError,
   })
@@ -555,11 +554,11 @@ function loadlistofsampleapps(){
         })
     $('.list-group-item').on('click', function (e) {
             e.preventDefault()
-            data={'filename':$(this).attr('value_saved')}
+//            data={'filename':$(this).attr('value_saved')}
             console.log(data);
             $.ajax({
               method: 'GET',
-              url:    window.location.origin+'/samplesave/',
+              url:    window.location.origin+'sample/load/'+$(this).attr('value_saved'),
               data:   data,
               success: loadMethodSuccess,
               error: loadMethodError,
@@ -574,7 +573,7 @@ $('#stopbttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'STOP&'
-  $endpoint = window.location.origin+'/sampleapp/'
+  $endpoint = window.location.origin+'oclab/control/',
   $.ajax({
   method: 'POST',
   url:    $endpoint,
@@ -587,7 +586,7 @@ $('#pausebttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'PAUSE&'
-  $endpoint = window.location.origin+'/sampleapp/'
+  $endpoint = window.location.origin+'oclab/control/',
   $.ajax({
   method: 'POST',
   url:    $endpoint,
@@ -612,7 +611,7 @@ $('#startbttn').on('click', function (e) {
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
   $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getTableValues(true)
-  $endpoint = window.location.origin+'/samplesave/'
+  $endpoint = window.location.origin+'/sample/save/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,

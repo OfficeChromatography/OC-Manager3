@@ -29,52 +29,43 @@ forms = {
     'ZeroPosition_Form': ZeroPosition_Form()
     }
 
-class Sample(FormView):
+
+class SampleList(FormView):
     def get(self, request):
-        # Load the list with all the saved data
-        if 'LISTLOAD' in request.GET:
-            sample_application = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
-            data_saved = [[i.file_name,i.id] for i in sample_application]
-            return JsonResponse(data_saved, safe=False)
-        else:
-            forms['list_load'] = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
-            return render(request,'sample.html',forms)
+        """Returns a list with all the SampleApplications save in DB"""
+        sample_application = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
+        data_saved = [[i.file_name,i.id] for i in sample_application]
+        return JsonResponse(data_saved, safe=False)
 
+class SampleView(FormView):
+    def get(self, request):
+        forms['list_load'] = SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
+        return render(request,'sample.html',forms)
 
-class SampleAppPlay(View):
-    def post(self, request):
-        # Play button
-        if 'START' in request.POST:
-            if OC_LAB.paused == True:
-                OC_LAB.resume()
-            else:
-                # Run the form validations and return the clean data
-                forms_data = data_validations(  plate_properties_form    =   PlateProperties_Form(request.POST),
-                                                band_settings_form       =   BandSettings_Form(request.POST),
-                                                movement_settings_form   =   MovementSettings_Form(request.POST),
-                                                pressure_settings_form   =   PressureSettings_Form(request.POST),
-                                                zero_position_form       =   ZeroPosition_Form(request.POST))
+class SampleDetails(View):
+    def get(self, request, id):
+        id_object=id;
+        sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
+        plate_properties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sample_application_conf['plate_properties']))
+        band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
+        movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
+        pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
+        zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
+        bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
 
+        bands=dict()
+        for i, band in enumerate(bands_components):
+            bands[i]=model_to_dict(band)
+        bands = {'bands':bands}
+        sample_application_conf.update(bands)
+        sample_application_conf.update(plate_properties_conf)
+        sample_application_conf.update(band_settings_conf)
+        sample_application_conf.update(movement_settings_conf)
+        sample_application_conf.update(pressure_settings_conf)
+        sample_application_conf.update(zero_position_conf)
+        # print(sample_application_conf)
+        return JsonResponse(sample_application_conf)
 
-                # Add table data
-                forms_data.update({'table':json.loads(request.POST.get('table'))})
-
-                # With the data, gcode is generated
-                gcode = calculate(forms_data)
-
-                # Printrun
-                OC_LAB.print_from_list(gcode)
-                return JsonResponse({'error':'f.errors'})
-
-        if 'STOP' in request.POST:
-            OC_LAB.cancelprint()
-            return JsonResponse({'message':'stopped'})
-
-        if 'PAUSE' in request.POST:
-            OC_LAB.pause()
-            return JsonResponse({'message':'paused'})
-
-class SampleAppSaveAndLoad(View):
     def post(self, request):
         # Check the data receive and save it
         sample_application_form  =   SampleApplication_Form(request.POST, request.user)
@@ -110,7 +101,7 @@ class SampleAppSaveAndLoad(View):
                     bands_components_form = BandsComponents_Form(i)
 
                     if bands_components_form.is_valid():
-                        bands_components_instance=bands_components_form.save(commit=False)
+                        bands_components_instance = bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = in_db[0]
                         bands_components_instance.save()
                     else:
@@ -141,34 +132,36 @@ class SampleAppSaveAndLoad(View):
                         bands_components_instance.save()
                     else:
                         JsonResponse({'error':bands_components_form.errors})
-          
-                return JsonResponse({'message':f'The File {filename} was saved!'})
 
+                return JsonResponse({'message':f'The File {filename} was saved!'})
         else:
             return JsonResponse({'error':'Please fill in the filename!'})
 
-    def get(self, request):
-        id_object=request.GET.get('filename')
-        sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
-        plate_properties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sample_application_conf['plate_properties']))
-        band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
-        movement_settings_conf=model_to_dict(MovementSettings_Db.objects.get(id=sample_application_conf['movement_settings']))
-        pressure_settings_conf=model_to_dict(PressureSettings_Db.objects.get(id=sample_application_conf['pressure_settings']))
-        zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
-        bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
+class SampleAppPlay(View):
+    def post(self, request):
+        # Play button
+        if 'START' in request.POST:
+            if OC_LAB.paused == True:
+                OC_LAB.resume()
+            else:
+                # Run the form validations and return the clean data
+                forms_data = data_validations(  plate_properties_form    =   PlateProperties_Form(request.POST),
+                                                band_settings_form       =   BandSettings_Form(request.POST),
+                                                movement_settings_form   =   MovementSettings_Form(request.POST),
+                                                pressure_settings_form   =   PressureSettings_Form(request.POST),
+                                                zero_position_form       =   ZeroPosition_Form(request.POST))
 
-        bands=dict()
-        for i, band in enumerate(bands_components):
-            bands[i]=model_to_dict(band)
-        bands = {'bands':bands}
-        sample_application_conf.update(bands)
-        sample_application_conf.update(plate_properties_conf)
-        sample_application_conf.update(band_settings_conf)
-        sample_application_conf.update(movement_settings_conf)
-        sample_application_conf.update(pressure_settings_conf)
-        sample_application_conf.update(zero_position_conf)
-        # print(sample_application_conf)
-        return JsonResponse(sample_application_conf)
+
+                # Add table data
+                forms_data.update({'table':json.loads(request.POST.get('table'))})
+
+                # With the data, gcode is generated
+                gcode = calculate(forms_data)
+
+                # Printrun
+                OC_LAB.print_from_list(gcode)
+                return JsonResponse({'error':'f.errors'})
+
 
 class CalcVol(View):
     def post(self, request):
@@ -203,7 +196,7 @@ def data_validations_and_save(**kwargs):
     return objects_saved
 
 def calculate(data):
-    
+
     data = SimpleNamespace(**data)
 
     working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
