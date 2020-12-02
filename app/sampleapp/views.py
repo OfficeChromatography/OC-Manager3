@@ -63,7 +63,7 @@ class SampleDetails(View):
         sample_application_conf.update(movement_settings_conf)
         sample_application_conf.update(pressure_settings_conf)
         sample_application_conf.update(zero_position_conf)
-        # print(sample_application_conf)
+        print(f'Property id:{id_object} of sample app loaded!')
         return JsonResponse(sample_application_conf)
 
     def post(self, request):
@@ -79,7 +79,6 @@ class SampleDetails(View):
         )
 
         table_data = json.loads(request.POST.get('table'))
-        print(table_data)
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
             filename = sample_application_form.cleaned_data['file_name']
@@ -166,7 +165,6 @@ class SampleAppPlay(View):
 class CalcVol(View):
     def post(self, request):
         data = SimpleNamespace(**request.POST)
-        print(data)
         results = returnDropEstimateVol(data)
 
         return JsonResponse({'results':results})
