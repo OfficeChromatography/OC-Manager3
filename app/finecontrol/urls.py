@@ -9,5 +9,7 @@ urlpatterns = [
     # path('setuphomming/', HommingSetup.as_view(), name='homming'),
     path('syringeload/', SyringeLoad.as_view(), name='syringeload'),
     path('temperature/', Temperature.as_view(), name='temperature'),
-    path('tempControl/', TempControl.as_view(), name='tempcontrol')
+    path('tempControl/', TempControl.as_view(), name='tempcontrol'),
+
+    path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
 ]
