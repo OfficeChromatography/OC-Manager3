@@ -4,43 +4,6 @@ import numpy as np
 from scipy.optimize import minimize
 from finecontrol.calculations.flowCalc import FlowCalc
 
-# def calculateDeltaX(length,height,maxPoints):
-#     '''calculates the distance of the points if deltaX == deltaY'''
-
-#     #deltaX = [0,0]
-#     deltaX = - ((length+height)/(2*(1-maxPoints))) + math.sqrt(((length+height)/(2*(1-maxPoints)))**2-((length*height)/(1-maxPoints)))
-#     #deltaX[1] = - ((length+height)/(2*(1-maxPoints))) - math.sqrt(((length+height)/(2*(1-maxPoints)))**2-((length*height)/(1-maxPoints)))
-
-#     return deltaX
-
-# def optimizeMaxPoints(length, height, maxPoints):
-#     '''calculates the error function, so it can
-#     be minimized to get the best number of points'''
-
-#     deltaX = calculateDeltaX(length,height,maxPoints)
-#     pointsX = np.round(length / deltaX)
-#     pointsY = np.round(height / deltaX)
-
-#     error = (pointsX * deltaX - length)**2 + (pointsY * deltaX - height)**2
-
-#     return error
-
-# def minimizeDeltaX(length, height, volume, bandNum, data):
-#     '''calculates deltaX according to the set volume'''
-#     #print(data)
-#     dropVolume = FlowCalc(pressure=float(data.pressure), nozzleDiameter=data.nozzlediameter, timeOrFrequency = float(data.frequency), fluid=data.table[bandNum]['type'], density=data.table[bandNum]['density'], viscosity=data.table[bandNum]['viscosity']).calcVolumeFrequency()
-#     print("dropVolume: "+str(dropVolume))
-#     #dropVolume = 0.025
-
-#     optimizeTest = lambda maxPoints: optimizeMaxPoints(length, height, maxPoints)
-#     x0 = volume / dropVolume
-#     res = minimize(optimizeTest,x0)
-#     points = np.round(res.x)
-#     deltaX = calculateDeltaX(length,height,points)
-#     realVolume = points * dropVolume
-
-#     return [deltaX[0], realVolume]
-
 def returnDropEstimateVol(data):
     working_area = [float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     ,float(data.size_y)-float(data.offset_top)-float(data.offset_bottom)]
