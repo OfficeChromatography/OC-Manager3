@@ -165,10 +165,14 @@ class SampleAppPlay(View):
 
 class CalcVol(View):
     def post(self, request):
-        data = SimpleNamespace(**request.POST)
-        print(data)
+        forms_data = data_validations(  plate_properties_form    =   PlateProperties_Form(request.POST),
+                                        band_settings_form       =   BandSettings_Form(request.POST),
+                                        movement_settings_form   =   MovementSettings_Form(request.POST),
+                                        pressure_settings_form   =   PressureSettings_Form(request.POST),
+                                        zero_position_form       =   ZeroPosition_Form(request.POST))
+        forms_data.update({'table':json.loads(request.POST.get('table'))})
+        data = SimpleNamespace(**forms_data)
         results = returnDropEstimateVol(data)
-
         return JsonResponse({'results':results})
 
 # AUX Functions
@@ -212,31 +216,38 @@ def calculate(data):
 
     volEstimate = returnDropEstimateVol(data)
     applicationsurface = []
-    times = []
+    
+    deltaX = float(data.delta_x)
+    deltaY = float(data.delta_y)
     for i in range(0,n_bands):
-        
-        deltaX = float(data.delta_x)
-        deltaY = float(data.delta_y)
-       
-        
         zeros=(i*(length+data.gap))+data.offset_left
-        current_height = 0.
-        while current_height <= data.height:
-            applicationline=[]
-            current_length=0.
-            while current_length<=length:
-                applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
-                current_length+=deltaX
-            applicationsurface.append(applicationline)
-            current_height+=deltaY
-        
-        times.append(volEstimate[i][2])
+        for j in range(volEstimate[i][2]):
+            if j % 2:
+                current_height = deltaY/2
+                while current_height <= data.height:
+                    applicationline=[]
+                    current_length=deltaX/2
+                    while current_length<=length:
+                        applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
+                        current_length+=deltaX
+                    applicationsurface.append(applicationline)
+                    current_height+=deltaY
+            else:
+                current_height = 0.
+                while current_height <= data.height:
+                    applicationline=[]
+                    current_length=0.
+                    while current_length<=length:
+                        applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
+                        current_length+=deltaX
+                    applicationsurface.append(applicationline)
+                    current_height+=deltaY
 
     # Creates the Gcode for the application and return it
-    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y],times)
+    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
 
 
-def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition, times):
+def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -254,13 +265,12 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
     # Application
     generate.pressurize(pressure)
     for index, list_of_points in enumerate(list_of_lines):
-        for time in range(times[index]):
-            for point in list_of_points:
-                generate.linear_move_xy(point[1], point[0], speed)
-                generate.finish_moves()
-                generate.pressurize(pressure)
-                generate.open_valve(frequency)
-                generate.finish_moves()
+        for point in list_of_points:
+            generate.linear_move_xy(point[1], point[0], speed)
+            generate.finish_moves()
+            generate.pressurize(pressure)
+            generate.open_valve(frequency)
+            generate.finish_moves()
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
