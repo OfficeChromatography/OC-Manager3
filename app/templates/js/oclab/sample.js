@@ -555,10 +555,10 @@ function loadlistofsampleapps(){
     $('.list-group-item').on('click', function (e) {
             e.preventDefault()
 //            data={'filename':$(this).attr('value_saved')}
-            console.log(data);
+            url = window.location.origin+'/sample/load/'+$(this).attr('value_saved')
             $.ajax({
               method: 'GET',
-              url:    window.location.origin+'sample/load/'+$(this).attr('value_saved'),
+              url:    url,
               data:   data,
               success: loadMethodSuccess,
               error: loadMethodError,
