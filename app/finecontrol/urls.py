@@ -10,6 +10,6 @@ urlpatterns = [
     path('syringeload/', SyringeLoad.as_view(), name='syringeload'),
     path('temperature/', Temperature.as_view(), name='temperature'),
     path('tempControl/', TempControl.as_view(), name='tempcontrol'),
-
+    path('fan/', Fan.as_view(), name='fan'),
     path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
 ]

@@ -377,3 +377,11 @@ class TempControl(View):
     def get(self, request):
         return JsonResponse({'message': 'ok'})
 
+class Fan(View):
+    # Manage the GET request
+    def get(self, request):
+        return render(
+            request,
+            "./fancontrol.html",
+            form)
+
