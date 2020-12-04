@@ -2,7 +2,9 @@ def volumeToZMovement(volume):
     '''
     volume in ml -> zMovement in (mm)
     '''
-    return round(30*float(volume)/2000,2)
+    return round(40*float(volume)/3000,2)
 
 def zMovementToVolume(zMovement):
-    return round(float(zMovement)*2000/30,2)
+    return round(float(zMovement)*3000/40,2)
+
+'''40 mm = 3ml
