@@ -85,9 +85,9 @@ class BandSettings_Form(forms.ModelForm):
 class MovementSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['motor_speed'] = 3000
-        initial['delta_x'] = 0.5
-        initial['delta_y'] = 0.5
+        initial['motor_speed'] = 1000
+        initial['delta_x'] = 1
+        initial['delta_y'] = 1
         kwargs['initial'] = initial
         super(MovementSettings_Form, self).__init__(*args, **kwargs)
     class Meta:
