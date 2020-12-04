@@ -112,7 +112,7 @@ class MovementSettings_Form(forms.ModelForm):
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
-        initial['pressure'] = 21
+        initial['pressure'] = 25
         initial['frequency'] = 1400
         initial['temperature'] = 0
         kwargs['initial'] = initial
