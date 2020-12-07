@@ -573,7 +573,7 @@ $('#stopbttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'STOP&'
-  $endpoint = window.location.origin+'oclab/control/',
+  $endpoint = window.location.origin+'/oclab/control/',
   $.ajax({
   method: 'POST',
   url:    $endpoint,
@@ -586,7 +586,7 @@ $('#pausebttn').on('click', function (e) {
   event.preventDefault()
   //
   $formData = 'PAUSE&'
-  $endpoint = window.location.origin+'oclab/control/',
+  $endpoint = window.location.origin+'/oclab/control/',
   $.ajax({
   method: 'POST',
   url:    $endpoint,
