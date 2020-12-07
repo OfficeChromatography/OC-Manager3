@@ -126,6 +126,9 @@ class GcodeGenerator:
         """In absolute mode all coordinates given in G-code are interpreted as positions in the logical coordinate space."""
         return self.check_return(f"G90")
 
+    def check_pressure(self):
+        return self.check_return(f"G95P")
+
 
 
 

@@ -131,11 +131,21 @@ class Cleaning(object):
     def static_cleaning(self, volume, speed):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
+        generate = GcodeGenerator(True)
         zMovement = volumeToZMovement(volume)
+        zIncrement = int(round(zMovement,1)/0.05)
         speed = round(speed * 60, 2)
-        gcode = ['G28XY','G91','G40', f'G1Z{zMovement}F{speed}', 'G40', 'G90']
-        print(gcode)
-        return gcode
+        generate.homming("XY")
+        generate.set_relative()
+        generate.toggle_valve()
+        for i in range(zIncrement):
+            generate.check_pressure()   
+            generate.linear_move_z(0.05,speed)     
+        generate.toggle_valve()
+        generate.set_absolute()
+
+        print(generate.list_of_gcodes)
+        return generate.list_of_gcodes
 
 
 clean = Cleaning()
