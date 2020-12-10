@@ -133,14 +133,15 @@ class Cleaning(object):
         # zMovement = round(volume * 58 / 1000, 2)
         generate = GcodeGenerator(True)
         zMovement = volumeToZMovement(volume)
-        zIncrement = int(round(zMovement,1)/0.2)
+        #zIncrement = int(round(zMovement,1)/0.2)
         speed = round(speed * 60, 2)
         generate.homming("XY")
         generate.set_relative()
         generate.toggle_valve()
-        for i in range(zIncrement):
-            generate.check_pressure()   
-            generate.linear_move_z(0.2,speed)     
+        # for i in range(zIncrement):
+        #     generate.check_pressure()   
+        #     generate.linear_move_z(0.2,speed)
+        generate.linear_move_z(zMovement, speed)     
         generate.toggle_valve()
         generate.set_absolute()
 

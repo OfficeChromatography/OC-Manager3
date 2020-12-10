@@ -131,6 +131,7 @@ class PressureSettings_Form(forms.ModelForm):
                 ('0.10','0.10'),
                 ('0.08','0.08'),
                 ('0.05','0.05'),
+                ('atomizer','atomizer'),
             ]),
         }
         def clean_temperature(self):

@@ -52,6 +52,8 @@ class FlowCalc:
             self.nozzleLohms = 125000.
         elif nozzleDiameter=='0.05':
             self.nozzleLohms = 280000.
+        elif nozzleDiameter=='atomizer':
+            self.nozzleLohms = 22000
 
     def calcFlow(self):
         '''
