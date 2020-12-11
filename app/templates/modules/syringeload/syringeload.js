@@ -1,5 +1,5 @@
 $('#loadrange').on('change',function(){
-  zMovement = 40*$(this).val()/1000
+  zMovement = 40-40*$(this).val()/1000
   value = 'G1Z'+zMovement
   data={'gcode':value}
   console.log(data);
