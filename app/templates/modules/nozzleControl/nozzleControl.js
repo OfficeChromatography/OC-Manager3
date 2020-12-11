@@ -42,20 +42,6 @@ function movement(direction){
   return value;
 }
 
-function sendToMachine(value){
-  data={'gcode':value}
-  console.log(data);
-  $.ajax({
-    method: 'POST',
-    url:    window.location.origin+'/send/',
-    data:   data,
-    success: setHommingEndpointSucess,
-    error: setHommingEndpointError,
-  })
-  function setHommingEndpointSucess(data, textStatus, jqXHR){}
-  function setHommingEndpointError(jqXHR, textStatus, errorThrown){}
-}
-
 $( document ).ready(function() {
   sendToMachine("G28XY")
 });
