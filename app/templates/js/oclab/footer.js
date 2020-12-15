@@ -1,23 +1,8 @@
 $(document).ready(function(){
-  checkconnection();
+    checkConnection();
 })
 
-// function checkconnection(){
-//   $.get( window.location.origin + '/isconnected/', function( data ) {
-//     foot = document.getElementById("footer")
-//     footText = document.getElementById("footerText")
-//     if (data.port!=null){
-//       foot.classList.replace(foot.classList[1],'bg-success')
-//       footText.innerHTML="OC-Lab Connected to "+ data.port
-//     } else{
-//       foot.classList.replace(foot.classList[1],'bg-warning')
-//       footText.innerHTML="OC-Lab Disconnected"
-//     }
-//   });
-// }
-
-function checkconnection(){
-  $.get( window.location.origin + '/isconnected/', function( data ) {
+function footerState(data){
     foot = $('#footer')
     footText = $('#footerText')
     if (data.connected==true){
@@ -27,5 +12,23 @@ function checkconnection(){
       foot.removeClass("bg-success").addClass("bg-warning");
       footText.html("OC-Lab Disconnected")
     }
-  });
 }
+
+function checkConnection(){
+//This promise will resolve when the network call succeeds
+var networkPromise = fetch(window.location.origin + '/isconnected/')
+                    .then(response=>response.json())
+                    .then(data=>footerState(data));
+
+//This promise will resolve when 2 seconds have passed
+var timeOutPromise = new Promise(function(resolve, reject) {
+  // 4 Second delay
+  setTimeout(resolve, 4000, 'Timeout Done');
+});
+
+Promise.all(
+[networkPromise, timeOutPromise]).then(function(values) {
+  checkConnection();
+});
+}
+
