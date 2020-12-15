@@ -12,34 +12,33 @@ class FlowCalc:
             used in development as time [s]
         '''
 
-        """density [g/cm**3] / kinematic viscosity [cSt] Correction Factor"""
-        fluidDensity_empiricCorrectionFactor = {
-            "Water": (1, 5),
-            "Methanol": (0.792, 5),
-            "Acetone": (0.784, 5),
-            'n-Hexane': (0.655, 5),
-            'Pentane': (0.6209, 5),
-            'Cyclohexane': (0.779, 5),
-            'Carbon Tetrachloride': (1.589, 5),
-            'Toluene': (0.867, 5),
-            'Chloroform': (1.49, 5),
-            'Dichloromethane': (1.33, 5),
-            'Diethyl ether': (0.713, 5),
-            'Ethyl acetate': (0.902, 5),
-            'Ethanol': (0.789, 5),
-            'Pyridine': (0.982, 5)
+        """density [g/cm**3]"""
+        densityTable = {
+            "Water": 1,
+            "Methanol": 0.792,
+            "Acetone": 0.784,
+            'n-Hexane': 0.655,
+            'Pentane': 0.6209,
+            'Cyclohexane': 0.779,
+            'Carbon Tetrachloride': 1.589,
+            'Toluene': 0.867,
+            'Chloroform': 1.49,
+            'Dichloromethane': 1.33,
+            'Diethyl ether': 0.713,
+            'Ethyl acetate': 0.902,
+            'Ethanol': 0.789,
+            'Pyridine': 0.982,
         }
         if (fluid!='Specific'):
-            [density, empiricCorrectionFactor] = fluidDensity_empiricCorrectionFactor[fluid]
+            fluidDensity= densityTable[fluid]
         else:
-            density = float(density)
+            fluidDensity = float(density)
             viscosity = float(viscosity)
-            empiricCorrectionFactor = fluidDensity_empiricCorrectionFactor["Water"][1] / viscosity
+            
 
         self.pressure = pressure
         self.timeOrFrequency = timeOrFrequency
-        self.density = density
-        self.empiricCorrectionFactor = empiricCorrectionFactor
+        self.density = fluidDensity
         if nozzleDiameter=='0.25':
             self.nozzleLohms=7500.
         elif nozzleDiameter=='0.19':
@@ -60,10 +59,12 @@ class FlowCalc:
         flowRateI [ul/s]
         '''
         unitConversionKonstantK = 75700.
-        lohms= self.nozzleLohms + 4750 + 2600
+        lohms= math.sqrt(self.nozzleLohms**2 + 4750**2 + 2600**2)
 
+        #empiricly determined correctionfactor
+        correctionFactor = 5
         #flowrate in ul per s
-        flowRateI = self.empiricCorrectionFactor * unitConversionKonstantK / lohms * math.sqrt( self.pressure / self.density ) / 60. * 1000
+        flowRateI = correctionFactor * unitConversionKonstantK / lohms * math.sqrt( self.pressure / self.density ) / 60. * 1000
         return flowRateI
 
     def calcVolumeFrequency(self):

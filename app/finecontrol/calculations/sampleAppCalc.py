@@ -52,6 +52,6 @@ def returnDropEstimateVol(data):
                 realVolume -= vol2
         
    
-        results.append([dropVolume, realVolume, times])
+        results.append([dropVolume, realVolume, times, vol])
 
     return results
