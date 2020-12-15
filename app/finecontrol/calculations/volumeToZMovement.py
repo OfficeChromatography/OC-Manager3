@@ -11,7 +11,11 @@ def volumeToZMovement(volume, ul):
         return round(40*float(volume)/3,2)
     
 
-def zMovementToVolume(zMovement):
-    return round(float(zMovement)*3000/40,2)
+def zMovementToVolume(zMovement, ul):
+
+    if ul:
+        return round(float(zMovement)*3000/40,2)
+    else:
+        return round(float(zMovement)*3/40,2)
 
 '''40 mm = 3ml'''
