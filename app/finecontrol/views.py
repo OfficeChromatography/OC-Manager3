@@ -69,7 +69,11 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            mm_movement = round(-27/2*float(request.POST['MOVEMOTOR'])+60-6, 2);
+            
+            zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']),False)
+            print(zMov)
+            mm_movement = round(40-zMov, 2)
+            print(mm_movement)
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
 
@@ -132,7 +136,7 @@ class Cleaning(object):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
         generate = GcodeGenerator(True)
-        zMovement = volumeToZMovement(volume)
+        zMovement = volumeToZMovement(volume,True)
         #zIncrement = int(round(zMovement,1)/0.2)
         speed = round(speed * 60, 2)
         generate.homming("XY")
