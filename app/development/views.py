@@ -169,7 +169,7 @@ def calculateDevelopment(data):
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
     
-    zMovement = volumeToZMovement(data.volume)
+    zMovement = volumeToZMovement(data.volume,True)
 
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.precision, data.pressure, data.waitTime)
 

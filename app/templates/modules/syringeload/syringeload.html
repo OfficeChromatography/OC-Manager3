@@ -11,16 +11,41 @@
             <div class="modal-body">
 
                 <div class="container">
-                   
-                    <div class="d-flex justify-content-between py-2">
-                        <p class="text-center  m-0">0</p>
-                        <input class="custom-range mx-2" name="loadrange" value='0' type="range" min="0" max="1000" step="1" id='loadrange'/>
-                        <p class="text-center  m-0">max</p>
-                      </div>
+                    <div class="row">
+                        <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Volumes</h6>
+                    </div>
+                    <div class="row">
+                        <br>
+                        <div class="col">
+                            <div class="list-group w-100 p-3" id="list_syringe_vol" role="tablist" style="max-height:300px; overflow-y:scroll;"></div>
+                        </div>
+                        <div class="col">
+                            <form id="formSyringeLoad">
+                                <div class="input-group">
+                                    <input type="number" name="syringe_volume" value="1" class="form-control" step="0.1" required="" id="syringe_volume">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">[ml]</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-secondary" id='save_syringe_volume' type="button">Save</button>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary" id='delete_syringe_volume' type="button">Delete</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
             </div>
-            
+            <div class="modal-footer">
+                <button class="btn btn-primary" id='moveSyringeMotor' type="button" data-dismiss="modal">Move</button>
+            </div>
+
         </div>
     </div>
 </div>

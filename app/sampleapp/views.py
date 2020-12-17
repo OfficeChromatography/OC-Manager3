@@ -256,16 +256,15 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
         generate.report_bed_temperature(4)
 
     # Move to the home
-    generate.homming("XY")
-    generate.linear_move_xy(zeroPosition[0], zeroPosition[1], speed)
-    generate.set_position_xy(0, 0)
-    generate.finish_moves()
+    generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
 
     # Application
     generate.pressurize(pressure)
     list_of_lines=list_of_lines[::-1]
     for index, list_of_points in enumerate(list_of_lines):
         list_of_points = list_of_points[::-1]
+        generate.rinsing()
+        generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
         for point in list_of_points:
             generate.linear_move_xy(point[1], point[0], speed)
             generate.finish_moves()
