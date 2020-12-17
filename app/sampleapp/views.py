@@ -263,7 +263,9 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
 
     # Application
     generate.pressurize(pressure)
+    list_of_lines=list_of_lines[::-1]
     for index, list_of_points in enumerate(list_of_lines):
+        list_of_points = list_of_points[::-1]
         for point in list_of_points:
             generate.linear_move_xy(point[1], point[0], speed)
             generate.finish_moves()
