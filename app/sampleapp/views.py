@@ -266,6 +266,7 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
     for band in list_of_bands:
         generate.rinsing()
         generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
+        jj = 0
         for index, list_of_points in enumerate(band):
             list_of_points = list_of_points[::-1]
             for point in list_of_points:
@@ -274,6 +275,11 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
                 generate.pressurize(pressure)
                 generate.open_valve(frequency)
                 generate.finish_moves()
+                jj += 1
+                if jj > 50:
+                    generate.rinsing()
+                    generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
+                    jj = 0
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
