@@ -262,10 +262,12 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
 
     # Application
     # generate.pressurize(pressure)
+    list_of_bands = list_of_bands[::-1]
     for band in list_of_bands:
         generate.rinsing()
         generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
         for index, list_of_points in enumerate(band):
+            list_of_points = list_of_points[::-1]
             for point in list_of_points:
                 generate.linear_move_xy(point[1], point[0], speed)
                 generate.finish_moves()
