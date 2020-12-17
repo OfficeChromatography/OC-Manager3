@@ -129,7 +129,16 @@ class GcodeGenerator:
     def check_pressure(self):
         return self.check_return(f"G95P")
 
+    def rinsing(self):
+        self.homming("XY")
+        for i in range(0,3):
+            self.pressurize("60")
+            self.open_valve("100")
 
-
+    def set_new_zero_position(self, x, y,speed):
+        self.homming("XY")
+        self.linear_move_xy(x, y, speed)
+        self.set_position_xy(0, 0)
+        self.finish_moves()
 
 
