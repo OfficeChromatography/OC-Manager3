@@ -1,23 +1,17 @@
-from __future__ import division
-import matplotlib.pyplot as plt
+
 import numpy as np
 from scipy import interpolate
 
-
-
-# x = np.array([0,25,50,75,100])
-# y = np.array([1,1.5,1.5,1,1])
-
-# tck,u     = interpolate.splprep( [x,y] ,s = 0 )
-# xnew,ynew = interpolate.splev( np.linspace( 0, 1, 10 ), tck,der = 0)
 def speedSpline(x, y, steps):
     '''
-    x: Position in x
+    x: start and endposition in x
     y: Speed Coefficients consistent with x
     steps: will influence precision of the spline interpolation, high -> high precision
     '''
+    x = np.array(np.linspace(x[0],x[1], len(y)))
+    y = np.array(y)
     tck = interpolate.splprep( [x,y] ,s = 0 )
-    xnew,ynew = interpolate.splev( np.linspace( 0, 1, steps), tck,der = 0)
+    xnew,ynew = interpolate.splev( np.linspace( 0, 1, steps), tck[0],der = 0)
     return xnew,ynew
 
 def speedWeighting(speedList):

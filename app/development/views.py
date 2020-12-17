@@ -16,6 +16,7 @@ from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
+from finecontrol.calculations.DevCalc import speedWeighting,speedSpline
 
 forms = {
     'Development_Form': Development_Form(),
@@ -171,10 +172,14 @@ def calculateDevelopment(data):
     
     zMovement = volumeToZMovement(data.volume,True)
 
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.precision, data.pressure, data.waitTime)
+    
+    speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1,1,2,2,2,3,2,1],10)
+    speedfactorList = speedWeighting(speedSplineList[1])
+
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
 
 
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure, waitTime):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waitTime, speedfactorList):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -194,21 +199,21 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     for x in range(int(applications)*2):
         #moving to the end of the line
         if (x%2)==0:
-            for yy in range(int(precision)):
-                generate.pressurize(pressure)
-                generate.toggle_valve()
-                generate.linear_move_xz(round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
-                generate.toggle_valve() 
+            generate.pressurize(pressure)
+            generate.toggle_valve()
+            for speedfactor in speedfactorList:
+                generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
+            generate.toggle_valve() 
             generate.wait(waitTime)
             jj += 1
         #moving back to the start of the line
         else:
             if printBothways == 'On':
-                for yy in range(int(precision)):
-                    generate.pressurize(pressure)
-                    generate.toggle_valve()
-                    generate.linear_move_xz(-1*round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
-                    generate.toggle_valve()
+                generate.pressurize(pressure)
+                generate.toggle_valve()
+                for speedfactor in speedfactorList:
+                    generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
+                generate.toggle_valve()
                 generate.wait(waitTime)
                 jj += 1
             else:
@@ -223,5 +228,5 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     generate.set_absolute()    
     #Homming
     generate.homming("XY")
-    
+    print(generate.list_of_gcodes)
     return generate.list_of_gcodes
