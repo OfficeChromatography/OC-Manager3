@@ -256,10 +256,10 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
         generate.report_bed_temperature(4)
 
     # Move to the home
-    generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
+    # generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
 
     # Application
-    generate.pressurize(pressure)
+    # generate.pressurize(pressure)
     list_of_lines=list_of_lines[::-1]
     for index, list_of_points in enumerate(list_of_lines):
         list_of_points = list_of_points[::-1]
