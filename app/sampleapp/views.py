@@ -214,11 +214,12 @@ def calculate(data):
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
 
     volEstimate = returnDropEstimateVol(data)
-    applicationsurface = []
+    list_of_bands = []
     
     deltaX = float(data.delta_x)
     deltaY = float(data.delta_y)
     for i in range(0,n_bands):
+        bandlist = []
         zeros=(i*(length+data.gap))+data.offset_left
         for j in range(volEstimate[i][2]):
             if j % 2:
@@ -229,7 +230,7 @@ def calculate(data):
                     while current_length<=length:
                         applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
                         current_length+=deltaX
-                    applicationsurface.append(applicationline)
+                    bandlist.append(applicationline)
                     current_height+=deltaY
             else:
                 current_height = 0.
@@ -239,14 +240,15 @@ def calculate(data):
                     while current_length<=length:
                         applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
                         current_length+=deltaX
-                    applicationsurface.append(applicationline)
+                    bandlist.append(applicationline)
                     current_height+=deltaY
+        list_of_bands.append(bandlist)
 
     # Creates the Gcode for the application and return it
-    return gcode_generation(applicationsurface, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
+    return gcode_generation(list_of_bands, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
 
 
-def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zeroPosition):
+def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zeroPosition):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -260,17 +262,16 @@ def gcode_generation(list_of_lines, speed, frequency, temperature, pressure, zer
 
     # Application
     # generate.pressurize(pressure)
-    list_of_lines=list_of_lines[::-1]
-    for index, list_of_points in enumerate(list_of_lines):
-        list_of_points = list_of_points[::-1]
+    for band in list_of_bands:
         generate.rinsing()
         generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
-        for point in list_of_points:
-            generate.linear_move_xy(point[1], point[0], speed)
-            generate.finish_moves()
-            generate.pressurize(pressure)
-            generate.open_valve(frequency)
-            generate.finish_moves()
+        for index, list_of_points in enumerate(band):
+            for point in list_of_points:
+                generate.linear_move_xy(point[1], point[0], speed)
+                generate.finish_moves()
+                generate.pressurize(pressure)
+                generate.open_valve(frequency)
+                generate.finish_moves()
     #Stop heating
     if (temperature !=0):
         generate.hold_bed_temperature(0)
