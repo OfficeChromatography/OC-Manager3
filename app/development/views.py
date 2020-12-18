@@ -173,8 +173,10 @@ def calculateDevelopment(data):
     zMovement = volumeToZMovement(data.volume,True)
 
     
-    speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
-    speedfactorList = speedWeighting(speedSplineList[1])
+    #speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
+    
+    #speedfactorList = speedWeighting(speedSplineList[1])
+    speedfactorList = speedWeighting([1,1,1])
 
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
 
