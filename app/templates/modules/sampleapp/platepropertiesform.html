@@ -1,23 +1,23 @@
 {% load static %}
-<form id="plateform">
+<form class="volume-calculation-parameter" id="plateform">
     <p><b>Plate Size</b><hr/><p>
     <div class="form-group mt-3 mb-1 row">
-        <div class="input-group">
+        <div class="input-group input-group-sm">
             <div class="input-group-prepend">
-                <span class="input-group-text">{{PlateProperties_Form.size_x.label}}</span>
+                <span class="input-group-text">X Size</span>
             </div>
-            {{PlateProperties_Form.size_x}}
+            <input type="number" name="size_x" value="100" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_size_x">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
     </div>
     <div class="form-group row pb-4">
-        <div class="input-group">
+        <div class="input-group input-group-sm">
             <div class="input-group-prepend">
-                <span class="input-group-text">{{PlateProperties_Form.size_y.label}}</span>
+                <span class="input-group-text">Y Size</span>
             </div>
-            {{PlateProperties_Form.size_y}}
+            <input type="number" name="size_y" value="100" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_size_y">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
@@ -28,41 +28,44 @@
         The sum of the offsets should be smaller than the plate size
     </div>
     <div class="form-group mt-3 mb-1 row">
-        <div class="input-group col">
-            <label for="colFormLabelSm" class="col-form-label col-form-label-sm text-truncate mx-1">{{PlateProperties_Form.offset_left.label}}</label>
-            {{PlateProperties_Form.offset_left}}
+        <div class="input-group input-group-sm col">
+            <label for="id_offset_left" class="col-form-label col-form-label-sm text-truncate mx-1">Left</label>
+            <input type="number" name="offset_left" value="1" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_offset_left">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
-        <div class="input-group col">
-            <label for="colFormLabelSm" class="col-form-label col-form-label-sm text-truncate mx-1">{{PlateProperties_Form.offset_right.label}}</label>
-            {{PlateProperties_Form.offset_right}}
+        <div class="input-group input-group-sm col">
+            <label for="id_offset_right" class="col-form-label col-form-label-sm text-truncate mx-1">Right</label>
+            <input type="number" name="offset_right" value="1" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_offset_right">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
     </div>
     <div class="form-group row">
-        <div class="input-group col">
-            <label for="colFormLabelSm" class="col-form-label col-form-label-sm text-truncate mx-1">{{PlateProperties_Form.offset_top.label}}</label>
-            {{PlateProperties_Form.offset_top}}
+        <div class="input-group input-group-sm col">
+            <label for="id_offset_top" class="col-form-label col-form-label-sm text-truncate mx-1">Top</label>
+            <input type="number" name="offset_top" value="1" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_offset_top">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
-        <div class="input-group col">
-            <label for="colFormLabelSm" class="col-form-label col-form-label-sm text-truncate mx-1">{{PlateProperties_Form.offset_bottom.label}}</label>
-            {{PlateProperties_Form.offset_bottom}}
+        <div class="input-group input-group-sm col">
+            <label for="id_offset_bottom" class="col-form-label col-form-label-sm text-truncate mx-1">Bottom</label>
+            <input type="number" name="offset_bottom" value="1" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_offset_bottom">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
     </div>
     <div class="form-group pt-4 mb-1 row">
-        <div class="input-group pt-4">
-            <label for="method" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>{{BandSettings_Form.main_property.label}}</b></h1></label>
-            {{BandSettings_Form.main_property}}
+        <div class="input-group input-group-sm pt-4">
+            <label for="id_main_property" class="col-xl-3 col-form-label col-form-label-sm text-truncate"><h6><b>Band Calculation</b></h1></label>
+            <select name="main_property" class="form-control" id="id_main_property">
+                <option value="1">Number of Bands</option>
+                <option value="2">Length</option>
+            </select>
         </div>
     </div>
     <hr/>
@@ -73,25 +76,25 @@
         There is not enough space for these parameters
     </div>
     <div class="form-group mt-3 mb-1 row" id='id_valuesform'>
-        <div class="input-group">
-            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate" id="valueLabel">{{BandSettings_Form.value.label}}</label>
-            {{BandSettings_Form.value}}
+        <div class="input-group input-group-sm">
+            <label for="id_value" class="col-xl-2 col-form-label col-form-label-sm text-truncate" id="valueLabel">Number</label>
+            <input type="number" name="value" value="2" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_value">
             <div class="input-group-append">
                 <span id='id_valuesunit'class="input-group-text">[#]</span>
             </div>
         </div>
     </div>
     <div class="form-group mb-1 row">
-        <div class="input-group">
-            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.height.label}}</label>
-            {{BandSettings_Form.height}}
+        <div class="input-group input-group-sm">
+            <label for="id_height" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Height</label>
+            <input type="number" name="height" value="1" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_height">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>
         </div>
-        <div class="input-group">
-            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{BandSettings_Form.gap.label}}</label>
-            {{BandSettings_Form.gap}}
+        <div class="input-group input-group-sm">
+            <label for="id_gap" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Gap</label>
+            <input type="number" name="gap" value="4" class="form-control change-graph-size-parameter" step="0.01" required="" id="id_gap">
             <div class="input-group-append">
                 <span class="input-group-text">[mm]</span>
             </div>

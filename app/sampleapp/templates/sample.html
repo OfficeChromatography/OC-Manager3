@@ -117,20 +117,7 @@
                   </div>
                 </div>
                 <div class="card-body show" id='banddescritionarea'>
-                    <div id="table" class="table-editable">
-                      <table class="table table-bordered table-responsive-md table-striped text-center">
-                        <thead>
-                          <tr>
-                            <th class="text-center">Band</th>
-                            <th class="text-center">Description</th>
-                            <th class="text-center">Volume (uL)</th>
-                            <th class="text-center">Type</th>
-                          </tr>
-                        </thead>
-                        <tbody id='tbody_band'>
-                        </tbody>
-                      </table>
-                    </div>
+                  {% include 'modules/sampleapp/table/table.html' %}
                   </div>
               </div>
               <!-- Save and Load -->
