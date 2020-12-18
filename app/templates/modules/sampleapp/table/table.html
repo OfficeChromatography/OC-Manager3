@@ -1,31 +1,17 @@
 {% load static %}
 <html>
-    <div id="table" class="table-editable mt-1">
-        <div style="display: none;" class="specific_fluid_options">
-            <table class="table table-bordered table-responsive-md table-striped text-center">
-                <tr class="hide">
-                    <td class="pt-3-half">density [g/cm³]</td>
-                    <td class="pt-3-half densityval" contenteditable="true"></td>
-                </tr>
-                <tr class="hide">
-                    <td class="pt-3-half">viscosity [cSt]</td>
-                    <td class="pt-3-half viscosityval" contenteditable="true"></td>
-                </tr>
-            </table>
-        </div>
-        <table class="table table-bordered table-responsive-md table-striped text-center">
-            <thead>
-            <tr>
-                <th class="text-center">Band</th>
-                <th class="text-center">Description</th>
-                <th class="text-center">Volume (uL)</th>
-                <th class="text-center">Calculations</th>
-            </tr>
-            </thead>
-            <tbody id='tbody_band'>
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-bordered table-responsive-md table-striped text-center">
+        <thead>
+        <tr>
+            <th class="text-center">Band</th>
+            <th class="text-center">Description</th>
+            <th class="text-center">Volume (uL)</th>
+            <th class="text-center">Calculations</th>
+        </tr>
+        </thead>
+        <tbody id='tbody_band'>
+        </tbody>
+    </table>
 <script src="{% static 'modules/sampleapp/table/table.js' %}"></script>
 
 </html>
