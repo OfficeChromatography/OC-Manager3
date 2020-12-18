@@ -49,21 +49,13 @@ class DevelopmentPlay(View):
                                     pressure_settings_form   =   PressureSettings_Form(request.POST),
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
-                
-                
-                devBandSettings = request.POST.get('devBandSettings')
-                devBandSettings_data = json.loads(devBandSettings)
-                developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
-                if developmentBandSettings_form.is_valid():
-                    forms_data.update(devBandSettings_data)
-                else:
-                    return JsonResponse({'error':'Check band properties'})
+                forms_data.update(json.loads(request.POST.get('devBandSettings')))
                 
                 # With the data, gcode is generated
                 gcode = calculateDevelopment(forms_data)
+
                 # Printrun
-                light_gcode = gcoder.LightGCode(gcode)
-                OC_LAB.startprint(light_gcode)
+                OC_LAB.print_from_list(gcode)
                 return JsonResponse({'error':'f.errors'})
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
@@ -171,10 +163,10 @@ def calculateDevelopment(data):
     
     zMovement = volumeToZMovement(data.volume,True)
 
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.precision, data.pressure, data.waitTime)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime)
 
 
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, precision, pressure, waitTime):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waitTime):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -194,21 +186,19 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     for x in range(int(applications)*2):
         #moving to the end of the line
         if (x%2)==0:
-            for yy in range(int(precision)):
-                generate.pressurize(pressure)
-                generate.toggle_valve()
-                generate.linear_move_xz(round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
-                generate.toggle_valve() 
+            generate.pressurize(pressure)
+            generate.toggle_valve()
+            generate.linear_move_xz(round(length,3),round(zMovement/float(applications),3),speed)
+            generate.toggle_valve() 
             generate.wait(waitTime)
             jj += 1
         #moving back to the start of the line
         else:
             if printBothways == 'On':
-                for yy in range(int(precision)):
-                    generate.pressurize(pressure)
-                    generate.toggle_valve()
-                    generate.linear_move_xz(-1*round(length/float(precision),3),round(zMovement/float(applications)/float(precision),3),speed)
-                    generate.toggle_valve()
+                generate.pressurize(pressure)
+                generate.toggle_valve()
+                generate.linear_move_xz(-1*round(length,3),round(zMovement/float(applications),3),speed)
+                generate.toggle_valve()
                 generate.wait(waitTime)
                 jj += 1
             else:
@@ -223,5 +213,5 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
     generate.set_absolute()    
     #Homming
     generate.homming("XY")
-    
+    print(generate.list_of_gcodes)
     return generate.list_of_gcodes
