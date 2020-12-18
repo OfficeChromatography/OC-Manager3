@@ -2,7 +2,6 @@ from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.forms.models import model_to_dict
-
 import json
 import numpy as np
 import math
@@ -29,6 +28,9 @@ forms = {
     'ZeroPosition_Form': ZeroPosition_Form()
     }
 
+class Table(View):
+    def get(self, request):
+        return render(request,'modules/sampleapp/table/row.html')
 
 class SampleList(FormView):
     def get(self, request):
@@ -44,7 +46,7 @@ class SampleView(FormView):
 
 class SampleDetails(View):
     def get(self, request, id):
-        id_object=id;
+        id_object=id
         sample_application_conf=model_to_dict(SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Db.objects.get(id=sample_application_conf['plate_properties']))
         band_settings_conf=model_to_dict(BandSettings_Db.objects.get(id=sample_application_conf['band_settings']))
@@ -77,7 +79,7 @@ class SampleDetails(View):
             zero_position       =   ZeroPosition_Form(request.POST)
 
         )
-
+        print(request.POST)
         table_data = json.loads(request.POST.get('table'))
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
