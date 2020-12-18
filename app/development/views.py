@@ -173,7 +173,7 @@ def calculateDevelopment(data):
     zMovement = volumeToZMovement(data.volume,True)
 
     
-    speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1,1,2,2,2,3,2,1],10)
+    speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
     speedfactorList = speedWeighting(speedSplineList[1])
 
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
@@ -203,7 +203,8 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             generate.toggle_valve()
             for speedfactor in speedfactorList:
                 generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-            generate.toggle_valve() 
+            generate.toggle_valve()
+            generate.check_pressure()
             generate.wait(waitTime)
             jj += 1
         #moving back to the start of the line
@@ -214,6 +215,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 for speedfactor in speedfactorList:
                     generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
                 generate.toggle_valve()
+                generate.check_pressure()
                 generate.wait(waitTime)
                 jj += 1
             else:

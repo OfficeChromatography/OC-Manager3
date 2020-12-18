@@ -39,10 +39,10 @@ var plotPreview = new Chart(ctx, {
 });
 var datatable
 // Execute every time something happens wi
-$("#id_motor_speed").change(
+$("#id_speed").change(
   function(){
     console.log('motor');
-    
+    flowrateCalc()
   }
 )
 $("#id_pressure").change(
@@ -51,25 +51,12 @@ $("#id_pressure").change(
     
   }
 )
-$("#id_frequency").change(
-  function(){
-    console.log('dpre');
-    
-  }
-)
-$("#id_delta_x").change(
-  function(){
-    console.log('dex');
-    
-  }
-)
-
 $("#id_size_x").change(
   function(){
     console.log('sizex');
     changegraphsize()
     bandsmain()
-    
+    flowrateCalc()
   }
 )
 $("#id_size_y").change(
@@ -77,39 +64,36 @@ $("#id_size_y").change(
     console.log('sizey');
     changegraphsize()
     bandsmain()
-    
   }
 );
 
 $("#id_offset_left").change(
     function(){
       bandsmain()
-      
+      flowrateCalc()
     }
 );
 $("#id_offset_right").change(
   function(){
     bandsmain()
-    
+    flowrateCalc()
   }
 );
 $("#id_offset_bottom").change(
     function(){
       bandsmain()
-      
     }
 );
 $("#id_offset_top").change(
   function(){
     bandsmain()
-    
   }
 );
 
 $("#id_volume").change(
   function(){
     bandsmain()
-    
+    flowrateCalc()
   }
 );
 $("#id_fluid").change(
@@ -125,6 +109,11 @@ $("#id_fluid").change(
 );
 $("#id_nozzlediameter").change(
   function(){
+  }
+);
+$("#id_applications").change(
+  function(){
+    flowrateCalc()
   }
 );
 
@@ -526,7 +515,21 @@ function getAsText(readFile) {
   }
 }
 
+function flowrateCalc(){
+  length = $("#id_size_x").val() - $("#id_offset_left").val() - $("#id_offset_right").val();
+  speed = $("#id_speed").val();
+  volume = $("#id_volume").val();
+  applications = $("#id_applications").val();
+  time = length / speed;
+  flowrate = Math.round(volume / time / applications, 3);
+  $('#flowrate').text('estimated flowrate: ' + flowrate + " ul/s");
+
+
+  console.log(flowrate);
+}
+
 $(document).ready(function() {
   
   $('#devModal').modal('show');
+  flowrateCalc();
 });
