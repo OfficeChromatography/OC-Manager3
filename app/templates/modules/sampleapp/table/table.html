@@ -1,19 +1,58 @@
 {% load static %}
-<html>
-    <table class="table table-bordered table-responsive-md table-striped text-center">
-        <thead>
-        <tr>
-            <th class="text-center">Band</th>
-            <th class="text-center">Description</th>
-            <th class="text-center">Volume (uL)</th>
-            <th class="text-center">Calculations</th>
-        </tr>
-        </thead>
-        <tbody id='tbody_band'>
-        </tbody>
-    </table>
+<table class="table table-bordered table-responsive-md table-striped text-center">
+    <thead>
+    <tr>
+        <th class="text-center">Band</th>
+        <th class="text-center">Description</th>
+        <th class="text-center">Volume (uL)</th>
+        <th class="text-center">Calculations</th>
+    </tr>
+    </thead>
+    <tbody id='tbody-band'>
+    <tr class="band-row" style="display: none">
+        <td class="pt-3-half band-number"></td>
+        <td class="pt-3-half description-column" contenteditable="true"></td>
+        <td class="pt-3-half volume-cell">
+            <form class="m-0">
+                <div class="form-group row">
+                    <div class="col">
+                        <input name="volume" type="number" class="form-control form-control-sm volume" placeholder="Volume [uL]">
+                    </div>
+                    <div class="col specific-options" style="display:none;">
+                        <input name="density" type="number" class="form-control form-control-sm density" placeholder="density [g/cm³]">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col ">
+                        <select name="solvent" class="form-control form-control-sm solvent_select">
+                            <option style="display: none" value=""></option>
+                        </select>
+                    </div>
+                    <div class="col specific-options" style="display:none;">
+                        <input name="viscosity" type="number" class="form-control form-control-sm viscosity" placeholder="viscosity [cSt]">
+                    </div>
+                </div>
+            </form>
+        </td>
+        <td class="m-1 calculation-cell" >
+            <table style="width:100%">
+                <tr>
+                    <td><small>Estimated Vol: </small></td>
+                    <td><small class="estimated-volume"></small></td>
+                </tr>
+                <tr>
+                    <td><small>Estimated dropvol: </small></td>
+                    <td><small class="estimated-drop"></small></td>
+                </tr>
+                <tr>
+                    <td><small>Min Vol: </small></td>
+                    <td><small class="minimum-volume"></small></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
 <script src="{% static 'modules/sampleapp/table/table.js' %}"></script>
-
-</html>
 
 <!--<script src="{% static 'modules/homming/homming.js' %}"></script>-->

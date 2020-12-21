@@ -39,19 +39,13 @@ var plotPreview = new Chart(ctx, {
     }
    },
 });
+window.table = new Table(0, calcVol);
 
 $(document).ready(function() {
     loadlistofsampleapps()
     createBandsTable()
-    calcVol();
-    $(document).on("blur", ".vol", function() {
-    calcVol();
-    })
+    calcVol()
 });
-
-$( document ).ready(function(){
-
-})
 
 $(".change-graph-size-parameter").on("change", function(){
     changeGraphSize()
@@ -63,8 +57,6 @@ $(".change-graph-size-parameter").on("change", function(){
 $(".change-volume-parameter").on("change", function(){
     calcVol()
 });
-
-// Execute every time something happens
 
 $("#id_main_property").on("change",function(){
         switch ($("#id_main_property").val()) {
@@ -243,28 +235,8 @@ function addData2Chart(label, color, data) {
 
 // Create a new Table with a given number of rows
 function newComponentsTable(number_row){
-    window.table = new Table(number_row);
-}
-// Load the table with data from de DB or from file
-function loadComponentsTable(band,fromDB){
-    let bands = band.bands
-    console.log("FROM DB:",band.bands);
-    if(fromDB==true){
-        idbandname = "band_number"
-        idvolumename= "volume"
-    }
-    else{
-        idbandname= "band"
-        idvolumename= "volume (ul)"
-    }
-
-    Object.entries(bands).forEach(function(key,value){
-        console.log(key, value)
-        $('#volume-cell-'+(value+1)).find(".volume").val(key[1].volume)
-        $('#volume-cell-'+(value+1)).find(".solvent_select").val(key[1].type)
-    });
-
-  calcVol()
+    table.destructor()
+    table = new Table(number_row, calcVol);
 }
 
 // Load field values with 'data' Object
@@ -336,7 +308,7 @@ function getAsText(readFile) {
     jsonObject = JSON.parse(fileString)
     loadFieldsValues(jsonObject)
     console.log(jsonObject)
-    loadComponentsTable(jsonObject['bands'],false)
+    table.loadTable(jsonObject['bands'])
     changeGraphSize()
   }
   function errorHandler(evt) {
@@ -377,6 +349,15 @@ function loadlistofsampleapps(){
               success: loadMethodSuccess,
               error: loadMethodError,
             })
+            function loadMethodSuccess(data, textStatus, jqXHR){
+              // Load all the fields with the ones get in the database
+                loadFieldsValues(data);
+                table.getTableValues()
+                table.loadTable(data.bands)
+                changeGraphSize()
+                calcVol()
+            }
+            function loadMethodError(jqXHR, textStatus, errorThrown){}
         })
     }
   function loadlistMethodError(jqXHR, textStatus, errorThrown){}
@@ -395,6 +376,12 @@ $('#stopbttn').on('click', function (e) {
   success: stopMethodSuccess,
   error: stopMethodError,
   })
+  function stopMethodSuccess(data, textStatus, jqXHR){
+    console.log(data);
+    $('.control-bttn').removeClass('btn-success btn-secondary')
+    $('.control-bttn').addClass('btn btn-danger')
+  }
+  function stopMethodError(jqXHR, textStatus, errorThrown){}
 })
 $('#pausebttn').on('click', function (e) {
   event.preventDefault()
@@ -408,11 +395,17 @@ $('#pausebttn').on('click', function (e) {
   success: pauseMethodSuccess,
   error: pauseMethodError,
   })
+  function pauseMethodSuccess(data, textStatus, jqXHR){
+    console.log(data);
+      $('.control-bttn').removeClass('btn-success btn-danger')
+    $('.control-bttn').addClass('btn btn-secondary')
+  }
+  function pauseMethodError(jqXHR, textStatus, errorThrown){}
 })
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+Table.getTableValues(true)
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+'&table='+JSON.stringify(table.getTableValues())
   $endpoint = window.location.origin+'/sampleapp/'
   $.ajax({
   method: 'POST',
@@ -421,139 +414,64 @@ $('#startbttn').on('click', function (e) {
   success: startMethodSuccess,
   error: startMethodError,
   })
+  function startMethodSuccess(data, textStatus, jqXHR){
+    //console.log(data);
+    $('.control-bttn').removeClass('btn-danger btn-secondary')
+    $('.control-bttn').addClass('btn btn-success')
+  }
+  function startMethodError(jqXHR, textStatus, errorThrown){}
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+Table.getTableValues(true)
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+'&table='+JSON.stringify(table.getTableValues())
   $endpoint = window.location.origin+'/sample/save/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
   data:   $formData,
   success: saveMethodSuccess,
-  error: saveMethodError,stopbttn
+  error: saveMethodError,
   })
-})
-
-// Import/Export DATA
-$('#downloadfilebttn').on('click', function (e) {
-  event.preventDefault()
-  var element = document.createElement('a');
-
-  var plate = getFormData($('#plateform'))
-  var movement = getFormData($('#movementform'))
-  var zero = getFormData($('#zeroform'))
-  var table = {bands:Table.getTableValues(false)}
-  items = Object.assign(plate,movement,table,zero)
-
-  content = JSON.stringify(items);
-  filename = new Date().toLocaleString()+".json"
-
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
-  element.setAttribute('download', filename);
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-})
-$('#loadfilebttn').on('click', function (e) {
-  event.preventDefault()
-  var file = $('#file')[0].files[0];
-  getAsText(file);
-})
-$('#removefilebttn').on('click', function (e) {
-  $('#file').next('.custom-file-label').html('');
-  $('#file').val('')
-  $('#sizesfile').html('')
-})
-$('#file').on('change',function(e){
-                //get the file name
-                var fileName = e.target.files[0];
-                $(this).next('.custom-file-label').html(fileName.name);
-            })
-
-
-function hommingMethodSuccess(data, textStatus, jqXHR){
-  if(data.error!=''){
-    areErrors('#id_parameter_error',false)
+  function saveMethodSuccess(data, textStatus, jqXHR){
+    console.log(typeof(data.error));
+    if(data.error==undefined){
+      $('#id_save_sucess').html(data.message)
+      $("#id_save_sucess").fadeIn().delay( 800 ).fadeOut( 400 );
+    }
+    else {
+      $('#id_save_error').html(data.error)
+      $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
+    }
+    //console.log("funciono");
+    loadlistofsampleapps();
   }
-  else{
-    areErrors('#id_parameter_error',true)
-  }
-
-}
-function hommingMethodError(jqXHR, textStatus, errorThrown){};
-
-function stopMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
-  $('.control-bttn').removeClass('btn-success btn-secondary')
-  $('.control-bttn').addClass('btn btn-danger')
-}
-function stopMethodError(jqXHR, textStatus, errorThrown){}
-
-function pauseMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
-    $('.control-bttn').removeClass('btn-success btn-danger')
-  $('.control-bttn').addClass('btn btn-secondary')
-}
-function pauseMethodError(jqXHR, textStatus, errorThrown){}
-
-function startMethodSuccess(data, textStatus, jqXHR){
-  //console.log(data);
-  $('.control-bttn').removeClass('btn-danger btn-secondary')
-  $('.control-bttn').addClass('btn btn-success')
-}
-function startMethodError(jqXHR, textStatus, errorThrown){}
-
-function loadMethodSuccess(data, textStatus, jqXHR){
-  // Load all the fields with the ones get in the database
-    loadFieldsValues(data);
-    loadComponentsTable(data,true)
-    changeGraphSize()
-    calcVol()
-}
-function loadMethodError(jqXHR, textStatus, errorThrown){
-  console.log('error');
-}
-
-function saveMethodSuccess(data, textStatus, jqXHR){
-  console.log(typeof(data.error));
-  if(data.error==undefined){
-    $('#id_save_sucess').html(data.message)
-    $("#id_save_sucess").fadeIn().delay( 800 ).fadeOut( 400 );
-  }
-  else {
+  function saveMethodError(data, jqXHR, textStatus, errorThrown){
+    console.log(data);
     $('#id_save_error').html(data.error)
     $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
   }
-  //console.log("funciono");
-  loadlistofsampleapps();
-}
-function saveMethodError(data, jqXHR, textStatus, errorThrown){
-  console.log(data);
-  $('#id_save_error').html(data.error)
-  $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
-}
+})
 
-function calcVol(){
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+Table.getTableValues(true)
+var calcVol = function calcVol(){
+  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&table='+JSON.stringify(table.getTableValues())
   $endpoint = window.location.origin+'/samplecalc/'
   $.ajax({
   method: 'POST',
   url:    $endpoint,
   data:   $formData,
   success: calcMethodSuccess,
-  error: saveMethodError
+  error: calcMethodError,
   })
+  function calcMethodSuccess(data, textStatus, jqXHR){
+    table.setTableCalculationValues(data.results)
+    console.log(data.results)
+  }
+  function calcMethodError(jqXHR, textStatus, errorThrown){
+      alert("Error calculating estimated volumes")
+    }
 }
 
-function calcMethodSuccess(data, textStatus, jqXHR){
-  //console.log(typeof(data.error));
-    console.log(data.results)
-  if(data.error==undefined){
-    Table.loadCalculationValues(data.results)
-  }
-}
+
 
 
 
