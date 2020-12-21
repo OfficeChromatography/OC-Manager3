@@ -32,7 +32,6 @@ def returnDropEstimateVol(data):
         volPerBand = (table['volume (ul)'])
         if (volPerBand == "" or volPerBand == "null"):
             volPerBand = 0
-            
         volPerBand = float(volPerBand)
 
         times = 0
