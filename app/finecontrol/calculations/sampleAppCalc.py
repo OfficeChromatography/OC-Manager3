@@ -7,6 +7,8 @@ from finecontrol.calculations.flowCalc import FlowCalc
 def returnDropEstimateVol(data):
     working_area = [float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     ,float(data.size_y)-float(data.offset_top)-float(data.offset_bottom)]
+
+
     if int(data.main_property)==1:
         n_bands = int(data.value)
         number_of_gaps = n_bands - 1
@@ -18,7 +20,6 @@ def returnDropEstimateVol(data):
         
     results = []
     for table in data.table:
-
         dropVolume = FlowCalc(pressure=float(data.pressure), nozzleDiameter=data.nozzlediameter, timeOrFrequency = float(data.frequency), fluid=table['type'], density=table['density'], viscosity=table['viscosity']).calcVolumeFrequency()
 
         pointsX = np.round(float(length)/float(data.delta_x))+1
@@ -27,7 +28,7 @@ def returnDropEstimateVol(data):
         vol = pointsX * pointsY * dropVolume
         #print(vol,vol2)
         
-        volPerBand = (table['volume (ul)'])
+        volPerBand = (table['volume'])
         if (volPerBand == "" or volPerBand == "null"):
             volPerBand = 0
         volPerBand = float(volPerBand)
@@ -51,7 +52,9 @@ def returnDropEstimateVol(data):
                 times -= 1
                 realVolume -= vol2
         
-   
-        results.append([dropVolume, realVolume, times, vol])
-
+        values = {  "estimated_volume": realVolume,
+                    "estimated_drop_volume": dropVolume,
+                    "times": times,
+                    "minimum_volume": vol}
+        results.append(values)
     return results

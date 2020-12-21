@@ -1,119 +1,239 @@
-OPTIONS = ["Water", "Methanol", "Acetone", "Specific"]
-
-// $( document ).ready(function() {
-//     window.table = new Table(5);
-// });
-
-function addOptions(select){
-    OPTIONS.forEach((item, index)=>{
-        let option;
-        option = $("<option></option>").text(item).attr("val",item);
-        select.append(option)
-    })
-}
+const OPTIONS = ["Water", "Methanol", "Acetone", "Specific"]
 
 class Table {
-    constructor(number_of_rows, url) {
-        Table.removeRows();
-        this.number_of_rows = number_of_rows;
-        this.addRow();
-        this.urlGetData = url;
+    row = [];
 
+    constructor(number_of_rows, calculationMethod) {
+        this.numberOfRows = 0;
+        this.calculationMethod = calculationMethod;
+        this.#addMultipleRows(number_of_rows);
     }
 
-    addRow() {
-        for (let i = 0; i < this.number_of_rows; i++) {
-            let request = $.ajax({
-                method: 'GET',
-                url: "/table/",
-                dataType: 'html',
-                async: false,
-                success: dispatch,
-            });
-
-            function dispatch(data, textStatus, jqXHR){
-                Table.createRowFromHtml(data, i+1);
-            }
+    destructor(){
+        for(let i=this.numberOfRows-1; i>=0;i--){
+            this.row[i].eliminate()
+            this.row.pop()
+            this.numberOfRows--;
         }
     }
 
-    static loadCalculationValues(dataForEachRow){
-        dataForEachRow.forEach(function (values,index){
-            let calc_cell = $("#calculation-cell-"+(index+1))
-            values.forEach(function(val, index){
-                val = parseFloat(val).toFixed(3)
-                switch (index){
-                    case 0:
-                        calc_cell.find('.estimated-drop').text(val)
-                        break;
-                    case 1:
-                        calc_cell.find('.estimated-volume').text(val)
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        calc_cell.find('.minimum-volume').text(val)
-                        break;
+    #addRow(){
+        /**
+         * Appends a row at the end of #tbody-band
+         * @param  {void}
+         * @return  {Object<tr.band-row>}
+         */
+        this.numberOfRows = this.row.push(new Table.#Row(this.calculationMethod))
+        return this.row[this.numberOfRows-1];
+    }
+
+    #addMultipleRows(n){
+        /**
+         * Create n number of rows
+         * @param  {number}
+         * @return  {void}
+         */
+        for(let i=1; i<=n;i++){
+            let newRow = this.#addRow();
+            newRow.setBandNumber(this.numberOfRows)
+        }
+    }
+
+    ///ERROR DEVOLVER EL OBJETO
+    getRowByNumber(numberOfRow){
+        /**
+         * Returns the row object selected by number of row
+         * @param  {Number}
+         * @return  {Object<tr.band-row>}
+         */
+        let row = $('.band-number').filter(function(){
+            return this.innerHTML == numberOfRow
+        }).parent();
+        return row
+    }
+
+    getTableValues(){
+        let data = [];
+        if(this.numberOfRows==0){
+            console.log("Empty table")
+            return
+        }
+        else{
+            this.row.forEach(function (value){
+                data.push(value.getRowData())
+            })
+        }
+        return data
+    }
+
+    setTableCalculationValues(data){
+        data.forEach(function(row,index,array){
+            this.row[index].setCalculatedData(row)
+        },this)
+    }
+
+    loadTable(data){
+        data.forEach(function(data,index,array){
+            this.row[index].loadDataInRow(data)
+        },this)
+    }
+
+    static #Row = class Row{
+        row = null;
+
+        constructor(calculationMethod){
+            this.row = $(".band-row").first().clone().show().appendTo("#tbody-band");
+            this.solventOptions = OPTIONS;
+            this.#setSolventOptions();
+            this.calculationMethod = calculationMethod
+            this.setCalculateMethod();
+        }
+
+        setCalculateMethod(){
+            this.row.find('.volume, .solvent_select').on("change",this.calculationMethod)
+        }
+
+        setEstimatedVolume(value){
+            this.row.find('.estimated-volume').text(value.toFixed(3))
+        }
+
+        getEstimatedVolume(){
+            let value = this.row.find('.estimated-volume').text()
+            return this.#sanityUndefined(value)
+        }
+
+        setEstimatedDropVolume(value){
+            this.row.find('.estimated-drop').text(value.toFixed(3))
+        }
+        getEstimatedDropVolume(){
+            let value = this.row.find('.estimated-drop').text()
+            return this.#sanityUndefined(value)
+        }
+
+
+        setMinimumVolume(value){
+            this.row.find('.minimum-volume').text(value.toFixed(3))
+        }
+        getMinimumVolume(){
+            let value = this.row.find('.minimum-volume').text()
+            return this.#sanityUndefined(value)
+        }
+
+        setSolventOption(value){
+            this.row.find('.solvent_select').val(value)
+        }
+        getSolventOption(){
+            let value = this.row.find('.solvent_select').val()
+            return this.#sanityUndefined(value)
+        }
+
+        setDescription(value){
+            this.row.find('.description-column').text(value)
+        }
+        getDescription(){
+            let value = this.row.find('.description-column').text()
+            return this.#sanityUndefined(value)
+        }
+
+        setVolumeValue(value){
+            this.row.find('.volume').val(value)
+        }
+        getVolumeValue(){
+            let value = this.row.find('.volume').val()
+            return this.#sanityUndefined(value)
+        }
+
+        setBandNumber(value){
+            this.row.find('.band-number').text(value)
+        }
+        getBandNumber(){
+            let value = this.row.find('.band-number').text()
+            return this.#sanityUndefined(value)
+        }
+
+        setViscosity(value){
+            this.row.find('.viscosity').text(value)
+        }
+        getViscosity(){
+            let value = this.row.find('.viscosity').text()
+            return this.#sanityUndefined(value)
+        }
+
+        setDensity(value){
+            this.row.find('.density').text(value)
+        }
+        getDensity(){
+            let value = this.row.find('.density').text()
+            return this.#sanityUndefined(value)
+        }
+
+
+
+        #setSolventOptions(){
+            /**
+             * adds the solvents options to a cell
+             * @param  {Object<tr.band-row> , options list}
+             * @return  {void}
+             */
+            for(let option in this.solventOptions){
+                let aux = this.row.find('option:first')
+                aux.clone()
+                    .show()
+                    .attr("value",this.solventOptions[option])
+                    .text(this.solventOptions[option])
+                    .appendTo(aux.parent())
+            }
+            this.row.find('select').val(this.solventOptions[0])
+            this.row.find('select').on("change",function (){
+                if($(this).val()=="Specific"){
+                    $(this).closest('.band-row').find('.specific-options').fadeIn()
+                }
+                else{
+                    $(this).closest('.band-row').find('.specific-options').fadeOut()
                 }
             })
-        });
-    }
-
-
-    static getTableValues(toString){
-        let row = $(".band_row")
-        let tablevalues = [];
-        row.each(function (index){
-            let item = {}
-            item['band'] = $(this).find(".band_column").text()
-            item['description'] = $(this).find(".description_column").text()
-            item['volume (ul)'] = $(this).find(".volume").val()
-            item['type'] = $(this).find(".solvent_select").val()
-            item['density'] = $(this).find(".density").val()
-            item['viscosity'] =$(this).find(".viscosity").val()
-            tablevalues.push(item)
-        })
-        if(toString==true){
-            tablevalues = '&table='+JSON.stringify(tablevalues)
         }
-        return tablevalues
-    }
 
-    static createRowFromHtml(data, i){
-        let body = $('#tbody_band');
-        let row = jQuery(data)
-        let select = row.find('select')
-        let bandColumn = row.find('.band_column')
-        let form = row.find('form')
-        bandColumn.text(i)
-
-        let calculation_cell = row.find('.calculation-cell')
-        let volume_cell = row.find('.volume-cell')
-        calculation_cell.attr('id',"calculation-cell-"+i)
-        volume_cell.attr('id',"volume-cell-"+i)
-        addOptions(select);
-
-        // If Selection is "Specific"
-        select.on("change", function () {
-            let specific_options = $(this).closest('form').find('.specific-options')
-            if ($(this).val() == "Specific") {
-                specific_options.show()
-            } else {
-                specific_options.hide()
+        #sanityUndefined(value){
+            if(value==undefined){
+                value = "";
             }
-        })
+            return value;
+        }
 
-        // If Something change in the row
-        form.on("change", function () {
-            let formData = new FormData(this);
-            calcVol()
-        })
-        body.append(row);
-    }
+        getRowData(){
+            let data = {
+                "band_number": this.getBandNumber(),
+                "description": this.getDescription(),
+                "volume": this.getVolumeValue(),
+                "type": this.getSolventOption(),
+                "density": this.getDensity(),
+                "viscosity": this.getViscosity(),
+                "estimated_volume": this.getEstimatedVolume(),
+                "estimated_drop_volume": this.getEstimatedDropVolume(),
+                "minimum_volume": this.getMinimumVolume()
+            }
+            return data
+        }
 
-    static removeRows(){
-        let body = $('#tbody_band');
-        body.empty();
+        setCalculatedData(data){
+            this.setEstimatedDropVolume(data.estimated_drop_volume)
+            this.setMinimumVolume(data.minimum_volume)
+            this.setEstimatedVolume(data.estimated_volume)
+        }
+
+        loadDataInRow(data){
+            this.setBandNumber(data.band_number)
+            this.setDescription(data.description)
+            this.setVolumeValue(data.volume)
+            this.setSolventOption(data.type)
+            this.setDensity(data.density)
+            this.setViscosity(data.viscosity)
+        }
+
+        eliminate(){
+            this.row.remove();
+        }
     }
 }
 

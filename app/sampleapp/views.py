@@ -30,7 +30,13 @@ forms = {
 
 class Table(View):
     def get(self, request):
-        return render(request,'modules/sampleapp/table/row.html')
+
+        return JsonResponse({"Lucas":"Sing"})
+
+    def post(self, request):
+        received_json_data=json.loads(request.body)
+        print(received_json_data)
+        return JsonResponse({"Lucas":"sing"})
 
 class SampleList(FormView):
     def get(self, request):
@@ -55,9 +61,9 @@ class SampleDetails(View):
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=sample_application_conf['zero_position']))
         bands_components = BandsComponents_Db.objects.filter(sample_application=SampleApplication_Db.objects.filter(pk=id_object).filter(auth_id=request.user)[0])
 
-        bands=dict()
+        bands=[]
         for i, band in enumerate(bands_components):
-            bands[i]=model_to_dict(band)
+            bands.append(model_to_dict(band))
         bands = {'bands':bands}
         sample_application_conf.update(bands)
         sample_application_conf.update(plate_properties_conf)
@@ -81,6 +87,7 @@ class SampleDetails(View):
         )
         print(request.POST)
         table_data = json.loads(request.POST.get('table'))
+        print(table_data)
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if sample_application_form.is_valid():
             filename = sample_application_form.cleaned_data['file_name']
@@ -95,12 +102,7 @@ class SampleDetails(View):
                 in_db[0].save()
                 BandsComponents_Db.objects.filter(sample_application=in_db[0]).delete()
                 for i in table_data:
-                    # Format data
-                    i['band_number'] = i['band']
-                    i['volume'] = i['volume (ul)']
-
                     bands_components_form = BandsComponents_Form(i)
-
                     if bands_components_form.is_valid():
                         bands_components_instance = bands_components_form.save(commit=False)
                         bands_components_instance.sample_application = in_db[0]
@@ -122,8 +124,8 @@ class SampleDetails(View):
 
                 for i in table_data:
                     # Format data
-                    i['band_number'] = i['band']
-                    i['volume'] = i['volume (ul)']
+#                     i['band_number'] = i['band']
+#                     i['volume'] = i['volume (ul)']
 
                     bands_components_form = BandsComponents_Form(i)
 
@@ -166,6 +168,7 @@ class SampleAppPlay(View):
 
 class CalcVol(View):
     def post(self, request):
+#         print(request.POST)
         forms_data = data_validations(  plate_properties_form    =   PlateProperties_Form(request.POST),
                                         band_settings_form       =   BandSettings_Form(request.POST),
                                         movement_settings_form   =   MovementSettings_Form(request.POST),
