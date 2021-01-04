@@ -213,7 +213,9 @@ def calculate(data):
         length = data.value
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
 
+    
     volEstimate = returnDropEstimateVol(data)
+
     list_of_bands = []
     
     deltaX = float(data.delta_x)

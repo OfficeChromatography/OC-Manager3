@@ -18,7 +18,7 @@ def returnDropEstimateVol(data):
         
     results = []
     for table in data.table:
-
+        print1time = False
         dropVolume = FlowCalc(pressure=float(data.pressure), nozzleDiameter=data.nozzlediameter, timeOrFrequency = float(data.frequency), fluid=table['type'], density=table['density'], viscosity=table['viscosity']).calcVolumeFrequency()
 
         pointsX = np.round(float(length)/float(data.delta_x))+1
@@ -30,6 +30,8 @@ def returnDropEstimateVol(data):
         volPerBand = (table['volume (ul)'])
         if (volPerBand == "" or volPerBand == "null"):
             volPerBand = 0
+            print1time = True
+            
         volPerBand = float(volPerBand)
 
         times = 0
@@ -51,7 +53,9 @@ def returnDropEstimateVol(data):
                 times -= 1
                 realVolume -= vol2
         
-   
-        results.append([dropVolume, realVolume, times, vol])
+        if print1time:
+            results.append([dropVolume, realVolume, 1, vol])
+        else:
+            results.append([dropVolume, realVolume, times, vol])
 
     return results
