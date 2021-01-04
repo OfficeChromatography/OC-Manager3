@@ -158,8 +158,8 @@ def calculate(data):
     else:
         length = data.value
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
-        
-    
+
+
     volEstimate = returnDropEstimateVol(data)
     #print(volEstimate)
     list_of_bands = []
@@ -384,7 +384,7 @@ data = {
     'size_x': 100, 
     'size_y': 100, 
     'offset_left': 2.5, 
-    'offset_right': 2.5, 
+    'offset_right': 2.5,
     'offset_top': 5, 
     'offset_bottom': 5, 
     'main_property': 1, 
