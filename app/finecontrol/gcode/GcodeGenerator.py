@@ -132,7 +132,7 @@ class GcodeGenerator:
     def rinsing(self):
         self.homming("XY")
         self.pressurize("60")
-        self.open_valve("1")
+        self.open_valve("2")
 
     def set_new_zero_position(self, x, y,speed):
         self.homming("XY")
