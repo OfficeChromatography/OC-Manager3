@@ -384,7 +384,7 @@ data = {
     'size_x': 100, 
     'size_y': 100, 
     'offset_left': 2.5, 
-    'offset_right': 0, 
+    'offset_right': 2.5, 
     'offset_top': 5, 
     'offset_bottom': 5, 
     'main_property': 1, 
@@ -395,7 +395,7 @@ data = {
     'delta_x': 2, 
     'delta_y': 1.5, 
     'pressure': 5, 
-    'frequency': 1000,
+    'frequency': 1400,
     'temperature': 0, 
     'nozzlediameter': '0.08', 
     'zero_x': 5, 
@@ -403,19 +403,22 @@ data = {
     'table': [{'band': '1', 'description': '', 'volume (ul)': '', 'type': 'Water', 'density': '', 'viscosity': ''}]
     }
 
-pressure = range(5,45,5)
+xlabel = "frequency"
+xlist = range(600,1500,200)
+
+ylabel = "pressure"
+ylist = range(5,45,5)
+
 offset = 2.5
-#frequency = range(600,1500,200)
-frequency=[800,100,500,4]
+
 listgcode = []
-for idx,f in enumerate(frequency):
-    data['offset_left'] = offset + idx*100/len(frequency) # 2.5 34.16 65,83
-    data['offset_right'] = 100-(idx+1)*100/len(frequency) + offset
-    data["frequency"] = f
-    print(data['offset_left'], data['offset_right'])
-    for idx2,p in enumerate(pressure):
+for idx,x in enumerate(xlist):
+    data['offset_left'] = offset + idx*100/len(xlist) # 2.5 34.16 65,83
+    data['offset_right'] = 100-(idx+1)*100/len(xlist) + offset
+    data[xlabel] = x
+    for idx2,y in enumerate(ylist):
         data['offset_bottom'] = 5 + idx2*5
-        data["pressure"] = p
+        data[ylabel] = y
         gcode = calculate(data)
         listgcode.extend(gcode)
 
