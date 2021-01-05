@@ -111,7 +111,7 @@ def returnDropEstimateVol(data):
         #print(vol,vol2)
         
         volPerBand = (table['volume (ul)'])
-        if (volPerBand == "" or volPerBand == "null"):
+        if (volPerBand == "" or volPerBand == "null"): #will apply 1 time if nothing is specified
             results.append([0, 0, 1, 0])
             continue
             

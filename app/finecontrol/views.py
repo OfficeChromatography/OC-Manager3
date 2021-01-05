@@ -399,4 +399,3 @@ class Fan(View):
             request,
             "./fancontrol.html",
             form)
-
