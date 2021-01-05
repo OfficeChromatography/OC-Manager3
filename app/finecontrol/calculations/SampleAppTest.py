@@ -112,7 +112,6 @@ def returnDropEstimateVol(data):
         
         volPerBand = (table['volume (ul)'])
         if (volPerBand == "" or volPerBand == "null"):
-            volPerBand = 0
             results.append([0, 0, 1, 0])
             continue
             
@@ -148,19 +147,21 @@ def calculate(data):
     data = SimpleNamespace(**data)
 
     working_area = [data.size_x-data.offset_left-data.offset_right,data.size_y-data.offset_top-data.offset_bottom]
+    #print(working_area)
 
     if data.main_property==1:
         n_bands = int(data.value)
         number_of_gaps = n_bands - 1
         sum_gaps_size = data.gap*number_of_gaps
         length = (working_area[0]-sum_gaps_size)/n_bands
+        #print(working_area[0],sum_gaps_size,length)
     else:
         length = data.value
         n_bands = int(math.trunc(working_area[0]/(length+data.gap)))
-    print(length)
+        
     
     volEstimate = returnDropEstimateVol(data)
-    print(volEstimate)
+    #print(volEstimate)
     list_of_bands = []
     
     deltaX = float(data.delta_x)
@@ -190,7 +191,7 @@ def calculate(data):
                     bandlist.append(applicationline)
                     current_height+=deltaY
         list_of_bands.append(bandlist)
-        print(list_of_bands)
+        #print(list_of_bands)
 
     # Creates the Gcode for the application and return it
     return gcode_generation(list_of_bands, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
@@ -403,12 +404,13 @@ data = {
     }
 
 pressure = range(5,45,5)
-frequency = [800]
-
+offset = 2.5
+#frequency = range(600,1500,200)
+frequency=[800,100,500,4]
 listgcode = []
 for idx,f in enumerate(frequency):
-    data['offset_left'] = 2.5 + idx*95/len(frequency) # 2.5 34.16 65,83
-    data['offset_right'] = 95 - (len(frequency)-idx-1)*95/len(frequency) # 31,16 63,3 95
+    data['offset_left'] = offset + idx*100/len(frequency) # 2.5 34.16 65,83
+    data['offset_right'] = 100-(idx+1)*100/len(frequency) + offset
     data["frequency"] = f
     print(data['offset_left'], data['offset_right'])
     for idx2,p in enumerate(pressure):
