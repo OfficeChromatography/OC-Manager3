@@ -1,9 +1,8 @@
-from django.views.generic import FormView,View
+from django.views.generic import FormView, View
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.forms.models import model_to_dict
 import json
-import numpy as np
 import math
 from types import SimpleNamespace
 
@@ -16,8 +15,6 @@ from connection.forms import OC_LAB
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 from finecontrol.calculations.sampleAppCalc import *
 
-
-
 forms = {
     'SampleApplication_Form': SampleApplication_Form(),
     'PlateProperties_Form': PlateProperties_Form(),
@@ -28,15 +25,6 @@ forms = {
     'ZeroPosition_Form': ZeroPosition_Form()
     }
 
-class Table(View):
-    def get(self, request):
-
-        return JsonResponse({"Lucas":"Sing"})
-
-    def post(self, request):
-        received_json_data=json.loads(request.body)
-        print(received_json_data)
-        return JsonResponse({"Lucas":"sing"})
 
 class SampleList(FormView):
     def get(self, request):
@@ -294,5 +282,3 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
     #Homming
     generate.homming("XY")
     return generate.list_of_gcodes
-
-
