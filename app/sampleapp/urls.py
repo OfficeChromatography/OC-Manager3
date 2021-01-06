@@ -11,4 +11,5 @@ urlpatterns = [
     # path('samplesave/', SampleAppSaveAndLoad.as_view(), name='samplesaveandload'),
     path('sampleapp/', SampleAppPlay.as_view(), name='sampleplay'),
     path('samplecalc/', CalcVol.as_view(), name='samplecalc'),
+    path('table/', Table.as_view(), name='samplecalc'),
 ]

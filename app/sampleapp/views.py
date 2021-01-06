@@ -25,6 +25,15 @@ forms = {
     'ZeroPosition_Form': ZeroPosition_Form()
     }
 
+class Table(View):
+    def get(self, request):
+
+        return JsonResponse({"Lucas":"Sing"})
+
+    def post(self, request):
+        received_json_data=json.loads(request.body)
+        print(received_json_data)
+        return JsonResponse({"Lucas":"sing"})
 
 class SampleList(FormView):
     def get(self, request):
