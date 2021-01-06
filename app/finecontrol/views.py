@@ -77,40 +77,6 @@ class SyringeLoad(View):
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
 
-    # def delete(self,request):
-    #     # Eliminates a vol from the database
-    #     print(request)
-    #     # if 'MOVEMOTOR' in request:
-    #     #     try:
-    #     #         SyringeLoad_Db.objects.filter(volume=request.POST['MOVEMOTOR']).filter(author=request.user)[0].delete()
-    #     #         return JsonResponse("Volume Deleted!", safe=False)
-    #     #     except IndexError:
-    #     return JsonResponse("Volume doesn't exist!", safe=False)
-
-    # def options(self, request):
-    #     if 'MOVEMOTOR' in request.OPTIONS:
-    #         print("Finish It!!")
-    #         return JsonResponse("Volume save", safe=False)
-
-""" class HommingSetup(View):
-    def post(self, request):
-        if request.POST.get('setzero'):
-            print(request.POST)
-            zeros_values = list(request.POST['setzero'].split(","))
-            zero_on_DB = ZeroPosition(uploader=request.user,
-                                      zero_x=float(zeros_values[0]),
-                                      zero_y=float(zeros_values[1]))
-            zero_on_DB.save()
-            OC_LAB.send(f'G92X0Y0')
-            return JsonResponse({'message': 'ok'})
-
-    def get(self, request):
-        if 'getzero' in request.GET:
-            last_zero_position = ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
-            OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
-        return JsonResponse({'message':'ok'}) """
-
-
 class Cleaning(object):
 
     def __init__(self):
