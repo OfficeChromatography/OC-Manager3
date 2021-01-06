@@ -168,6 +168,8 @@ def calculateDevelopment(data):
     #speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
     
     #speedfactorList = speedWeighting(speedSplineList[1])
+
+    #allows to set different speeds at different equidistant partials
     speedfactorList = speedWeighting([1,1,1])
 
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
