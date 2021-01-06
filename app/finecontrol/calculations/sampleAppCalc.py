@@ -3,6 +3,9 @@ import json
 import numpy as np
 from scipy.optimize import minimize
 from finecontrol.calculations.flowCalc import FlowCalc
+from types import SimpleNamespace
+from finecontrol.gcode.GcodeGenerator import GcodeGenerator
+
 
 def returnDropEstimateVol(data):
     working_area = [float(data.size_x)-float(data.offset_left)-float(data.offset_right)
@@ -76,6 +79,7 @@ def calculate(data):
 
 
     volEstimate = returnDropEstimateVol(data)
+    print(returnDropEstimateVol(data))
 
     list_of_bands = []
 
@@ -84,7 +88,7 @@ def calculate(data):
     for i in range(0,n_bands):
         bandlist = []
         zeros=(i*(length+data.gap))+data.offset_left
-        for j in range(volEstimate[i][2]):
+        for j in range(volEstimate[i]['times']):
             if j % 2:
                 current_height = deltaY/2
                 while current_height <= data.height:
