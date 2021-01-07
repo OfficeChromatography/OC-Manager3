@@ -72,7 +72,7 @@
                     <button id='minimize-settings' class="btn btn-link" data-toggle="collapse" data-target="#settingscontent" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show mx-3" id='settingscontent'>
+                <div class="card-body show" id='settingscontent'>
                     <!-- Editable table -->
                     {% include 'modules/sampleapp/dinamicpropertiesform.html' %}
                 </div>
@@ -86,7 +86,7 @@
                     <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#parametersarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show mx-3" id='parametersarea'>
+                <div class="card-body show" id='parametersarea'>
                   <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
                     Complete it!
                   </div>
@@ -161,7 +161,7 @@
                     <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#banddescritionarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show" id='banddescritionarea'>
+                <div class="card-body show p-1" id='banddescritionarea'>
                   {% include 'modules/sampleapp/table/table.html' %}
                   </div>
               </div>
