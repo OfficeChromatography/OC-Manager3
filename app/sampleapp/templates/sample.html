@@ -77,16 +77,21 @@
                     {% include 'modules/sampleapp/dinamicpropertiesform.html' %}
                 </div>
               </div>
-              <!-- Plate Preview -->
+              <!-- Plate Design Board -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
                   <div class="d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
-                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#platepreviewarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                    <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Parameters</h6>
+                    <button id='hommingbttn' name='start' class="btn btn-link"  data-toggle="modal" data-target="#hommingModal"><i class="fas fa-home"></i></button>
+                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#parametersarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show p-2" id='platepreviewarea'>
-                  <canvas id="plotPreview" width="400" height="400"></canvas>
+                <div class="card-body show mx-3" id='parametersarea'>
+                  <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
+                    Complete it!
+                  </div>
+                  <!-- Editable table -->
+                  {% include 'modules/sampleapp/platepropertiesform.html' %}
                 </div>
               </div>
               <!-- Save and Load -->
@@ -136,21 +141,16 @@
             </div>
             </div>
             <div class="col-lg-8">
-              <!-- Plate Design Board -->
+              <!-- Plate Preview -->
               <div class="card shadow mb-4 ">
                 <div class="card-header py-3">
                   <div class="d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary w-100 align-self-center">Parameters</h6>
-                    <button id='hommingbttn' name='start' class="btn btn-link"  data-toggle="modal" data-target="#hommingModal"><i class="fas fa-home"></i></button>
-                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#parametersarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
+                    <h6 class="m-0 font-weight-bold text-primary">Plate Preview</h6>
+                    <button id='minimize-platepreview' class="btn btn-link" data-toggle="collapse" data-target="#platepreviewarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                   </div>
                 </div>
-                <div class="card-body show mx-3" id='parametersarea'>
-                  <div class="alert alert-info alert-dismissible collapse" id='id_parameter_error' role="alert">
-                    Complete it!
-                  </div>
-                  <!-- Editable table -->
-                  {% include 'modules/sampleapp/platepropertiesform.html' %}
+                <div class="card-body show p-2" id='platepreviewarea'>
+                  <canvas id="plotPreview" width="400" height="400"></canvas>
                 </div>
               </div>
               <!-- Concentrations Board -->
