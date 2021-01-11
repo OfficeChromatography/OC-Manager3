@@ -22,17 +22,25 @@ class BandSettings_Dev_Db(models.Model):
     waitTime = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     description = models.CharField(max_length=120, default='', null=True, blank=True)
 
-class Bezier_Db(models.Model):
+class Flowrate_Db(models.Model):
     uploader = models.ForeignKey(
                 get_user_model(),
                 null=True,
                 on_delete=models.CASCADE,
                 blank=True,
                 )
-    a1 = models.DecimalField(decimal_places=2, max_digits=6, null=False, blank=False)
-    a2 = models.DecimalField(decimal_places=2, max_digits=6, null=False, blank=False)
-    a3 = models.DecimalField(decimal_places=2, max_digits=6, null=False, blank=False)
-    a4 = models.DecimalField(decimal_places=2, max_digits=6, null=False, blank=False)
+    a0 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a1 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a2 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a3 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a4 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a5 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a6 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a7 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a8 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a9 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    a10 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    
 
 class Development_Db(models.Model):
     auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
@@ -41,7 +49,7 @@ class Development_Db(models.Model):
     plate_properties = models.OneToOneField(PlateProperties_Db, null=True, on_delete=models.CASCADE)
     developmentBandSettings = models.OneToOneField(BandSettings_Dev_Db, null=True, on_delete=models.CASCADE)
     zero_position = models.OneToOneField(ZeroPosition, null=True, on_delete=models.CASCADE)
-    bezier = models.OneToOneField(Bezier_Db, null=True, on_delete=models.CASCADE)
+    flowrate = models.OneToOneField(Flowrate_Db, null=True, on_delete=models.CASCADE)
 
 
 

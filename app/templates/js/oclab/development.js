@@ -368,7 +368,18 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
   bandsmain()
   changegraphsize()
-  loadSegment(parseFloat(data.a1), parseFloat(data.a2), parseFloat(data.a3), parseFloat(data.a4))
+  loadSegment(parseFloat(data.a0),
+  parseFloat(data.a1), 
+  parseFloat(data.a2), 
+  parseFloat(data.a3), 
+  parseFloat(data.a4),
+  parseFloat(data.a5), 
+  parseFloat(data.a6), 
+  parseFloat(data.a7),
+  parseFloat(data.a8),
+  parseFloat(data.a9), 
+  parseFloat(data.a10)
+  )
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -537,69 +548,97 @@ $(document).ready(function() {
 });
 
 // Volume over x Graph
-brd = JXG.JSXGraph.initBoard('box', {axis:true, boundingbox: [-10, 2.1, 110, -0.1]});
+brd = JXG.JSXGraph.initBoard('box', {axis:true, boundingbox: [-20, 2.1, 120, -0.1]});
 p = [];
 
-l1 = brd.create('segment',[[0,0],[0,2]], {fixed: true, strokecolor:'black'});
-a1 = brd.create('glider',[0,1,l1],{name:'a1'});   // data point
-p.push(a1);
+l0 = brd.create('segment',[[0,0],[0,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l1 = brd.create('segment',[[10,0],[10,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l2 = brd.create('segment',[[20,0],[20,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l3 = brd.create('segment',[[30,0],[30,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l4 = brd.create('segment',[[40,0],[40,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l5 = brd.create('segment',[[50,0],[50,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l6 = brd.create('segment',[[60,0],[60,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l7 = brd.create('segment',[[70,0],[70,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l8 = brd.create('segment',[[80,0],[80,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l9 = brd.create('segment',[[90,0],[90,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
+l10 = brd.create('segment',[[100,0],[100,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
 
-l2 = brd.create('segment',[[33,0],[33,2]], {fixed: true, strokecolor:'black'});
-a2 = brd.create('glider',[0,1,l2],{name:'a2'});// control point
-p.push(a2);
-
-l3 = brd.create('segment',[[66,0],[66,2]], {fixed: true, strokecolor:'black'});
+a0 = brd.create('glider',[0,1,l0],{name:'a0'});
+a1 = brd.create('glider',[0,1,l1],{name:'a1'});
+a2 = brd.create('glider',[0,1,l2],{name:'a2'});
 a3 = brd.create('glider',[0,1,l3],{name:'a3'});
-p.push(a3); // control point
+a4 = brd.create('glider',[0,1,l4],{name:'a4'});
+a5 = brd.create('glider',[0,1,l5],{name:'a5'});
+a6 = brd.create('glider',[0,1,l6],{name:'a6'});
+a7 = brd.create('glider',[0,1,l7],{name:'a7'});
+a8 = brd.create('glider',[0,1,l8],{name:'a8'});
+a9 = brd.create('glider',[0,1,l9],{name:'a9'});
+a10 = brd.create('glider',[0,1,l10],{name:'a10'});
+p.push(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
 
-l4 = brd.create('segment',[[100,0],[100,2]], {fixed: true, strokecolor:'black'});
-a4 = brd.create('glider',[0,1,l4],{name:'a4'});  // data point
-p.push(a4);
 
-c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
+
+// c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
+c = brd.create('spline', p, {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
 
 function saveSegment(toString){
 
   data={}
+  data['a0'] = +a0.Y().toFixed(2)
   data['a1'] = +a1.Y().toFixed(2)
   data['a2'] = +a2.Y().toFixed(2)
   data['a3'] = +a3.Y().toFixed(2)
   data['a4'] = +a4.Y().toFixed(2)
+  data['a5'] = +a5.Y().toFixed(2)
+  data['a6'] = +a6.Y().toFixed(2)
+  data['a7'] = +a7.Y().toFixed(2)
+  data['a8'] = +a8.Y().toFixed(2)
+  data['a9'] = +a9.Y().toFixed(2)
+  data['a10'] = +a10.Y().toFixed(2)
+  
 
   if(toString){
-    data = '&bezier='+JSON.stringify(data)
+    data = '&flowrate='+JSON.stringify(data)
   }
   return data;
 }
 
 
-function loadSegment(y1,y2,y3,y4) {
+function loadSegment(y0,y1,y2,y3,y4,y5,y6,y7,y8,y9,y10) {
   brd.suspendUpdate();
   removeSegment();
 
-  a1 = brd.create('glider',[0,y1,l1],{name:'a1',fixed: false});   // data point
-  p.push(a1);
-
-  a2 = brd.create('glider',[0,y2,l2],{name:'a2',fixed: false});// control point
-  p.push(a2);
-
-  a3 = brd.create('glider',[0,y3,l3],{name:'a3',fixed: false});
-  p.push(a3); // control point
-
-  a4 = brd.create('glider',[0,y4,l4],{name:'a4',fixed: false});  // data point
-  p.push(a4);
+  a0 = brd.create('glider',[0,y0,l0],{name:'a0'});
+  a1 = brd.create('glider',[0,y1,l1],{name:'a1'});
+  a2 = brd.create('glider',[0,y2,l2],{name:'a2'});
+  a3 = brd.create('glider',[0,y3,l3],{name:'a3'});
+  a4 = brd.create('glider',[0,y4,l4],{name:'a4'});
+  a5 = brd.create('glider',[0,y5,l5],{name:'a5'});
+  a6 = brd.create('glider',[0,y6,l6],{name:'a6'});
+  a7 = brd.create('glider',[0,y7,l7],{name:'a7'});
+  a8 = brd.create('glider',[0,y8,l8],{name:'a8'});
+  a9 = brd.create('glider',[0,y9,l9],{name:'a9'});
+  a10 = brd.create('glider',[0,y10,l10],{name:'a10'});
+  p.push(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
   
-  c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
+  c = brd.create('spline', p, {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
   brd.unsuspendUpdate();
 };
              
 function removeSegment() {
   brd.suspendUpdate();
+  brd.removeObject(p[10]);
+  brd.removeObject(p[9]);
+  brd.removeObject(p[8]);
+  brd.removeObject(p[7]);
+  brd.removeObject(p[6]);
+  brd.removeObject(p[5]);
+  brd.removeObject(p[4]);
   brd.removeObject(p[3]);
   brd.removeObject(p[2]);
   brd.removeObject(p[1]);
   brd.removeObject(p[0]);
-  p.splice(0,4);
+  p.splice(0,11);
   brd.removeObject(c);
   brd.unsuspendUpdate();
 };

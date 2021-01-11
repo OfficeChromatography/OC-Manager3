@@ -142,20 +142,34 @@ class PressureSettings_Form(forms.ModelForm):
             if not temperature:
                 return 0
     
-class Bezier_Form(forms.ModelForm):
+class Flowrate_Form(forms.ModelForm):
     class Meta:
-        model = Bezier_Db
-        fields = ['a1','a2','a3','a4']
+        model = Flowrate_Db
+        fields = ['a0','a1','a2','a3','a4','a5','a6','a7','a8','a9','a10']
         widgets = {
+        'a0':        forms.NumberInput(attrs={'class': 'form-control'}),
         'a1':        forms.NumberInput(attrs={'class': 'form-control'}),
         'a2':        forms.NumberInput(attrs={'class': 'form-control'}),
         'a3':        forms.NumberInput(attrs={'class': 'form-control'}),
-        'a4':        forms.NumberInput(attrs={'class': 'form-control'})
+        'a4':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a5':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a6':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a7':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a8':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a9':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a10':       forms.NumberInput(attrs={'class': 'form-control'})
         }
         labels = {
+            'a0':        _('a0'),
             'a1':        _('a1'),
             'a2':        _('a2'),
             'a3':        _('a3'),
-            'a4':        _('a4')
+            'a4':        _('a4'),
+            'a5':        _('a5'),
+            'a6':        _('a6'),
+            'a7':        _('a7'),
+            'a8':        _('a8'),
+            'a9':        _('a9'),
+            'a10':       _('a10'),
         }
            

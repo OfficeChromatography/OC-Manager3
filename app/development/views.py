@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, Bezier_Form
-from .models import *#Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db, Bezier_Db
+from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, Flowrate_Form
+from .models import *#Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db, flowrate_Db
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -16,7 +16,7 @@ from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
-from finecontrol.calculations.DevCalc import speedWeighting,speedSpline
+from finecontrol.calculations.DevCalc import speedWeighting, cubicSpline
 
 forms = {
     'Development_Form': Development_Form(),
@@ -24,7 +24,7 @@ forms = {
     'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
     'ZeroPosition_Form': ZeroPosition_Form(),
-    'Bezier_Form': Bezier_Form(),
+    'Flowrate_Form': Flowrate_Form(),
     }
 
 class Development(FormView):
@@ -52,7 +52,7 @@ class DevelopmentPlay(View):
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
                 forms_data.update(json.loads(request.POST.get('devBandSettings')))
-                forms_data.update(json.loads(request.POST.get('bezier')))
+                forms_data.update(json.loads(request.POST.get('flowrate')))
                 
                 # With the data, gcode is generated
                 gcode = calculateDevelopment(forms_data)
@@ -78,9 +78,9 @@ class DevelopmentSaveAndLoad(View):
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
 
-        bezierSettings = request.POST.get('bezier')
-        bezierSettings_data = json.loads(bezierSettings)
-        print(bezierSettings_data)
+        flowrateSettings = request.POST.get('flowrate')
+        flowrateSettings_data = json.loads(flowrateSettings)
+        print(flowrateSettings_data)
         
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
@@ -108,12 +108,12 @@ class DevelopmentSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check home settings'})
 
-        #Check Bezier Settings Form
-        bezier_form = Bezier_Form(bezierSettings_data)
-        if bezier_form.is_valid():
-            bezier_object = bezier_form.save()
+        #Check flowrate Settings Form
+        flowrate_form = flowrate_Form(flowrateSettings_data)
+        if flowrate_form.is_valid():
+            flowrate_object = flowrate_form.save()
         else:
-            return JsonResponse({'error':'Check bezier settings'})
+            return JsonResponse({'error':'Check flowrate settings'})
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
@@ -130,7 +130,7 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
                 development_instance.zero_position = zero_position_object
-                development_instance.bezier = bezier_object
+                development_instance.flowrate = flowrate_object
                 new_development=development_instance.save()
 
                 return JsonResponse({'message':f'The File {filename} was saved!'})
@@ -147,13 +147,13 @@ class DevelopmentSaveAndLoad(View):
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
-        bezier_conf=model_to_dict(Bezier_Db.objects.get(id=development_conf['bezier']))
+        flowrate_conf=model_to_dict(Flowrate_Db.objects.get(id=development_conf['flowrate']))
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
         development_conf.update(pressure_settings_conf)
         development_conf.update(zero_position_conf)
-        development_conf.update(bezier_conf)
+        development_conf.update(flowrate_conf)
         
         return JsonResponse(development_conf)
 
@@ -179,7 +179,8 @@ def calculateDevelopment(data):
     zMovement = volumeToZMovement(data.volume,True)
 
     
-    speedSplineList = speedSpline(data.a1, data.a2, data.a3, data.a4, 10)
+    #speedSplineList = speedSpline(data.a1, data.a2, data.a3, data.a4, 10)
+    speedSplineList = cubicSpline([data.a0, data.a1, data.a2, data.a3, data.a4, data.a5, data.a6, data.a7, data.a8, data.a9, data.a10],10)
     speedfactorList = speedWeighting(speedSplineList)
 
     print(speedfactorList)
