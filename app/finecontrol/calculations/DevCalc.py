@@ -2,19 +2,20 @@
 import numpy as np
 from scipy import interpolate
 
-def speedSpline(x, y, steps):
+def speedSpline(a1, a2, a3, a4, steps):
     '''
-    x: start and endposition in x
-    y: Speed Coefficients consistent with x
+    values a1,a2,a3,a4: coefficients to create the bezier curve
     steps: will influence precision of the spline interpolation, high -> high precision
     '''
-    x = np.array(np.linspace(x[0],x[1], len(y)))
-    y = np.array(y)
-    tck = interpolate.splprep( [x,y] ,s = 0 )
-    xnew,ynew = interpolate.splev( np.linspace( 0, 1, steps), tck[0],der = 0)
-    del xnew[-1]
-    del ynew[-1]
-    return xnew,ynew
+    bezierfunc = lambda t: bezier(a1,a2,a3,a4,t)
+    t = np.delete(np.linspace(0, 1, steps+1), -1)
+    coordinates = list(map(bezierfunc,t))
+    return coordinates
+
+def bezier(a1,a2,a3,a4,t):
+    #x =  (1 - t)**3 * 0 + 3 * (1 - t)**2 * t * 33 + 3 * (1 - t) * t**2 * 66 + t**3 * 100
+    y =  (1 - t)**3 * a1 + 3 * (1 - t)**2 * t * a2 + 3 * (1 - t) * t**2 * a3 + t**3 * a4
+    return y
 
 def speedWeighting(speedList):
     '''weights the speed so that the volume of one band (the overall speed) stays constant, even if the speed is changing.'''

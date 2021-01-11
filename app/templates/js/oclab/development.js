@@ -252,7 +252,8 @@ $('#pausebttn').on('click', function (e) {
 $('#startbttn').on('click', function (e) {
   event.preventDefault()
   //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
+  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
+  +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+saveSegment(true)
   $endpoint = window.location.origin+'/developmentplay/'
   $.ajax({
   method: 'POST',
@@ -264,7 +265,8 @@ $('#startbttn').on('click', function (e) {
 })
 $('#savebttn').on('click', function (e) {
   event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+getSpecificFluid(true)
+  $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
+  +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+saveSegment(true)
   $endpoint = window.location.origin+'/developmentsave/'
   $.ajax({
   method: 'POST',
@@ -366,6 +368,7 @@ function loadMethodSuccess(data, textStatus, jqXHR){
   $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
   bandsmain()
   changegraphsize()
+  loadSegment(parseFloat(data.a1), parseFloat(data.a2), parseFloat(data.a3), parseFloat(data.a4))
 }
 function loadMethodError(jqXHR, textStatus, errorThrown){
   console.log('error');
@@ -529,7 +532,79 @@ function flowrateCalc(){
 }
 
 $(document).ready(function() {
-  
-  $('#devModal').modal('show');
+  //$('#devModal').modal('show');
   flowrateCalc();
 });
+
+// Volume over x Graph
+brd = JXG.JSXGraph.initBoard('box', {axis:true, boundingbox: [-10, 2.1, 110, -0.1]});
+p = [];
+
+l1 = brd.create('segment',[[0,0],[0,2]], {fixed: true, strokecolor:'black'});
+a1 = brd.create('glider',[0,1,l1],{name:'a1'});   // data point
+p.push(a1);
+
+l2 = brd.create('segment',[[33,0],[33,2]], {fixed: true, strokecolor:'black'});
+a2 = brd.create('glider',[0,1,l2],{name:'a2'});// control point
+p.push(a2);
+
+l3 = brd.create('segment',[[66,0],[66,2]], {fixed: true, strokecolor:'black'});
+a3 = brd.create('glider',[0,1,l3],{name:'a3'});
+p.push(a3); // control point
+
+l4 = brd.create('segment',[[100,0],[100,2]], {fixed: true, strokecolor:'black'});
+a4 = brd.create('glider',[0,1,l4],{name:'a4'});  // data point
+p.push(a4);
+
+c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
+
+function saveSegment(toString){
+
+  data={}
+  data['a1'] = +a1.Y().toFixed(2)
+  data['a2'] = +a2.Y().toFixed(2)
+  data['a3'] = +a3.Y().toFixed(2)
+  data['a4'] = +a4.Y().toFixed(2)
+
+  if(toString){
+    data = '&bezier='+JSON.stringify(data)
+  }
+  return data;
+}
+
+
+function loadSegment(y1,y2,y3,y4) {
+  brd.suspendUpdate();
+  removeSegment();
+
+  a1 = brd.create('glider',[0,y1,l1],{name:'a1',fixed: false});   // data point
+  p.push(a1);
+
+  a2 = brd.create('glider',[0,y2,l2],{name:'a2',fixed: false});// control point
+  p.push(a2);
+
+  a3 = brd.create('glider',[0,y3,l3],{name:'a3',fixed: false});
+  p.push(a3); // control point
+
+  a4 = brd.create('glider',[0,y4,l4],{name:'a4',fixed: false});  // data point
+  p.push(a4);
+  
+  c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
+  brd.unsuspendUpdate();
+};
+             
+function removeSegment() {
+  brd.suspendUpdate();
+  brd.removeObject(p[3]);
+  brd.removeObject(p[2]);
+  brd.removeObject(p[1]);
+  brd.removeObject(p[0]);
+  p.splice(0,4);
+  brd.removeObject(c);
+  brd.unsuspendUpdate();
+};
+
+
+
+
+    

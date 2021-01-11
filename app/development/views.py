@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form
-from .models import Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db
+from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, Bezier_Form
+from .models import *#Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db, Bezier_Db
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -23,7 +23,8 @@ forms = {
     'PlateProperties_Form': PlateProperties_Form(),
     'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
-    'ZeroPosition_Form': ZeroPosition_Form()
+    'ZeroPosition_Form': ZeroPosition_Form(),
+    'Bezier_Form': Bezier_Form(),
     }
 
 class Development(FormView):
@@ -51,6 +52,7 @@ class DevelopmentPlay(View):
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
                 forms_data.update(json.loads(request.POST.get('devBandSettings')))
+                forms_data.update(json.loads(request.POST.get('bezier')))
                 
                 # With the data, gcode is generated
                 gcode = calculateDevelopment(forms_data)
@@ -67,7 +69,6 @@ class DevelopmentPlay(View):
 
 class DevelopmentSaveAndLoad(View):
     def post(self, request):
-        #print(request.POST)
         development_form  =   Development_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
         pressure_settings_form = PressureSettings_Form(request.POST)
@@ -76,7 +77,11 @@ class DevelopmentSaveAndLoad(View):
 
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
-        #print(devBandSettings_data)
+
+        bezierSettings = request.POST.get('bezier')
+        bezierSettings_data = json.loads(bezierSettings)
+        print(bezierSettings_data)
+        
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
             plate_properties_object = plate_properties_form.save()
@@ -97,12 +102,18 @@ class DevelopmentSaveAndLoad(View):
             print(pressure_settings_form)
             return JsonResponse({'error':'Check pressure settings'})
             
-
         # Check Home Settings Formular
         if zero_position_form.is_valid():
             zero_position_object = zero_position_form.save()
         else:
             return JsonResponse({'error':'Check home settings'})
+
+        #Check Bezier Settings Form
+        bezier_form = Bezier_Form(bezierSettings_data)
+        if bezier_form.is_valid():
+            bezier_object = bezier_form.save()
+        else:
+            return JsonResponse({'error':'Check bezier settings'})
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
@@ -119,6 +130,7 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
                 development_instance.zero_position = zero_position_object
+                development_instance.bezier = bezier_object
                 new_development=development_instance.save()
 
                 return JsonResponse({'message':f'The File {filename} was saved!'})
@@ -135,11 +147,13 @@ class DevelopmentSaveAndLoad(View):
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
+        bezier_conf=model_to_dict(Bezier_Db.objects.get(id=development_conf['bezier']))
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
         development_conf.update(pressure_settings_conf)
         development_conf.update(zero_position_conf)
+        development_conf.update(bezier_conf)
         
         return JsonResponse(development_conf)
 
@@ -165,13 +179,10 @@ def calculateDevelopment(data):
     zMovement = volumeToZMovement(data.volume,True)
 
     
-    #speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
-    
-    #speedfactorList = speedWeighting(speedSplineList[1])
+    speedSplineList = speedSpline(data.a1, data.a2, data.a3, data.a4, 10)
+    speedfactorList = speedWeighting(speedSplineList)
 
-    #allows to set different speeds at different equidistant partials
-    speedfactorList = speedWeighting([1,1,1])
-
+    print(speedfactorList)
     return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
 
 
