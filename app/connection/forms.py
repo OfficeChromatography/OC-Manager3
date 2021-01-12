@@ -1,6 +1,5 @@
 from django import forms
 from .models import Connection_Db
-from monitor.models import Monitor_Db
 from .OcLab import OcLab
 
 def db_list_4_tuple(*args):
@@ -76,11 +75,6 @@ class ConnectionForm(forms.ModelForm):
         oc_lab = self.cleaned_data.get('oc_lab')
         choices = self.fields['oc_lab'].choices
         return oc_lab
-
-    def clean_monitor(self, *args, **kwargs):
-        monitor = Monitor_Db()
-        monitor.save()
-        return monitor
 
     def clean_auth_id(self, *args, **kwargs):
         auth_id = self.auth_id

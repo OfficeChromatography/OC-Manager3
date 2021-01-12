@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'finecontrol',
     'accounts',
     'printrun',
-    'monitor',
     'channels',
     'detection',
     'sampleapp',

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Printrun.  If not, see <http://www.gnu.org/licenses/>.
-from monitor.models import Monitor_Db
+from connection.models import Monitor_Db
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 channel_layer = get_channel_layer()
@@ -30,6 +30,7 @@ class PrinterEventHandler():
         '''
         Constructor.
         '''
+        self.messages = ""
         pass
 
     def on_init(self):
@@ -45,9 +46,10 @@ class PrinterEventHandler():
         @param command: The command to be sent.
         @param gline: The parsed high-level command.
         '''
-        aux = Monitor_Db.objects.last()
-        aux.monitortext += command+'\n'
-        aux.save()
+        # aux = Monitor_Db.objects.last()
+        # aux.monitortext += command+'\n'
+        # aux.save()
+        self.messages += command+'\n'
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': command})
         pass
 
@@ -57,9 +59,10 @@ class PrinterEventHandler():
 
         @param line: The data has been read from printer.
         '''
-        aux = Monitor_Db.objects.last()
-        aux.monitortext += line
-        aux.save()
+        # aux = Monitor_Db.objects.last()
+        # aux.monitortext += line
+        # aux.save()
+        self.messages += line
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': line[:-1]})
         pass
 
@@ -67,14 +70,28 @@ class PrinterEventHandler():
         '''
         Called whenever printcore is connected.
         '''
+        self.messages = ""
         time.sleep(2)
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': 'Connected!'})
+        async_to_sync(channel_layer.group_send)("monitor_oc_lab_status",
+                                                {'type': 'chat_message',
+                                                 'message': {'connected': True},
+                                                 })
         pass
 
     def on_disconnect(self):
         '''
         Called whenever printcore is disconnected.
         '''
+        aux = Monitor_Db.objects.last()
+        aux.monitortext = self.messages
+        aux.save()
+        self.messages = ""
+        print("DISCONNECTED EVENT HANDLER")
+        async_to_sync(channel_layer.group_send)("monitor_oc_lab_status",
+                                                {'type': 'chat_message',
+                                                 'message': {'connected': False},
+                                                 })
         pass
 
     def on_error(self, error):
@@ -83,6 +100,9 @@ class PrinterEventHandler():
 
         @param error: The error that has been triggered.
         '''
+        aux = Monitor_Db.objects.last()
+        aux.monitortext = self.messages
+        aux.save()
         pass
 
     def on_online(self):

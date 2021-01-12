@@ -13,6 +13,18 @@ class OcLab(printcore):
     def __init__(self):
         super().__init__()
 
+    def device_info(self):
+        device = {}
+        device['connected'] = (self.printer != None)
+        device['port'] = self.port
+        device['baudrate'] = self.baud
+        if self.online:
+            device['message'] = self.event_handler[0].messages
+        else:
+            device['message'] = self.event_handler[0].messages
+
+        return device
+
     @classmethod
     def get_devices(cls):
         devices = serial.tools.list_ports.comports()
@@ -25,3 +37,5 @@ class OcLab(printcore):
     def print_from_file(self, f):
         list_of_gcodes = [code_line.strip() for code_line in f]
         self.print_from_list(list_of_gcodes)
+
+
