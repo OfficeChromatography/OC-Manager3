@@ -56,7 +56,6 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
         initial = kwargs.get('initial', {})
         initial['volume'] = 1000
         initial['applications'] = 10
-        initial['precision'] = 10
         initial['fluid'] = 'Methanol'
         initial['waitTime'] = 0
         kwargs['initial'] = initial
@@ -64,7 +63,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','precision','waitTime','printBothways','density','viscosity','description']
+        fields = ['volume','fluid','applications','waitTime','printBothways','density','viscosity','description']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -85,7 +84,6 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
                 ('Specific','Specific')
             ]),
             'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'precision'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'waitTime'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'description': forms.TextInput(attrs={'class': 'form-control'}),
         }
@@ -93,7 +91,6 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
             'volume'         : _('Volume'),
             'fluid'         : _('Fluid'),
             'applications'   : _('Applications'),
-            'precision'   : _('Pressure Checks'),
             'waitTime'    : _('Waiting Time'),
             'description' : _('Description')
         }
@@ -144,3 +141,35 @@ class PressureSettings_Form(forms.ModelForm):
             temperature = self.temperature
             if not temperature:
                 return 0
+    
+class Flowrate_Form(forms.ModelForm):
+    class Meta:
+        model = Flowrate_Db
+        fields = ['a0','a1','a2','a3','a4','a5','a6','a7','a8','a9','a10']
+        widgets = {
+        'a0':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a1':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a2':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a3':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a4':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a5':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a6':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a7':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a8':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a9':        forms.NumberInput(attrs={'class': 'form-control'}),
+        'a10':       forms.NumberInput(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'a0':        _('a0'),
+            'a1':        _('a1'),
+            'a2':        _('a2'),
+            'a3':        _('a3'),
+            'a4':        _('a4'),
+            'a5':        _('a5'),
+            'a6':        _('a6'),
+            'a7':        _('a7'),
+            'a8':        _('a8'),
+            'a9':        _('a9'),
+            'a10':       _('a10'),
+        }
+           

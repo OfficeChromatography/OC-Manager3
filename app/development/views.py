@@ -2,28 +2,29 @@ from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form
-from .models import Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db
+from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, Flowrate_Form
+from .models import *#Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db, flowrate_Db
 import math
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 from printrun import printcore, gcoder
-from types import SimpleNamespace
+
 import json
 from decimal import *
 
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
-from finecontrol.calculations.volumeToZMovement import volumeToZMovement
-from finecontrol.gcode.GcodeGenerator import GcodeGenerator
-from finecontrol.calculations.DevCalc import speedWeighting,speedSpline
+
+
+from finecontrol.calculations.DevCalc import calculateDevelopment
 
 forms = {
     'Development_Form': Development_Form(),
     'PlateProperties_Form': PlateProperties_Form(),
     'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
     'PressureSettings_Form':PressureSettings_Form(),
-    'ZeroPosition_Form': ZeroPosition_Form()
+    'ZeroPosition_Form': ZeroPosition_Form(),
+    'Flowrate_Form': Flowrate_Form(),
     }
 
 class Development(FormView):
@@ -51,6 +52,7 @@ class DevelopmentPlay(View):
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
                 forms_data.update(json.loads(request.POST.get('devBandSettings')))
+                forms_data.update(json.loads(request.POST.get('flowrate')))
                 
                 # With the data, gcode is generated
                 gcode = calculateDevelopment(forms_data)
@@ -67,7 +69,6 @@ class DevelopmentPlay(View):
 
 class DevelopmentSaveAndLoad(View):
     def post(self, request):
-        #print(request.POST)
         development_form  =   Development_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
         pressure_settings_form = PressureSettings_Form(request.POST)
@@ -76,7 +77,11 @@ class DevelopmentSaveAndLoad(View):
 
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
-        #print(devBandSettings_data)
+
+        flowrateSettings = request.POST.get('flowrate')
+        flowrateSettings_data = json.loads(flowrateSettings)
+        print(flowrateSettings_data)
+        
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
             plate_properties_object = plate_properties_form.save()
@@ -97,12 +102,18 @@ class DevelopmentSaveAndLoad(View):
             print(pressure_settings_form)
             return JsonResponse({'error':'Check pressure settings'})
             
-
         # Check Home Settings Formular
         if zero_position_form.is_valid():
             zero_position_object = zero_position_form.save()
         else:
             return JsonResponse({'error':'Check home settings'})
+
+        #Check flowrate Settings Form
+        flowrate_form = Flowrate_Form(flowrateSettings_data)
+        if flowrate_form.is_valid():
+            flowrate_object = flowrate_form.save()
+        else:
+            return JsonResponse({'error':'Check flowrate settings'})
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
@@ -119,6 +130,7 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
                 development_instance.zero_position = zero_position_object
+                development_instance.flowrate = flowrate_object
                 new_development=development_instance.save()
 
                 return JsonResponse({'message':f'The File {filename} was saved!'})
@@ -135,11 +147,13 @@ class DevelopmentSaveAndLoad(View):
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
+        flowrate_conf=model_to_dict(Flowrate_Db.objects.get(id=development_conf['flowrate']))
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
         development_conf.update(pressure_settings_conf)
         development_conf.update(zero_position_conf)
+        development_conf.update(flowrate_conf)
         
         return JsonResponse(development_conf)
 
@@ -156,75 +170,4 @@ def data_validations(**kwargs):
             return
     return forms_data
 
-def calculateDevelopment(data):
-    data = SimpleNamespace(**data)
-    
-    length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
-    startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
-    
-    zMovement = volumeToZMovement(data.volume,True)
 
-    
-    #speedSplineList = speedSpline([startPoint[0],startPoint[0]+length], [1,1,1],10)
-    
-    #speedfactorList = speedWeighting(speedSplineList[1])
-
-    #allows to set different speeds at different equidistant partials
-    speedfactorList = speedWeighting([1,1,1])
-
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
-
-
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waitTime, speedfactorList):
-    generate = GcodeGenerator(True)
-
-    # No HEATBED CASE
-    if temperature != 0:
-        generate.wait_bed_temperature(temperature)
-        generate.hold_bed_temperature(temperature)
-        generate.report_bed_temperature(4)
-    
-    # Move to the home
-    generate.homming("XY")
-    generate.linear_move_y(startPoint[1],speed)
-    generate.linear_move_x(startPoint[0],speed)
-    generate.finish_moves()
-    #Set relative coordinates
-    generate.set_relative()
-    jj = 0   
-    for x in range(int(applications)*2):
-        #moving to the end of the line
-        if (x%2)==0:
-            generate.pressurize(pressure)
-            generate.toggle_valve()
-            for speedfactor in speedfactorList:
-                generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-            generate.toggle_valve()
-            generate.check_pressure()
-            generate.wait(waitTime)
-            jj += 1
-        #moving back to the start of the line
-        else:
-            if printBothways == 'On':
-                generate.pressurize(pressure)
-                generate.toggle_valve()
-                for speedfactor in speedfactorList:
-                    generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-                generate.toggle_valve()
-                generate.check_pressure()
-                generate.wait(waitTime)
-                jj += 1
-            else:
-                generate.linear_move_x(-1*length,speed)
-        if jj >= int(applications):
-            break
-    #Stop heating
-    if (temperature !=0):
-        generate.hold_bed_temperature(0)
-        generate.report_bed_temperature(0)
-    #set to absolute again
-    generate.set_absolute()    
-    #Homming
-    generate.homming("XY")
-    print(generate.list_of_gcodes)
-    return generate.list_of_gcodes
