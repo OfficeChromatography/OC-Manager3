@@ -2,7 +2,6 @@ $(document).ready(function(){
     checkConnection();
 })
 
-
 let connectionCheckRoomName = 'oc_lab_status';
 var connectionCheckSocket
 
@@ -14,7 +13,6 @@ connectionCheckSocket.onmessage = function(e) {
 chatSocket.onclose = function(e) {
     console.error('Connection check can not be done');
 };
-
 
 function footerState(data){
     console.log(data)

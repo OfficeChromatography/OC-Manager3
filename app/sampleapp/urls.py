@@ -8,8 +8,6 @@ urlpatterns = [
     path('sample/load/<int:id>/', SampleDetails.as_view(), name='samplelist'),
     path('sample/save/', SampleDetails.as_view(), name='samplelist'),
 
-    # path('samplesave/', SampleAppSaveAndLoad.as_view(), name='samplesaveandload'),
     path('sampleapp/', SampleAppPlay.as_view(), name='sampleplay'),
     path('samplecalc/', CalcVol.as_view(), name='samplecalc'),
-    path('table/', Table.as_view(), name='samplecalc'),
 ]
