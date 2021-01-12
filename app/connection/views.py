@@ -25,12 +25,13 @@ class Connection_test(View):
         if 'oc_lab' in request.POST:
             connection_form_instance = ConnectionForm(request.POST, user=request.user)
             if connection_form_instance.is_valid():
-                data = OC_LAB.data_info()
+                data = OC_LAB.device_info()
                 connection = connection_form_instance.save()
                 new_monitor = Monitor_Db(connection=connection)
+                print(new_monitor)
                 new_monitor.save()
             else:
-                data = OC_LAB.data_info()
+                data = OC_LAB.device_info()
             return JsonResponse({**data})
 
         if 'DISCONNECT' in request.POST:
