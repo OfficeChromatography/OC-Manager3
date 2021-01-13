@@ -10,7 +10,7 @@ connectionCheckSocket.onmessage = function(e) {
     checkConnection()
 };
 
-chatSocket.onclose = function(e) {
+connectionCheckSocket.onclose = function(e) {
     console.error('Connection check can not be done');
 };
 
