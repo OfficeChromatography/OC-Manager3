@@ -112,7 +112,7 @@
                         <div class="alert alert-danger alert-dismissible collapse m-1" id='id_save_error' role="alert"></div>
                         <form id='saveform'>
                           <div class="input-group">
-                            {{SampleApplication_Form.file_name}}
+                            <input type="text" name="file_name" class="form-control" maxlength="120" required="" id="id_file_name">
                             <div class="input-group-append">
                               <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
                             </div>
