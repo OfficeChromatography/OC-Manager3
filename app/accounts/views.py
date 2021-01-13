@@ -34,7 +34,7 @@ from .forms import UserRegisterForm, UserLoginForm, ProfileForm, ChangePasswordF
 
 
 def login_view(request):
-    print(request.user.is_authenticated)
+    logout(request)
     form = UserLoginForm(request.POST or None)
     if form.is_valid():
         username = form.cleaned_data.get('username')
@@ -53,6 +53,7 @@ def logout_view(request):
     return render(request,"login.html",{'form':form})
 
 def register_view(request):
+    logout(request)
     form = UserRegisterForm(request.POST or None)
     if form.is_valid():
         # Create an Entry for the new User
