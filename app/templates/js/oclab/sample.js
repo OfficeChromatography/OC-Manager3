@@ -117,7 +117,7 @@ function mainCalculations(){
       newdata[3]={y:offset_bottom_size,x:(i+1)*band_size+(gap_size*i)+offset_left_size}
       newdata[4]=newdata[0]
     }
-    addData2Chart(i,'black', newdata)
+    plotPreview.addData2Chart(i,'black', newdata)
   }
   plotPreview.update();
 }
