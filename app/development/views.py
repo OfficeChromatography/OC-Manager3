@@ -1,17 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import FormView,View
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, Flowrate_Form
-from .models import *#Development_Db, BandSettings_Dev_Db, PlateProperties_Dev_Db, PressureSettings_Dev_Db, flowrate_Db
-import math
+from .models import *
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
-from printrun import printcore, gcoder
-
 import json
-from decimal import *
-
 from finecontrol.forms import ZeroPosition_Form
 from finecontrol.models import ZeroPosition
 
@@ -53,8 +48,7 @@ class DevelopmentPlay(View):
                                     zero_position_form       =   ZeroPosition_Form(request.POST))
 
                 forms_data.update(json.loads(request.POST.get('devBandSettings')))
-                forms_data.update(json.loads(request.POST.get('flowrate')))
-                
+                forms_data.update({'flowrate':json.loads(request.POST['flowrate'])})
                 # With the data, gcode is generated
                 gcode = calculateDevelopment(forms_data)
 
@@ -70,6 +64,7 @@ class DevelopmentPlay(View):
 
 class DevelopmentSaveAndLoad(View):
     def post(self, request):
+        print(request.POST)
         development_form  =   Development_Form(request.POST, request.user)
         plate_properties_form    =   PlateProperties_Form(request.POST)
         pressure_settings_form = PressureSettings_Form(request.POST)
@@ -78,11 +73,11 @@ class DevelopmentSaveAndLoad(View):
 
         devBandSettings = request.POST.get('devBandSettings')
         devBandSettings_data = json.loads(devBandSettings)
+        print(devBandSettings_data)
 
         flowrateSettings = request.POST.get('flowrate')
         flowrateSettings_data = json.loads(flowrateSettings)
         print(flowrateSettings_data)
-        
         # Check Plate Property Formular
         if plate_properties_form.is_valid():
             plate_properties_object = plate_properties_form.save()
@@ -109,12 +104,6 @@ class DevelopmentSaveAndLoad(View):
         else:
             return JsonResponse({'error':'Check home settings'})
 
-        #Check flowrate Settings Form
-        flowrate_form = Flowrate_Form(flowrateSettings_data)
-        if flowrate_form.is_valid():
-            flowrate_object = flowrate_form.save()
-        else:
-            return JsonResponse({'error':'Check flowrate settings'})
 
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
@@ -131,9 +120,13 @@ class DevelopmentSaveAndLoad(View):
                 development_instance.plate_properties = plate_properties_object
                 development_instance.developmentBandSettings = developmentBandSettings_object
                 development_instance.zero_position = zero_position_object
-                development_instance.flowrate = flowrate_object
-                new_development=development_instance.save()
-
+                development_instance.save()
+                for flow_value in flowrateSettings_data:
+                    flowrate_form = Flowrate_Form(flow_value)
+                    if flowrate_form.is_valid():
+                        flowrate_form = flowrate_form.save(commit=False)
+                        flowrate_form.development_in_db = development_instance
+                        flowrate_form.save()
                 return JsonResponse({'message':f'The File {filename} was saved!'})
 
         else:
@@ -141,22 +134,22 @@ class DevelopmentSaveAndLoad(View):
 
     def get(self, request):
         file_name=request.GET.get('filename')
-
-        
         development_conf=model_to_dict(Development_Db.objects.filter(file_name=file_name).filter(auth_id=request.user)[0])
         plate_properties_conf=model_to_dict(PlateProperties_Dev_Db.objects.get(id=development_conf['plate_properties']))
         developmentBandSettings_conf=model_to_dict(BandSettings_Dev_Db.objects.get(id=development_conf['developmentBandSettings']))
         pressure_settings_conf=model_to_dict(PressureSettings_Dev_Db.objects.get(id=development_conf['pressure_settings']))
         zero_position_conf=model_to_dict(ZeroPosition.objects.get(id=development_conf['zero_position']))
-        flowrate_conf=model_to_dict(Flowrate_Db.objects.get(id=development_conf['flowrate']))
+        flowrate_entry=Flowrate_Db.objects.filter(development_in_db=development_conf['id']).values()
+        flowrate_conf={'flowrate':[entry for entry in flowrate_entry]}
 
         development_conf.update(plate_properties_conf)
         development_conf.update(developmentBandSettings_conf)
         development_conf.update(pressure_settings_conf)
         development_conf.update(zero_position_conf)
         development_conf.update(flowrate_conf)
-        
+        print(development_conf)
         return JsonResponse(development_conf)
+#         return JsonResponse({})
 
 # AUX Functions
 

@@ -18,12 +18,17 @@ from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 #     coordinates = list(map(bezierfunc,t))
 #     return coordinates
 
-def cubicSpline(data,steps):
-    x = np.array([0,10,20,30,40,50,60,70,80,90,100])
-    y = np.array(data)
+def cubicSpline(data):
+    step = 100/(len(data)-1)
+    print(data)
+    x = np.arange( 0, 100+step, step )
+    y = np.array([float(i['value']) for i in data])
+#     print(f"X = \t{x}\nY = \t{y}")
     cs = CubicSpline(x,y)
-    t = np.delete(np.linspace(0, 100, steps+1), -1)
+    t = np.linspace(0, 100, len(data))
+#     print(f"t = {t}\ncs = {cs}")
     coordinates = list(map(cs,t))
+
     return coordinates
 
 # def bezier(a1,a2,a3,a4,t):
@@ -51,7 +56,7 @@ def flowrate(length, speed, volume):
 
 def calculateDevelopment(data):
     data = SimpleNamespace(**data)
-    
+    print(data)
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
     
@@ -59,7 +64,7 @@ def calculateDevelopment(data):
 
     
     #speedSplineList = speedSpline(data.a1, data.a2, data.a3, data.a4, 10)
-    speedSplineList = cubicSpline([data.a0, data.a1, data.a2, data.a3, data.a4, data.a5, data.a6, data.a7, data.a8, data.a9, data.a10],10)
+    speedSplineList = cubicSpline(data.flowrate)
     speedfactorList = speedWeighting(speedSplineList)
 
     #print(speedfactorList)

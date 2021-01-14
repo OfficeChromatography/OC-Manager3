@@ -37,7 +37,7 @@
 </head>
 
 
-<body id="page-top" onload="bandsmain();">
+<body id="page-top">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -181,13 +181,7 @@
                   </div>
                 </div>
                 <div class="card-body show" id='platepreviewarea'>
-                  <div class="container">
-                    <div class="row">
-                      <div class="col">
-                        <canvas id="plotPreview" width="400" height="400"></canvas>
-                      </div>
-                    </div>
-                  </div>
+                  {% include 'modules/bandschart/bandschart.html' %}
                 </div>
               </div>
 
@@ -201,11 +195,9 @@
                 </div>
                 <div class="card-body show" id='flowratearea'>
                   <div class="d-flex justify-content-center">
-                    <div id="box" class="jxgbox" style="width:500px; height:500px;"></div>
+                    {% include 'modules/flowrategraph/flowrategraph.html' %}
                   </div>
-                  <script type="text/javascript">
-                  var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-10, 10, 10, -10], axis:true});
-                  </script>
+
                 </div>
               </div>
 

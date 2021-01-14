@@ -1,44 +1,3 @@
-// Graph var
-var ctx = document.getElementById('plotPreview').getContext('2d');
-var plotPreview = new Chart(ctx, {
-   type: 'scatter',
-   data: {
-      datasets: [{
-         borderColor: 'black',
-         backgroundColor: 'transparent',
-         borderWidth: 1,
-         pointBackgroundColor: ['#000', '#000', '#000'],
-         pointRadius: 1,
-         pointHoverRadius: 1,
-         fill: false,
-         tension: 0,
-         showLine: true,
-      },]
-   },
-   options:{
-      legend:{
-        display:false
-      },
-      scales: {
-        yAxes: [{
-          stacked: true,
-          ticks: {
-            min: 0, // minimum value
-            max: 100, // maximum value
-            reverse: true,
-          },
-        }],
-        xAxes: [{
-          stacked: true,
-          ticks: {
-            min: 0, // minimum value
-            max: 100, // maximum value
-          },
-        }]
-
-    }
-   },
-});
 window.table = new Table(0, calcVol);
 
 $(document).ready(function() {
@@ -141,7 +100,7 @@ function mainCalculations(){
       break;
   }
 
-  while(plotPreview.data.datasets.pop()!=undefined){}
+  plotPreview.eliminateAllPoints()
   for(i=0;i<number_bands;i++){
     newdata = []
     if(i==0){
@@ -177,17 +136,16 @@ function areErrors(error_id, bolean_exp){
 
 //  Calculates the Working Area
 function nBandsWorkingArea(){
-
-    plate_x_size = parseFloat($("#id_size_x").val());
-    plate_y_size = parseFloat($("#id_size_y").val());
-    offset_left_size = parseFloat($("#id_offset_left").val());
-    offset_right_size = parseFloat($("#id_offset_right").val());
-    offset_top_size = parseFloat($("#id_offset_top").val());
-    offset_bottom_size = parseFloat($("#id_offset_bottom").val());
+    let plate_x_size = parseFloat($("#id_size_x").val());
+    let plate_y_size = parseFloat($("#id_size_y").val());
+    let offset_left_size = parseFloat($("#id_offset_left").val());
+    let offset_right_size = parseFloat($("#id_offset_right").val());
+    let offset_top_size = parseFloat($("#id_offset_top").val());
+    let offset_bottom_size = parseFloat($("#id_offset_bottom").val());
 
     working_area = [plate_x_size-offset_left_size-offset_right_size,plate_y_size-offset_top_size-offset_bottom_size]
     if(working_area[0] <= 0 || working_area[1] <= 0 || isNaN(working_area[0]) || isNaN(working_area[1])){
-    return [NaN,NaN];
+        return [NaN,NaN];
     }
     else{
       return working_area;
@@ -216,22 +174,7 @@ function totalBandsLength(working_area,sum_gaps_size,number_bands){
   }
 }
 
-// add new bands to the chart
-function addData2Chart(label, color, data) {
-    plotPreview.data.datasets.push({
-        label: label,
-        backgroundColor: color,
-        data: data,
-        borderColor: 'black',
-        borderWidth: 1,
-        pointRadius: 2,
-        pointHoverRadius: 4,
-        fill: true,
-        tension: 0,
-        showLine: true,
-    });
-    plotPreview.update();
-}
+
 
 // Create a new Table with a given number of rows
 function newComponentsTable(number_row){
@@ -365,8 +308,7 @@ function loadlistofsampleapps(){
 
 // Endpoints
 $('#stopbttn').on('click', function (e) {
-  event.preventDefault()
-  //
+  e.preventDefault()
   $formData = 'STOP&'
   $endpoint = window.location.origin+'/oclab/control/',
   $.ajax({
@@ -384,7 +326,7 @@ $('#stopbttn').on('click', function (e) {
   function stopMethodError(jqXHR, textStatus, errorThrown){}
 })
 $('#pausebttn').on('click', function (e) {
-  event.preventDefault()
+  e.preventDefault()
   //
   $formData = 'PAUSE&'
   $endpoint = window.location.origin+'/oclab/control/',
@@ -403,7 +345,7 @@ $('#pausebttn').on('click', function (e) {
   function pauseMethodError(jqXHR, textStatus, errorThrown){}
 })
 $('#startbttn').on('click', function (e) {
-  event.preventDefault()
+  e.preventDefault()
   //
   $formData = 'START&'+$('#plateform').serialize()+'&'+$('#movementform').serialize()+'&'+$('#saveform').serialize()+'&'+$('#zeroform').serialize()+'&table='+JSON.stringify(table.getTableValues())
   $endpoint = window.location.origin+'/sampleapp/'
