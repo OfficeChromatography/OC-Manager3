@@ -32,10 +32,13 @@ class SampleList(FormView):
 
 class SampleView(FormView):
     def get(self, request):
-        list_of_samples = {
-            'list_load': SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
-        }
-        return render(request, 'sample.html', list_of_samples)
+        # list_of_samples = {
+        #     'list_load': SampleApplication_Db.objects.filter(auth_id=request.user).order_by('-id')
+        # }
+        # return render(request, 'sample.html', list_of_samples)
+        forms['list_load'] = SampleApplication_Db.objects.filter(auth=request.user).order_by('-id')
+        #print(forms['list_load'])
+        return render(request,'sample.html',forms)
 
 class SampleDetails(View):
     def get(self, request, id):
