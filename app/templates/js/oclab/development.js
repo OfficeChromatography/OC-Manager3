@@ -136,7 +136,7 @@ $('#savebttn').on('click', function (e) {
   e.preventDefault()
   let $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
   +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+flowGraph.saveSegment(true)
-  let $endpoint = window.location.origin+'/developmentsave/'
+  let $endpoint = window.location.origin+'/development/save/'
   $.ajax({
     method: 'POST',
     url:    $endpoint,

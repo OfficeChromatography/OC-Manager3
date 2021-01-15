@@ -63,7 +63,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume','fluid','applications','waitTime','printBothways','density','viscosity','description']
+        fields = ['volume', 'fluid', 'applications', 'waitTime', 'printBothways', 'density', 'viscosity', 'description']
         widgets = {
             'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
             'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
@@ -96,6 +96,7 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
         }
 
         def clean(self):
+            print(f"CleanedData: {self.cleaned_data}")
             fluid = self.cleaned_data.get("fluid")
             density = self.cleaned_data.get("density")
             viscosity = self.cleaned_data.get("viscosity")
@@ -105,7 +106,10 @@ class DevelopmentBandSettings_Form(forms.ModelForm):
                         "Specify Density and Viscosity!"
                     )
             return self.cleaned_data
-            
+
+        def clean_printBothways(self):
+            print(f"CLEANEADda: {self.cleaned_data}")
+
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', {})
