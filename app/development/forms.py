@@ -6,18 +6,7 @@ from .models import *
 class Development_Form(forms.ModelForm):
     class Meta:
         model = Development_Db
-        fields = ['file_name']
-        widgets = {
-            'file_name':        forms.TextInput(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'file_name':        _('Filename'),
-        }
-        error_messages = {
-            'file_name': {
-                'max_length': _("This name is too long."),
-            },
-        }
+        fields = ['filename']
 
 class PlateProperties_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -52,63 +41,19 @@ class PlateProperties_Form(forms.ModelForm):
         }
 
 class DevelopmentBandSettings_Form(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        initial = kwargs.get('initial', {})
-        initial['volume'] = 1000
-        initial['applications'] = 10
-        initial['fluid'] = 'Methanol'
-        initial['waitTime'] = 0
-        kwargs['initial'] = initial
-        super(DevelopmentBandSettings_Form, self).__init__(*args, **kwargs)
+
+    # printBothways = forms.BooleanField()
 
     class Meta:
         model = BandSettings_Dev_Db
-        fields = ['volume', 'fluid', 'applications', 'waitTime', 'printBothways', 'density', 'viscosity', 'description']
-        widgets = {
-            'volume'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'fluid'    : forms.Select(attrs={'class': 'form-control'}, choices=[
-                ('n-Hexane','n-Hexane'),
-                ('Pentane','Pentane'),
-                ('Cyclohexane','Cyclohexane'),
-                ('Carbon Tetrachloride','Carbon Tetrachloride'),
-                ('Toluene','Toluene'),
-                ('Chloroform','Chloroform'),
-                ('Dichloromethane','Dichloromethane'),
-                ('Diethyl ether','Diethyl ether'),
-                ('Ethyl acetate','Ethyl acetate'),
-                ('Acetone','Acetone'),
-                ('Ethanol','Ethanol'),
-                ('Methanol','Methanol'),
-                ('Pyridine','Pyridine'),
-                ('Water','Water'),
-                ('Specific','Specific')
-            ]),
-            'applications'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'waitTime'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'description': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'volume'         : _('Volume'),
-            'fluid'         : _('Fluid'),
-            'applications'   : _('Applications'),
-            'waitTime'    : _('Waiting Time'),
-            'description' : _('Description')
-        }
+        fields = ['volume', 'fluid', 'applications', 'printBothways','waitTime', 'density', 'viscosity', 'description']
 
-        def clean(self):
-            print(f"CleanedData: {self.cleaned_data}")
-            fluid = self.cleaned_data.get("fluid")
-            density = self.cleaned_data.get("density")
-            viscosity = self.cleaned_data.get("viscosity")
-            if fluid == 'Specific':
-                if density == "null" or viscosity == "null":
-                    raise forms.ValidationError(
-                        "Specify Density and Viscosity!"
-                    )
-            return self.cleaned_data
-
-        def clean_printBothways(self):
-            print(f"CLEANEADda: {self.cleaned_data}")
+    def clean(self):
+        if self.cleaned_data.get('printBothways'):
+            self.cleaned_data['printBothways']="True"
+        else:
+            self.cleaned_data['printBothways']="False"
+        return self.cleaned_data
 
 class PressureSettings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):

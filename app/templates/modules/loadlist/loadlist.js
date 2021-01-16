@@ -1,8 +1,9 @@
 class listOfSaved{
-    constructor(save_url, list_url, get_url){
+    constructor(save_url, list_url, get_url, saveEvent){
         this.save_url = save_url;
         this.list_url = list_url;
         this.get_url = get_url;
+        this.saveEvent = saveEvent;
     }
 
     loadList(){
@@ -81,7 +82,7 @@ class listOfSaved{
     $click_rename_button_handler(){
         //    FALTA MANDAR A API PARA RENOMBRAR
         $("#rename_bttn").on("click",function (){
-            let id = $("new_filename").attr("id-selected")
+            let id = $("#selected-element-id").val()
             let name = $("new_filename").val()
         })
     }
@@ -90,7 +91,7 @@ class listOfSaved{
         $("#new_method_bttn").on("click",function(){
             $("#list-load").find("a.active").removeClass("active")
             $('#new_filename').val("")
-            $('#new_filename').attr("id-selected","")
+            $('#selected-element-id').val("")
             $('#rename_bttn').hide()
         })
     }
@@ -99,23 +100,32 @@ class listOfSaved{
         //    FALTA MANDAR A API PARA guardar
         let mainList = this;
         $("#save_bttn").on("click",function (){
-            let data = $('form').serialize()
-            $.post(mainList.save_url,data)
-                .done(function (){
-                    console.log("DONE")
-                })
-                .fail(function(){
-                    console.log("FAIL")
-                })
-                .always(function (){
-                    console.log("ALWAYS")
-                })
+            data = mainList.saveEvent()
+            mainList.$save(data)
         })
+    }
+
+    $save(data){
+        let mainList = this;
+        var jqxhr = $.post( mainList.save_url, data,function() {
+//          alert( "success" );
+        })
+        .done(function(data) {
+//        alert( "second success" );
+        console.log(data)
+        })
+        .fail(function(data) {
+//        alert( "error" );
+        })
+        .always(function(data) {
+//        alert( "finished" );
+        });
     }
 
     $delete_element(object){
         console.log(object.attr("value_saved"))
     }
+
 
     $get_element_data(e){
         //Gets the data save it in data_received
@@ -123,7 +133,7 @@ class listOfSaved{
         $.get(this.get_url+"/"+e.attr('value_saved')+"/").done(function (data){
             mainList.data_recieved = data
             $('#new_filename').val(data.file_name)
-            $('#new_filename').attr("id-selected",data.id)
+            $('#selected-element-id').val(data.id)
             $('#rename_bttn').show()
             console.log(data)
         })

@@ -345,15 +345,23 @@ function flowrateCalc(){
   flowrate = Math.round(volume / time / applications, 3);
   $('#flowrate').text('estimated flowrate: ' + flowrate + " ul/s");
 }
+
+var getData = function(){
+    data = $('form').serialize()+flowGraph.saveSegment(true)
+    return data
+}
+
+
 var list_of_saved = new listOfSaved("http://127.0.0.1:8000/development/save/",
     "http://127.0.0.1:8000/development/list",
-    "http://127.0.0.1:8000/development/load")
+    "http://127.0.0.1:8000/development/load",
+    getData
+    )
 
 $(document).ready(function() {
   flowrateCalc();
   list_of_saved.loadList()
 });
-
 
 
 

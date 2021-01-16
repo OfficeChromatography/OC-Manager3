@@ -20,16 +20,19 @@ forms = {
     'Flowrate_Form': Flowrate_Form(),
 }
 
+
 class DevelopmentView(FormView):
     def get(self, request):
         """Manage the HTML view in Development"""
         return render(request, 'development.html', {})
 
+
 class DevelopmentList(FormView):
+
     def get(self, request):
         """Returns a list with all the SampleApplications save in DB"""
         developments = Development_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = [[development.file_name, development.id] for development in developments]
+        data_saved = [[development.filename, development.id] for development in developments]
         return JsonResponse(data_saved, safe=False)
 
 class DevelopmentDetail(View):
@@ -56,57 +59,35 @@ class DevelopmentDetail(View):
 
     def post(self, request):
         """Save and Update Data"""
-        print(request.POST)
-        development_form  =  Development_Form(request.POST, request.user)
+        development_form = Development_Form(request.POST, request.user)
+
         objects_save = data_validations_and_save(
-            plate_properties    =   PlateProperties_Form(request.POST),
+            plate_properties = PlateProperties_Form(request.POST),
             pressure_settings = PressureSettings_Form(request.POST),
-            zero_position       =   ZeroPosition_Form(request.POST)
+            zero_position = ZeroPosition_Form(request.POST),
+            developmentBandSettings_form = DevelopmentBandSettings_Form(request.POST),
         )
-        devBandSettings = request.POST.get('devBandSettings')
-        devBandSettings_data = json.loads(devBandSettings)
 
         flowrateSettings = request.POST.get('flowrate')
         flowrateSettings_data = json.loads(flowrateSettings)
 
-#         Check Band Settings Formular
-        developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
-        if developmentBandSettings_form.is_valid():
-            developmentBandSettings_object = developmentBandSettings_form.save()
-        else:
-            return JsonResponse({'error':'Check band properties'})
-
         # If everything is OK then it checks the name and tries to save the Complete Sample App
         if development_form.is_valid():
-            filename = development_form.cleaned_data['file_name']
-            in_db = Development_Db.objects.filter(file_name=filename).filter(auth_id=request.user)
-
-            # Check if theres
-            if len(in_db)>0:
-                in_db[0].pressure_settings = objects_save['pressure_settings']
-                in_db[0].plate_properties = objects_save['plate_properties']
-                in_db[0].developmentBandSettings = developmentBandSettings_object
-                in_db[0].zero_position = objects_save['zero_position']
-                in_db[0].save()
-                Flowrate_Db.objects.filter(development_in_db=in_db[0].id).delete()
-                for flow_value in flowrateSettings_data:
-                    flowrate_form = Flowrate_Form(flow_value)
-                    if flowrate_form.is_valid():
-                        flowrate_form = flowrate_form.save(commit=False)
-                        flowrate_form.development_in_db = in_db[0]
-                        flowrate_form.save()
-                    else:
-                        JsonResponse({'error': flowrate_form.errors})
-                return JsonResponse({'message':'Data updated!!'})
-            else:
+            id = request.POST.get("selected-element-id")
+            try:
+                development_instance = Development_Db.objects.get(pk=id)
+                Flowrate_Db.objects.filter(development_in_db=development_instance.id).delete()
+            except:
                 development_instance = development_form.save(commit=False)
                 development_instance.auth = request.user
-                development_instance.pressure_settings = objects_save['pressure_settings']
-                development_instance.plate_properties = objects_save['plate_properties']
-                development_instance.developmentBandSettings = developmentBandSettings_object
-                development_instance.zero_position = objects_save['zero_position']
-                development_instance.save()
-                for flow_value in flowrateSettings_data:
+
+            development_instance.pressure_settings=objects_save['pressure_settings']
+            development_instance.plate_properties = objects_save['plate_properties']
+            development_instance.developmentBandSettings = objects_save['developmentBandSettings_form']
+            development_instance.zero_position = objects_save['zero_position']
+            development_instance.save()
+
+            for flow_value in flowrateSettings_data:
                     flowrate_form = Flowrate_Form(flow_value)
                     if flowrate_form.is_valid():
                         flowrate_form = flowrate_form.save(commit=False)
@@ -114,7 +95,8 @@ class DevelopmentDetail(View):
                         flowrate_form.save()
                     else:
                         JsonResponse({'error': flowrate_form.errors})
-                return JsonResponse({'message':f'The File {filename} was saved!'})
+            return JsonResponse({'message':'Data !!'})
+
 
 class DevelopmentAppPlay(View):
         def post(self, request):
