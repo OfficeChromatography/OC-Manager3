@@ -2,8 +2,7 @@ from django.shortcuts import render
 from django.views.generic import FormView, View
 from django.http import JsonResponse
 from django.shortcuts import render
-from .forms import Development_Form, PlateProperties_Form, DevelopmentBandSettings_Form, PressureSettings_Form, \
-    Flowrate_Form
+from .forms import *
 from .models import *
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
@@ -24,10 +23,7 @@ forms = {
 class DevelopmentView(FormView):
     def get(self, request):
         """Manage the HTML view in Development"""
-        list_of_developments = {
-            'list_load': Development_Db.objects.filter(auth_id=request.user).order_by('-id')
-        }
-        return render(request, 'development.html', list_of_developments)
+        return render(request, 'development.html', {})
 
 class DevelopmentList(FormView):
     def get(self, request):
@@ -60,6 +56,7 @@ class DevelopmentDetail(View):
 
     def post(self, request):
         """Save and Update Data"""
+        print(request.POST)
         development_form  =  Development_Form(request.POST, request.user)
         objects_save = data_validations_and_save(
             plate_properties    =   PlateProperties_Form(request.POST),
@@ -72,7 +69,7 @@ class DevelopmentDetail(View):
         flowrateSettings = request.POST.get('flowrate')
         flowrateSettings_data = json.loads(flowrateSettings)
 
-        # Check Band Settings Formular
+#         Check Band Settings Formular
         developmentBandSettings_form = DevelopmentBandSettings_Form(devBandSettings_data)
         if developmentBandSettings_form.is_valid():
             developmentBandSettings_object = developmentBandSettings_form.save()
