@@ -53,7 +53,6 @@ class flowRateGraph{
     }
 
     loadSegment = function (flowrates){
-        console.log(flowrates)
         this.brd.suspendUpdate();
         this.removeSegment();
         flowrates.forEach(function (currentValue, index, array){

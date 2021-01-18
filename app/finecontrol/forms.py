@@ -66,22 +66,10 @@ class CleaningProcessForm(forms.ModelForm):
         return int(self.cleaned_data['pressure'])
 
 class ZeroPosition_Form(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        initial = kwargs.get('initial', {})
-        initial['zero_x'] = 5
-        initial['zero_y'] = 18
-        kwargs['initial'] = initial
-        super(ZeroPosition_Form, self).__init__(*args, **kwargs)
+
     class Meta:
         model = ZeroPosition
         fields = ['zero_x','zero_y']
-        widgets = {
-            'zero_x'   : forms.NumberInput(attrs={'class': 'form-control'}),
-            'zero_y'   : forms.NumberInput(attrs={'class': 'form-control'}),
-        }
-        labels = {
-            'zero_x'     : _('X0'),
-            'zero_y'     : _('Y0'),
-        }
+
 
 

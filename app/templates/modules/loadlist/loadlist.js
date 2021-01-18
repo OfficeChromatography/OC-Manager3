@@ -1,20 +1,34 @@
 class listOfSaved{
-    constructor(save_url, list_url, get_url, saveEvent){
+    constructor(save_url, list_url, get_url, saveEvent, loadEvent){
         this.save_url = save_url;
         this.list_url = list_url;
         this.get_url = get_url;
         this.saveEvent = saveEvent;
+        this.loadEvent = loadEvent;
+
+        this.$click_new_button_handler()
+        this.$click_save_button_handler()
     }
 
     loadList(){
         // Query the elements
         let mainList = this;
         $.get( this.list_url, function( elements ) {
+            mainList.$cleanList()
             elements.forEach(element => mainList.$addToList(element))
         }).done(function (e){
-            mainList.$loadEventsHandler();
-            $("#list-load a").first().trigger("click")
+            if($("#list-load").children().length>0){
+                mainList.$loadEventsHandler();
+                $("#list-load a").first().trigger("click")
+            }
+            else{
+                $("#new_method_bttn").trigger("click")
+            }
         });
+    }
+
+    $cleanList(){
+        $('#list-load').empty()
     }
 
     $addToList(element){
@@ -27,11 +41,11 @@ class listOfSaved{
         // Creates the new element in list
         let mainList = this;
 
-        let flex_container = $("<div class=\"d-flex flex-row justify-content-between align-items-center\"></div>")
-        let element = $("<a class=\"saved_element\" style=\"width:100%\">"+ text +"</a>")
+        let flex_container = $("<div class=\"d-flex py-0 flex-row justify-content-between align-items-center\"></div>")
+        let element = $("<a class=\"saved_element py-2\" style=\"width:100%\">"+ text +"</a>")
         let trash_can = $("<i class=\"fas fa-trash saved_element_trash_can\"></i>")
 
-        flex_container.addClass('list-group-item list-group-item-action py-1')
+        flex_container.addClass('list-group-item list-group-item-action')
         flex_container.attr('role','tab')
         flex_container.attr('href','#list-home')
         flex_container.attr('data-toggle','list')
@@ -44,11 +58,8 @@ class listOfSaved{
     }
 
     $loadEventsHandler(){
-        this.$click_new_button_handler()
-        this.$click_save_button_handler()
-        this.$click_rename_button_handler()
-        this.$delete_element_handler()
         this.$click_element_handler()
+        this.$delete_element_handler()
     }
 
     $click_element_handler(){
@@ -79,27 +90,18 @@ class listOfSaved{
         })
     }
 
-    $click_rename_button_handler(){
-        //    FALTA MANDAR A API PARA RENOMBRAR
-        $("#rename_bttn").on("click",function (){
-            let id = $("#selected-element-id").val()
-            let name = $("new_filename").val()
-        })
-    }
-
     $click_new_button_handler(){
         $("#new_method_bttn").on("click",function(){
             $("#list-load").find("a.active").removeClass("active")
             $('#new_filename').val("")
             $('#selected-element-id').val("")
-            $('#rename_bttn').hide()
         })
     }
 
     $click_save_button_handler(){
-        //    FALTA MANDAR A API PARA guardar
         let mainList = this;
-        $("#save_bttn").on("click",function (){
+        $("#save_bttn").on("click",function (e){
+            e.preventDefault()
             data = mainList.saveEvent()
             mainList.$save(data)
         })
@@ -112,7 +114,7 @@ class listOfSaved{
         })
         .done(function(data) {
 //        alert( "second success" );
-        console.log(data)
+            mainList.loadList()
         })
         .fail(function(data) {
 //        alert( "error" );
@@ -123,7 +125,13 @@ class listOfSaved{
     }
 
     $delete_element(object){
-        console.log(object.attr("value_saved"))
+        let mainList = this;
+        $.ajax({
+            url: mainList.get_url+"/"+object.attr("value_saved"),
+            type: 'DELETE',
+        }).done(function (){
+            mainList.loadList()
+        })
     }
 
 
@@ -132,10 +140,9 @@ class listOfSaved{
         let mainList = this;
         $.get(this.get_url+"/"+e.attr('value_saved')+"/").done(function (data){
             mainList.data_recieved = data
-            $('#new_filename').val(data.file_name)
+            $('#new_filename').val(data.filename)
             $('#selected-element-id').val(data.id)
-            $('#rename_bttn').show()
-            console.log(data)
+            mainList.loadEvent(data)
         })
     }
 }

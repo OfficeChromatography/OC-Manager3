@@ -351,11 +351,27 @@ var getData = function(){
     return data
 }
 
+var setData = function (data){
+  console.log(data)
+  $.each(data,function (key,value){
+    $('input[name='+key+']').val(value)
+    if(key=="printBothways"){
+      if(value=="True"){
+        $('input[name='+key+']').prop('checked', true);
+      }
+      else{
+        $('input[name='+key+']').prop('checked', false);
+      }
+    }
+  })
+  flowGraph.loadSegment(data.flowrate)
+}
 
 var list_of_saved = new listOfSaved("http://127.0.0.1:8000/development/save/",
     "http://127.0.0.1:8000/development/list",
     "http://127.0.0.1:8000/development/load",
-    getData
+    getData,
+    setData
     )
 
 $(document).ready(function() {
