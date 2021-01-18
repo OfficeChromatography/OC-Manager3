@@ -95,7 +95,7 @@ def calculate(data):
                     applicationline=[]
                     current_length=deltaX/2
                     while current_length<=length:
-                        applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
+                        applicationline.append([current_length+float(zeros), float(data.offset_bottom)+current_height])
                         current_length+=deltaX
                     bandlist.append(applicationline)
                     current_height+=deltaY
@@ -105,7 +105,7 @@ def calculate(data):
                     applicationline=[]
                     current_length=0.
                     while current_length<=length:
-                        applicationline.append([float(data.offset_bottom)+current_height, current_length+float(zeros)])
+                        applicationline.append([current_length+float(zeros), float(data.offset_bottom)+current_height])
                         current_length+=deltaX
                     bandlist.append(applicationline)
                     current_height+=deltaY
@@ -136,7 +136,7 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
     for band in list_of_bands:
         for index, list_of_points in enumerate(band):
             for point in list_of_points:
-                generate.linear_move_xy(point[1], point[0], speed)
+                generate.linear_move_xy(point[0], point[1], speed)
                 generate.finish_moves()
                 generate.pressurize(pressure)
                 generate.open_valve(frequency)
