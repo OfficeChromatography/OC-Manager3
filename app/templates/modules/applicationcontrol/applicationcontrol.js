@@ -23,46 +23,58 @@ class ApplicationControl{
     }
 
     $click_start_button_handler(){
-        application_control = this
+        let application_control = this
         $("#start_bttn").on("click",function(){
-            if (application_control.state == "paused"){
-                $.post(application_control.control_url,{RESUME:''}).done(function(){
-                    application_control.state = "started"
-                    application_control.$change_state()
-                    $(this).text("Start")
-                    }
-                )
-            }
-            else{
-                $.post(application_control.play_url,application_control.getData()).done(function(){
-                    application_control.state = "started"
-                    application_control.$change_state()
-                    $(this).text("Start")
-                    }
-                )
-            }
+            (application_control.state == "paused" ? application_control.$resume() : application_control.$start());
         })
     }
+
     $click_stop_button_handler(){
+        application_control = this
         $("#stop_bttn").on("click",function(){
-            console.log("STOP")
-            $.post(application_control.control_url,{STOP:''}).done(function(){
-                application_control.state = "stopped"
-                application_control.$change_state()
-                }
-            )
+            application_control.$stop()
         })
     }
+
     $click_pause_button_handler(){
         application_control = this
         $("#pause_bttn").on("click",function(){
-            if(application_control.state == "started"){
-                    $("#start_bttn").text("Resume")
-                    $.post(application_control.control_url,{PAUSE:''}).done(function(){
-                    application_control.state = "paused"
-                    application_control.$change_state()
-                    })
+            if(application_control.state == "started") application_control.$pause();
+        })
+    }
+
+    $resume(){
+        $.post(application_control.control_url,{RESUME:''}).done(function(){
+            application_control.state = "started"
+            application_control.$change_state()
+            $("#start_bttn").text("Start")
             }
+        )
+    }
+
+    $start(){
+        $.post(application_control.play_url,application_control.getData()).done(function(){
+                    application_control.state = "started"
+                    application_control.$change_state()
+                    $(this).text("Start")
+                    }
+        )
+    }
+
+    $stop(){
+        $.post(application_control.control_url,{STOP:''}).done(function(){
+                application_control.state = "stopped"
+                $("#start_bttn").text("Start")
+                application_control.$change_state()
+                }
+        )
+    }
+
+    $pause(){
+        $("#start_bttn").text("Resume")
+        $.post(application_control.control_url,{PAUSE:''}).done(function(){
+            application_control.state = "paused"
+            application_control.$change_state()
         })
     }
 }

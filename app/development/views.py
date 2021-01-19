@@ -106,24 +106,16 @@ class DevelopmentDetail(View):
 
 class DevelopmentAppPlay(View):
         def post(self, request):
-            if 'START' in request.POST:
-                if OC_LAB.paused == True:
-                    OC_LAB.resume()
-                else:
-                    # Run the form validations and return the clean data
-                    forms_data = data_validations(plate_properties_form=PlateProperties_Form(request.POST),
-                                                  pressure_settings_form=PressureSettings_Form(request.POST),
-                                                  zero_position_form=ZeroPosition_Form(request.POST))
+            flowrates = json.loads(request.POST.get('flowrate'))
+            forms_data = data_validations( plate_properties=PlateProperties_Form(request.POST),
+                                            pressure_settings=PressureSettings_Form(request.POST),
+                                            zero_position=ZeroPosition_Form(request.POST),
+                                            band_settings=DevelopmentBandSettings_Form(request.POST))
 
-                    forms_data.update(json.loads(request.POST.get('devBandSettings')))
-                    forms_data.update({'flowrate': json.loads(request.POST['flowrate'])})
-                    # With the data, gcode is generated
-                    gcode = calculateDevelopment(forms_data)
-
-                    # Printrun
-                    OC_LAB.print_from_list(gcode)
-                    return JsonResponse({'error': 'f.errors'})
-
+            forms_data['flowrate'] = flowrates
+            gcode = calculateDevelopment(forms_data)
+            OC_LAB.print_from_list(gcode)
+            return JsonResponse({'error': 'f.errors'})
 
 # AUX Functions
 

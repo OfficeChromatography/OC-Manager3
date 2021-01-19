@@ -68,7 +68,7 @@ def calculateDevelopment(data):
     speedfactorList = speedWeighting(speedSplineList)
 
     #print(speedfactorList)
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.motor_speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
 
 
 def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waitTime, speedfactorList):
