@@ -132,101 +132,6 @@ $('#startbttn').on('click', function (e) {
   }
   function startMethodError(jqXHR, textStatus, errorThrown){}
 })
-$('#savebttn').on('click', function (e) {
-  e.preventDefault()
-  let $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
-  +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+flowGraph.saveSegment(true)
-  let $endpoint = window.location.origin+'/development/save/'
-  $.ajax({
-    method: 'POST',
-    url:    $endpoint,
-    data:   $formData,
-    success: saveMethodSuccess,
-    error: saveMethodError,
-  })
-  function saveMethodSuccess(data, textStatus, jqXHR){
-    console.log(typeof(data.error));
-    if(data.error===undefined){
-      $('#id_save_sucess').html(data.message)
-      $( "#id_save_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
-    }
-    else {
-      $('#id_save_error').html(data.error)
-      $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
-    }
-
-
-  }
-  function saveMethodError(jqXHR, textStatus, errorThrown){
-    console.log(data);
-    $('#id_save_error').html(data.error)
-    $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
-  }
-})
-$('#list-load a').on('click', function (e) {
-  e.preventDefault()
-  data={'filename':$(this)[0].innerHTML}
-  $.ajax({
-    method: 'GET',
-    url:    window.location.origin+'/developmentsave/',
-    data:   data,
-    success: loadMethodSuccess,
-    error: loadMethodError,
-  })
-  function loadMethodSuccess(data, textStatus, jqXHR){
-    // Load all the fields with the ones get in the database
-    $("#id_speed").val(data.speed)
-    $("#id_pressure").val(data.pressure)
-    // $("#id_frequency").val(data.frequency)
-    $("#id_temperature").val(data.temperature)
-    // $("#id_delta_x").val(data.delta_x)
-    $('#id_nozzlediameter').val(data.nozzlediameter)
-
-    $("#id_zero_x").val(data.zero_x)
-    $("#id_zero_y").val(data.zero_y)
-
-    $("#id_size_x").val(data.size_x)
-    $("#id_size_y").val(data.size_y)
-
-    $("#id_offset_left").val(data.offset_left)
-    $("#id_offset_right").val(data.offset_right)
-    $("#id_offset_top").val(data.offset_top)
-    $("#id_offset_bottom").val(data.offset_bottom)
-
-    $("#id_volume").val(data.volume)
-    $("#id_applications").val(data.applications)
-    $("#id_precision").val(data.precision)
-    $("#id_waitTime").val(data.waitTime)
-    $("#id_description").val(data.description)
-
-    if (data.printBothways==='On') {
-      $("#printBothwaysButton").text('On');
-    } else {
-      $("#printBothwaysButton").text('Off');
-    }
-
-    $('#id_fluid').val(data.fluid)
-
-    if (data.fluid === 'Specific') {
-      $('#specificFluidTable').show()
-    } else {
-      $('#specificFluidTable').hide()
-    }
-
-    $('#densityval').text(data.density)
-    $('#viscosityval').text(data.viscosity)
-
-    $('#id_load_sucess').html(data.file_name+' successfully loaded!')
-    $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
-    mainCalculations()
-    plotPreview.changeGraphSize()
-    flowGraph.loadSegment(data.flowrate)
-  }
-  function loadMethodError(jqXHR, textStatus, errorThrown){
-    console.log('error');
-  }
-})
-
 
 function getSpecificFluid(toString){
   data = {}
@@ -352,7 +257,6 @@ var getData = function(){
 }
 
 var setData = function (data){
-  console.log(data)
   $.each(data,function (key,value){
     $('input[name='+key+']').val(value)
     if(key=="printBothways"){
@@ -373,6 +277,10 @@ var list_of_saved = new listOfSaved("http://127.0.0.1:8000/development/save/",
     getData,
     setData
     )
+
+var application_control = new ApplicationControl('http://127.0.0.1:8000/oclab/control/',
+                                                'http://127.0.0.1:8000/development/start/',
+                                                getData)
 
 $(document).ready(function() {
   flowrateCalc();

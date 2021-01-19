@@ -6,4 +6,6 @@ urlpatterns = [
 
     path('development/load/<int:id>/', DevelopmentDetail.as_view(), name='development_element'),
     path('development/save/', DevelopmentDetail.as_view(), name='development_element'),
+
+    path('development/start/', DevelopmentAppPlay.as_view(), name='development_element'),
 ]
