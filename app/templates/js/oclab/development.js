@@ -26,7 +26,7 @@ function mainCalculations(){
   let offset_top_size = parseFloat($("#id_offset_top").val());
   let offset_bottom_size = parseFloat($("#id_offset_bottom").val());
 
-  let volume = parseFloat($("#id_volume").val());
+  let volume = parseFloat($("#id_develop_volume").val());
   let printBothways = $('#printBothwaysButton').text();
 
   let band_height = 0.1;
@@ -160,8 +160,8 @@ function getAsText(readFile) {
 
 function flowrateCalc(){
   length = $("#id_size_x").val() - $("#id_offset_left").val() - $("#id_offset_right").val();
-  speed = $("#id_speed").val();
-  volume = $("#id_volume").val();
+  speed = $("#id_motor_speed").val();
+  volume = $("#id_develop_volume").val();
   applications = $("#id_applications").val();
   time = length / speed;
   flowrate = Math.round(volume / time / applications, 3);
