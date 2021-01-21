@@ -101,7 +101,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             jj += 1
         #moving back to the start of the line
         else:
-            if printBothways == 'On':
+            if printBothways == 'True':
                 generate.pressurize(pressure)
                 generate.toggle_valve()
                 for speedfactor in speedfactorList:
