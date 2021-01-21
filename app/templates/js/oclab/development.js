@@ -186,6 +186,7 @@ var setData = function (data){
     }
   })
   flowGraph.loadSegment(data.flowrate)
+  $(".change-graph-size-parameter").trigger("change")
 }
 
 var list_of_saved = new listOfSaved("http://127.0.0.1:8000/development/save/",
