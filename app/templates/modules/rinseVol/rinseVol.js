@@ -6,7 +6,7 @@ $("#pump_manual").on('click',function(e){
     $.ajax({
     method: 'POST',
     url:    window.location.origin+'/staticpurge/',
-    data:   $("#static-form").serialize(),
+    data:   $("#rinse-form").serialize(),
     success: staticCleanMethodSuccess,
     error: staticCleanMethodError,
     })

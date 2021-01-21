@@ -160,8 +160,8 @@ clean = Cleaning();
 
 class StaticPurge(View):
     def post(self, request):
-        if request.POST.get('volume'):
-            gcode = clean.static_cleaning(float(request.POST.get('volume')),float(request.POST.get('speed')))
+        if request.POST.get('rinse_volume'):
+            gcode = clean.static_cleaning(float(request.POST.get('rinse_volume')),float(request.POST.get('rinse_speed')))
             OC_LAB.print_from_list(gcode)
         return JsonResponse({'message': 'ok'})
 
