@@ -95,6 +95,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
             generate.toggle_valve()
             for speedfactor in speedfactorList:
                 generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
+            generate.wait_ms(300)
             generate.toggle_valve()
             generate.check_pressure()
             generate.wait(waitTime)
@@ -106,6 +107,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 generate.toggle_valve()
                 for speedfactor in speedfactorList:
                     generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
+                generate.wait_ms(300)
                 generate.toggle_valve()
                 generate.check_pressure()
                 generate.wait(waitTime)

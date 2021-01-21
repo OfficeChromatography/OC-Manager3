@@ -72,7 +72,7 @@ class SyringeLoad(View):
             
             zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']),False)
             print(zMov)
-            mm_movement = round(43-zMov, 2)
+            mm_movement = round(37-zMov, 2)
             print(mm_movement)
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
