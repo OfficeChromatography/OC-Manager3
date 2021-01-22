@@ -43,3 +43,35 @@ class ZeroPosition(models.Model):
                 )
     zero_x = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
     zero_y = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+
+
+class ZeroPosition_Db(models.Model):
+    zero_x = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    zero_y = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class PlateProperties_Db(models.Model):
+    size_x = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    size_y = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_left = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_right = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_top = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_bottom = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+
+    class Meta:
+        abstract = True
+
+class Application_Db(models.Model):
+    auth = models.ForeignKey(
+                get_user_model(),
+                null=True,
+                on_delete=models.CASCADE,
+                blank=True,
+                )
+    filename = models.CharField(null=True, max_length=120)
+
+    class Meta:
+        abstract = True

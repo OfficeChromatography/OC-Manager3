@@ -37,7 +37,7 @@
 </head>
 
 
-<body id="page-top" onload="bandsmain();">
+<body id="page-top">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -94,83 +94,26 @@
 
             <!-- </div> -->
             <div class="col-lg-8 col-xl-6">
-              <!-- Save and Load -->
               <div class="card shadow mb-4 ">
-                <div class="card-header py-3 ">
-                  <div class="d-flex flex-row justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Save and Load</h6>
-                    <button id='minimize-saveandload' class="btn btn-link" data-toggle="collapse" data-target="#saveandloadarea" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
-                  </div>
-                </div>
-                <div class="card-body show" id='saveandloadarea'>
-                        <!-- Editable table -->
-                  <form class="resume-form" id='saveform' method="post">{% csrf_token %}
-                    <div class="row">
-                      <div class="col-xl">
-                        <label>Save</label>
-                        <div class="alert alert-success alert-dismissible collapse m-1" id='id_save_sucess' role="alert"></div>
-                        <div class="alert alert-danger alert-dismissible collapse m-1" id='id_save_error' role="alert"></div>
-                        <form id='saveform'>
-                          <div class="input-group">
-                            {{Development_Form.file_name}}
-                            <div class="input-group-append">
-                              <button type="submit" id='savebttn' class="btn btn-primary">Save</button>
-                            </div>
-                          </div>
-                        </form>
-                        <label for="list-load" class="mt-4">Load</label>
-                        <div class="alert alert-success alert-dismissible collapse m-1" id='id_load_sucess' role="alert"></div>
-                        <div class="list-group" id="list-load" role="tablist" style="max-height:300px; overflow-y:scroll;">
-                          {% for list in list_load %}
-                              <a class="list-group-item list-group-item-action py-1" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">{{ list.file_name }}</a>
-                          {% endfor %}
-                        </div>
-                        <br>
-                        <label for="uploadform">Import/Export Data</label>
-                        <div class="d-flex flex-row align-items-center" id='uploadform'>
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                              <div class="btn btn-primary btn-icon-split" id="downloadfilebttn">
-                                <span class="icon">
-                                  <i class="fas fa-cloud-download-alt"></i>
-                                </span>
-                              </div>
-                              <div class="btn btn-primary btn-icon-split" id="removefilebttn">
-                                <span class="icon">
-                                  <i class="fas fa-trash-alt"></i>
-                                </span>
-                              </div>
-                              <div class="btn btn-primary btn-icon-split" id="loadfilebttn">
-                                <span class="icon">
-                                  <i class="fas fa-cloud-upload-alt"></i>
-                                </span>
-                              </div>
-                            </div>
-                            <div class="custom-file" id="custom-file-id">
-                              <input type="file" class="form-control custom-file-input" name="file" id='file' aria-describedby="inputGroupFileAddon01">
-                              <label class="custom-file-label" id='upload_label' for="file">Choose file</label>
-                            </div>
-                          </div>
-                        </div>
-
-
-                        <label for="list-load" class="mt-4">Control</label>
-                        <div class="input-group">
-                          <div class="input-group-prepend">
-                            <button id='startbttn' name='start' class="btn btn-primary control-bttn">Start</button>
-                          </div>
-                          <div class="input-group-append">
-                            <button id='stopbttn' class="btn btn-primary control-bttn">Stop</button>
-                          </div>
-                          <div class="input-group-append">
-                            <button id='pausebttn' class="btn btn-primary control-bttn">Pause</button>
-                          </div>
-                        </div>
+                  <div class="card-header">
+                      <div class="d-flex flex-row justify-content-between align-items-center">
+                          <h6 class="m-0 font-weight-bold text-primary">Save and Load</h6>
+                          <button id='minimize-settings' class="btn btn-link invisible" aria-expanded="true" aria-controls="collapseOne"><i class="far fa-window-minimize"></i></button>
                       </div>
-                    </div>
-                  </form>
-                </div>
+                  </div>
+                  <div class="card-body d-flex flex-column">
+                      {% include 'modules/loadlist/loadlist.html' %}
+                      <div class="container-fluid">
+                          <div class="row">
+                              <div class="col">
+                                  {% include 'modules/applicationcontrol/applicationcontrol.html' %}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
+
+
 
               <!-- Plate Preview -->
               <div class="card shadow mb-4 ">
@@ -181,13 +124,7 @@
                   </div>
                 </div>
                 <div class="card-body show" id='platepreviewarea'>
-                  <div class="container">
-                    <div class="row">
-                      <div class="col">
-                        <canvas id="plotPreview" width="400" height="400"></canvas>
-                      </div>
-                    </div>
-                  </div>
+                  {% include 'modules/bandschart/bandschart.html' %}
                 </div>
               </div>
 
@@ -201,11 +138,9 @@
                 </div>
                 <div class="card-body show" id='flowratearea'>
                   <div class="d-flex justify-content-center">
-                    <div id="box" class="jxgbox" style="width:500px; height:500px;"></div>
+                    {% include 'modules/flowrategraph/flowrategraph.html' %}
                   </div>
-                  <script type="text/javascript">
-                  var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-10, 10, 10, -10], axis:true});
-                  </script>
+
                 </div>
               </div>
 

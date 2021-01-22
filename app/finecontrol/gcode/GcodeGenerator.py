@@ -118,6 +118,10 @@ class GcodeGenerator:
         """pauses the command queue and waits for a period of time in seconds"""
         return self.check_return(f"G4S{time}")
     
+    def wait_ms(self, time):
+        """pauses the command queue and waits for a period of time in miliseconds"""
+        return self.check_return(f"G4P{time}")
+    
     def set_relative(self):
         """In this mode all coordinates are interpreted as relative to the last position."""
         return self.check_return(f"G91")

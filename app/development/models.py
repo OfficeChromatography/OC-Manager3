@@ -1,56 +1,58 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from sampleapp.models import PlateProperties_Db
-from finecontrol.models import ZeroPosition
+import finecontrol.models as core_models
 
-class PlateProperties_Dev_Db(PlateProperties_Db):
-    pass
+
+class Development_Db(core_models.Application_Db):
+    class Meta(core_models.Application_Db.Meta):
+        pass
+
+
+class PlateProperties_Db(core_models.PlateProperties_Db):
+    development = models.ForeignKey(Development_Db,
+                                    related_name='plate_properties',
+                                    null=True,
+                                    on_delete=models.CASCADE,
+                                    blank=True)
+
+
+class ZeroPosition_Db(core_models.ZeroPosition_Db):
+    development = models.ForeignKey(Development_Db,
+                                    related_name='zero_properties',
+                                    null=True,
+                                    on_delete=models.CASCADE,
+                                    blank=True)
+
+
 
 class PressureSettings_Dev_Db(models.Model):
+    development = models.ForeignKey(Development_Db,
+                                    related_name='pressure_settings',
+                                    null=True,
+                                    on_delete=models.CASCADE,
+                                    blank=True)
     pressure = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
     nozzlediameter = models.CharField(max_length=120, default='0.08')
-    speed = models.DecimalField(null=True, decimal_places=1, max_digits=5)
+    motor_speed = models.DecimalField(null=True, decimal_places=1, max_digits=5)
+
 
 class BandSettings_Dev_Db(models.Model):
+    development = models.ForeignKey(Development_Db,
+                                    related_name='band_settings',
+                                    null=True,
+                                    on_delete=models.CASCADE,
+                                    blank=True)
     volume = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     fluid = models.CharField(max_length=120, default='Methanol')
-    printBothways = models.CharField(max_length=120, default='Off')
+    printBothways = models.CharField(max_length=120, default='Off', blank=True)
     density = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     viscosity = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     applications = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     waitTime = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     description = models.CharField(max_length=120, default='', null=True, blank=True)
 
+
 class Flowrate_Db(models.Model):
-    uploader = models.ForeignKey(
-                get_user_model(),
-                null=True,
-                on_delete=models.CASCADE,
-                blank=True,
-                )
-    a0 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a1 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a2 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a3 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a4 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a5 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a6 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a7 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a8 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a9 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    a10 = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
-    
-
-class Development_Db(models.Model):
-    auth = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
-    file_name = models.CharField(null=True, max_length=120)
-    pressure_settings = models.OneToOneField(PressureSettings_Dev_Db, null=True, on_delete=models.CASCADE)
-    plate_properties = models.OneToOneField(PlateProperties_Db, null=True, on_delete=models.CASCADE)
-    developmentBandSettings = models.OneToOneField(BandSettings_Dev_Db, null=True, on_delete=models.CASCADE)
-    zero_position = models.OneToOneField(ZeroPosition, null=True, on_delete=models.CASCADE)
-    flowrate = models.OneToOneField(Flowrate_Db, null=True, on_delete=models.CASCADE)
-
-
-
-
+    development = models.ForeignKey(Development_Db, related_name='flowrates', null=True, on_delete=models.CASCADE, blank=True)
+    value = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)

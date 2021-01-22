@@ -72,7 +72,7 @@ class SyringeLoad(View):
             
             zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']),False)
             print(zMov)
-            mm_movement = round(40-zMov, 2)
+            mm_movement = round(37-zMov, 2)
             print(mm_movement)
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
@@ -160,8 +160,8 @@ clean = Cleaning();
 
 class StaticPurge(View):
     def post(self, request):
-        if request.POST.get('volume'):
-            gcode = clean.static_cleaning(float(request.POST.get('volume')),float(request.POST.get('speed')))
+        if request.POST.get('rinse_volume'):
+            gcode = clean.static_cleaning(float(request.POST.get('rinse_volume')),float(request.POST.get('rinse_speed')))
             OC_LAB.print_from_list(gcode)
         return JsonResponse({'message': 'ok'})
 

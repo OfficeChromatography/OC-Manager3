@@ -21,15 +21,15 @@
        <form id="zeroform">
         <div class="form-group mb-1 row">
           <div class="input-group">
-            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{ZeroPosition_Form.zero_x.label}}</label>
-            {{ZeroPosition_Form.zero_x}}
+            <label for="id_zero_x" class="col-xl-2 col-form-label col-form-label-sm text-truncate">X0</label>
+            <input type="number" name="zero_x" value="5" class="form-control" step="0.01" id="id_zero_x">
             <div class="input-group-append">
               <span class="input-group-text">[mm]</span>
             </div>
           </div>
           <div class="input-group">
-            <label for="colFormLabelSm" class="col-xl-2 col-form-label col-form-label-sm text-truncate">{{ZeroPosition_Form.zero_y.label}}</label>
-            {{ZeroPosition_Form.zero_y}}
+            <label for="id_zero_y" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Y0</label>
+            <input type="number" name="zero_y" value="18" class="form-control" step="0.01" id="id_zero_y">
             <div class="input-group-append">
               <span class="input-group-text">[mm]</span>
             </div>
@@ -38,10 +38,6 @@
       </form>
     </div>
       </div>
-      <!-- <div class="modal-footer">
-        <button class="btn btn-primary" id='getHome' type="button" data-dismiss="modal">Load Home</button>
-        <button class="btn btn-secondary" id='setHome' type="button" data-dismiss="modal">Set Home</button>
-      </div> -->
     </div>
   </div>
 </div>

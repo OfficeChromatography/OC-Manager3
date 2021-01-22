@@ -1,200 +1,65 @@
-var ctx = document.getElementById('plotPreview').getContext('2d');
-var plotPreview = new Chart(ctx, {
-   type: 'scatter',
-   data: {
-      datasets: [{
-         borderColor: 'black',
-         backgroundColor: 'transparent',
-         borderWidth: 1,
-         pointBackgroundColor: ['#000', '#000', '#000'],
-         pointRadius: 1,
-         pointHoverRadius: 1,
-         fill: false,
-         tension: 0,
-         showLine: true,
-      },]
-   },
-   options:{
-      legend:{
-        display:false
-      },
-      scales: {
-        yAxes: [{
-          stacked: true,
-          ticks: {
-            min: 0, // minimum value
-            max: 100, // maximum value
-            reverse: true,
-          },
-        }],
-        xAxes: [{
-          stacked: true,
-          ticks: {
-            min: 0, // minimum value
-            max: 100, // maximum value
-          },
-        }]
-    }
-   },
-});
-var datatable
 // Execute every time something happens wi
-$("#id_speed").change(
-  function(){
-    console.log('motor');
-    flowrateCalc()
-  }
-)
-$("#id_pressure").change(
-  function(){
-    console.log('pres');
-    
-  }
-)
-$("#id_size_x").change(
-  function(){
-    console.log('sizex');
-    changegraphsize()
-    bandsmain()
-    flowrateCalc()
-  }
-)
-$("#id_size_y").change(
-  function(){
-    console.log('sizey');
-    changegraphsize()
-    bandsmain()
-  }
-);
+// let flowRateChart = new flowRateGraph()
 
-$("#id_offset_left").change(
-    function(){
-      bandsmain()
-      flowrateCalc()
-    }
-);
-$("#id_offset_right").change(
-  function(){
-    bandsmain()
-    flowrateCalc()
-  }
-);
-$("#id_offset_bottom").change(
-    function(){
-      bandsmain()
-    }
-);
-$("#id_offset_top").change(
-  function(){
-    bandsmain()
-  }
-);
-
-$("#id_volume").change(
-  function(){
-    bandsmain()
-    flowrateCalc()
-  }
-);
-$("#id_fluid").change(
-  function(){   
-    bandsmain()
-    
-    if ($(this).val() == 'Specific') {
-      $('#specificFluidTable').show()
-    } else {
-      $('#specificFluidTable').hide()
-    }
-  }
-);
-$("#id_nozzlediameter").change(
-  function(){
-  }
-);
-$("#id_applications").change(
-  function(){
-    flowrateCalc()
-  }
-);
+$(".development-flowrate-insidence").on("change", function (){
+  flowrateCalc()
+})
 
 
-function bandsmain(){
-  plate_x_size = parseFloat($("#id_size_x").val());
-  plate_y_size = parseFloat($("#id_size_y").val());
+$(".change-graph-size-parameter").on("change", function(){
+  plotPreview.changeGraphSize()
+  mainCalculations()
+})
 
-  offset_left_size = parseFloat($("#id_offset_left").val());
-  offset_right_size = parseFloat($("#id_offset_right").val());
-  offset_top_size = parseFloat($("#id_offset_top").val());
-  offset_bottom_size = parseFloat($("#id_offset_bottom").val());
+$("#id_fluid").change(function(){
+  $(this).val()=='Specific' ? $('#specificFluidTable').show() : $('#specificFluidTable').hide()
+});
 
-  volume = parseFloat($("#id_volume").val());
-  printBothways = $('#printBothwaysButton').text();
 
-  band_height = 0.1;
+// MAIN
+function mainCalculations(){
+  let plate_x_size = parseFloat($("#id_size_x").val());
+  let plate_y_size = parseFloat($("#id_size_y").val());
+
+  let offset_left_size = parseFloat($("#id_offset_left").val());
+  let offset_right_size = parseFloat($("#id_offset_right").val());
+  let offset_top_size = parseFloat($("#id_offset_top").val());
+  let offset_bottom_size = parseFloat($("#id_offset_bottom").val());
+
+  let volume = parseFloat($("#id_develop_volume").val());
+  let printBothways = $('#printBothwaysButton').text();
+
+  let band_height = 0.1;
 
 
   // Check if theres missing parameters
   missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(volume))
-  if(theres_error('#id_parameter_error',missing_parameter)){return}
+
+  if(areErrors('#id_parameter_error',missing_parameter)){return}
 
   // Calculate the Working Area [x,y]
-  working_area = nbands_working_area(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size)
+  working_area = nBandsWorkingArea(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size)
 
   // Check if its not posible to calculate the wa
-  if(theres_error('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
+  if(areErrors('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
 
   // Check if the vertical sizes is enough
-  if(theres_error('#id_space_error',working_area[1]<band_height)){return}
+  if(areErrors('#id_space_error',working_area[1]<band_height)){return}
 
   band_size = working_area[0]
-  
-  while(plotPreview.data.datasets.pop()!=undefined){}
+
+  plotPreview.eliminateAllPoints()
   newdata = []
   newdata[0]={y:offset_bottom_size,x:offset_left_size}
   newdata[1]={y:offset_bottom_size+band_height,x:offset_left_size}
   newdata[2]={y:offset_bottom_size+band_height,x:band_size+offset_left_size}
   newdata[3]={y:offset_bottom_size,x:band_size+offset_left_size}
   newdata[4]=newdata[0]
-  addData(plotPreview,'1','black', newdata)
-  plotPreview.update();
-  banddescrition(1);
-}
-
-function banddescrition(number_row){
-  let newTr1 = `
-  <tr class="hide">
-  <td class="pt-3-half">`;
-  let newTr2 = `</td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  <td class="pt-3-half" contenteditable="true"></td>
-  </tr>`
-  $('#tbody_band').empty()
-  //console.log(number_row);
-  number_row = parseInt(number_row)
-  for(i=0;i<number_row;i++){
-    $('#tbody_band').append(newTr1+(i+1)+newTr2);
-  }
-}
-
-function addData(chart, label, color, data) {
-		chart.data.datasets.push({
-	    label: label,
-      backgroundColor: color,
-      data: data,
-      borderColor: 'black',
-      borderWidth: 1,
-      pointRadius: 2,
-      pointHoverRadius: 4,
-      fill: true,
-      tension: 0,
-      showLine: true,
-    });
-    chart.update();
+  plotPreview.addData2Chart('1','black', newdata)
 }
 
 //Calculates the Working Area
-function nbands_working_area(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size){
+function nBandsWorkingArea(plate_x_size,offset_left_size,offset_right_size,plate_y_size,offset_top_size,offset_bottom_size){
   working_area = [plate_x_size-offset_left_size-offset_right_size,plate_y_size-offset_top_size-offset_bottom_size]
   if(working_area[0] <= 0 || working_area[1] <= 0 || isNaN(working_area[0]) || isNaN(working_area[1])){
     return [NaN,NaN];
@@ -205,7 +70,7 @@ function nbands_working_area(plate_x_size,offset_left_size,offset_right_size,pla
 }
 
 
-function theres_error(error_id, bolean_exp){
+function areErrors(error_id, bolean_exp){
   if(bolean_exp){
     $(error_id).fadeIn();
     return true
@@ -216,243 +81,7 @@ function theres_error(error_id, bolean_exp){
   }
 }
 
-function changegraphsize(){
-  plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($("#id_size_x").val());
-  plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($("#id_size_y").val());
-  plotPreview.update();
-}
 
-$('#stopbttn').on('click', function (e) {
-  event.preventDefault()
-  //
-  $formData = 'STOP&'
-  $endpoint = window.location.origin+'/developmentplay/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: stopMethodSuccess,
-  error: stopMethodError,
-  })
-})
-$('#pausebttn').on('click', function (e) {
-  event.preventDefault()
-  //
-  $formData = 'PAUSE&'
-  $endpoint = window.location.origin+'/developmentplay/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: pauseMethodSuccess,
-  error: pauseMethodError,
-  })
-})
-
-$('#startbttn').on('click', function (e) {
-  event.preventDefault()
-  //
-  $formData = 'START&'+$('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
-  +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+saveSegment(true)
-  $endpoint = window.location.origin+'/developmentplay/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: startMethodSuccess,
-  error: startMethodError,
-  })
-})
-$('#savebttn').on('click', function (e) {
-  event.preventDefault()
-  $formData = $('#plateform').serialize()+'&'+$('#pressureform').serialize()+'&'+$('#saveform').serialize()
-  +'&'+$('#zeroform').serialize()+getSpecificFluid(true)+saveSegment(true)
-  $endpoint = window.location.origin+'/developmentsave/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: saveMethodSuccess,
-  error: saveMethodError,
-  })
-})
-$('#list-load a').on('click', function (e) {
-e.preventDefault()
-data={'filename':$(this)[0].innerHTML}
-//console.log(data);
-$.ajax({
-  method: 'GET',
-  url:    window.location.origin+'/developmentsave/',
-  data:   data,
-  success: loadMethodSuccess,
-  error: loadMethodError,
-})
-})
-
-function hommingMethodSuccess(data, textStatus, jqXHR){
-  if(data.error!=''){
-    theres_error('#id_parameter_error',false)
-  }
-  else{
-    theres_error('#id_parameter_error',true)
-  }
-
-}
-function hommingMethodError(jqXHR, textStatus, errorThrown){}
-
-function stopMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
-  $('.control-bttn').removeClass('btn-success btn-secondary')
-  $('.control-bttn').addClass('btn btn-danger')
-}
-function stopMethodError(jqXHR, textStatus, errorThrown){}
-
-function pauseMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
-    $('.control-bttn').removeClass('btn-success btn-danger')
-  $('.control-bttn').addClass('btn btn-secondary')
-}
-function pauseMethodError(jqXHR, textStatus, errorThrown){}
-
-function startMethodSuccess(data, textStatus, jqXHR){
-  console.log(data);
-  $('.control-bttn').removeClass('btn-danger btn-secondary')
-  $('.control-bttn').addClass('btn btn-success')
-}
-function startMethodError(jqXHR, textStatus, errorThrown){}
-
-function loadMethodSuccess(data, textStatus, jqXHR){
-  // Load all the fields with the ones get in the database
-  $("#id_speed").val(data.speed)
-  $("#id_pressure").val(data.pressure)
-  // $("#id_frequency").val(data.frequency)
-  $("#id_temperature").val(data.temperature)
-  // $("#id_delta_x").val(data.delta_x)
-  $('#id_nozzlediameter').val(data.nozzlediameter)
-
-  $("#id_zero_x").val(data.zero_x)
-  $("#id_zero_y").val(data.zero_y)
-
-  $("#id_size_x").val(data.size_x)
-  $("#id_size_y").val(data.size_y)
-
-  $("#id_offset_left").val(data.offset_left)
-  $("#id_offset_right").val(data.offset_right)
-  $("#id_offset_top").val(data.offset_top)
-  $("#id_offset_bottom").val(data.offset_bottom)
-
-  $("#id_volume").val(data.volume)
-  $("#id_applications").val(data.applications)
-  $("#id_precision").val(data.precision)
-  $("#id_waitTime").val(data.waitTime)
-  $("#id_description").val(data.description)
-
-  if (data.printBothways=='On') {
-    $("#printBothwaysButton").text('On');
-  } else {
-    $("#printBothwaysButton").text('Off');
-  }
-  
-  $('#id_fluid').val(data.fluid)
-
-  if (data.fluid == 'Specific') {
-    $('#specificFluidTable').show()
-  } else {
-    $('#specificFluidTable').hide()
-  }
-
-  $('#densityval').text(data.density)
-  $('#viscosityval').text(data.viscosity)
-
-  $('#id_load_sucess').html(data.file_name+' successfully loaded!')
-  $( "#id_load_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
-  bandsmain()
-  changegraphsize()
-  loadSegment(parseFloat(data.a0),
-  parseFloat(data.a1), 
-  parseFloat(data.a2), 
-  parseFloat(data.a3), 
-  parseFloat(data.a4),
-  parseFloat(data.a5), 
-  parseFloat(data.a6), 
-  parseFloat(data.a7),
-  parseFloat(data.a8),
-  parseFloat(data.a9), 
-  parseFloat(data.a10)
-  )
-}
-function loadMethodError(jqXHR, textStatus, errorThrown){
-  console.log('error');
-}
-
-function saveMethodSuccess(data, textStatus, jqXHR){
-  console.log(typeof(data.error));
-  if(data.error==undefined){
-    $('#id_save_sucess').html(data.message)
-    $( "#id_save_sucess" ).fadeIn().delay( 800 ).fadeOut( 400 );
-  }
-  else {
-    $('#id_save_error').html(data.error)
-    $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
-  }
-
-
-}
-function saveMethodError(jqXHR, textStatus, errorThrown){
-  console.log(data);
-  $('#id_save_error').html(data.error)
-  $( "#id_save_error" ).fadeIn().delay( 800 ).fadeOut( 400 );
-}
-
-function getSpecificFluid(toString){
-  data = {}
-  data['fluid'] = $('#id_fluid').val()
-  data['printBothways'] = $('#printBothwaysButton').text()
-  data['volume'] = $('#id_volume').val()
-  data['density'] = $('#densityval').text()
-  data['viscosity'] = $('#viscosityval').text()
-  data['applications'] = $('#id_applications').val()
-  data['precision'] = $('#id_precision').val()
-  data['waitTime'] = $('#id_waitTime').val()
-  data['description'] = $('#id_description').val()
-
-  if(toString){
-    data = '&devBandSettings='+JSON.stringify(data)
-  }
-  return data
-}
-
-$('#printBothwaysButton').on('click', function (e) {
-  event.preventDefault()
-  if ($('#printBothwaysButton').text()=='Off') {
-    $("#id_printBothways").prop('checked', true);
-    $('#printBothwaysButton').text('On');
-    $('#printBothways_resume').text('On');
-  } else {
-    $("#id_printBothways").prop('checked', false);
-    $('#printBothwaysButton').text('Off');
-    $('#printBothways_resume').text('Off');
-  }
-})
-
-function checkSpecificValues() {
-  if ($("#id_fluid").val() == 'Specific') {
-    if ($("#densityval").text() == "" || $("#viscosityval").text() == "" ) {
-      alert("Please specify density and viscosity!")
-    }
-  }
-} 
-
-function calcMethodSuccess(data, textStatus, jqXHR){
-  // console.log(typeof(data.error));
-  if(data.error==undefined){
-    $('.vol').html("<br>estimated vol: " + data.results[1].toFixed(3) + "<br>estimated dropvol: " + data.results[0].toFixed(3))
-    }
-  else {
-    console.log('error')
-  }
-  
-}
 // Import/Export DATA
 $('#downloadfilebttn').on('click', function (e) {
   event.preventDefault()
@@ -531,119 +160,55 @@ function getAsText(readFile) {
 
 function flowrateCalc(){
   length = $("#id_size_x").val() - $("#id_offset_left").val() - $("#id_offset_right").val();
-  speed = $("#id_speed").val();
-  volume = $("#id_volume").val();
+  speed = $("#id_motor_speed").val();
+  volume = $("#id_develop_volume").val();
   applications = $("#id_applications").val();
   time = length / speed;
   flowrate = Math.round(volume / time / applications, 3);
   $('#flowrate').text('estimated flowrate: ' + flowrate + " ul/s");
-
-
-  console.log(flowrate);
 }
+
+var getData = function(){
+    data = $('form').serialize()+flowGraph.saveSegment(true)
+    return data
+}
+
+var setData = function (data){
+  $.each(data,function (key,value){
+    $('input[name='+key+']').val(value)
+    if(key=="printBothways"){
+      if(value=="True"){
+        $('input[name='+key+']').prop('checked', true);
+      }
+      else{
+        $('input[name='+key+']').prop('checked', false);
+      }
+    }
+  })
+  flowGraph.loadSegment(data.flowrate)
+  $(".change-graph-size-parameter").trigger("change")
+}
+
+var list_of_saved = new listOfSaved("http://127.0.0.1:8000/development/save/",
+    "http://127.0.0.1:8000/development/list",
+    "http://127.0.0.1:8000/development/load",
+    getData,
+    setData
+    )
+
+var application_control = new ApplicationControl('http://127.0.0.1:8000/oclab/control/',
+                                                'http://127.0.0.1:8000/development/start/',
+                                                getData)
 
 $(document).ready(function() {
-  //$('#devModal').modal('show');
   flowrateCalc();
+  list_of_saved.loadList()
 });
 
-// Volume over x Graph
-brd = JXG.JSXGraph.initBoard('box', {axis:true, boundingbox: [-20, 2.1, 120, -0.1]});
-p = [];
-
-l0 = brd.create('segment',[[0,0],[0,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l1 = brd.create('segment',[[10,0],[10,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l2 = brd.create('segment',[[20,0],[20,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l3 = brd.create('segment',[[30,0],[30,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l4 = brd.create('segment',[[40,0],[40,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l5 = brd.create('segment',[[50,0],[50,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l6 = brd.create('segment',[[60,0],[60,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l7 = brd.create('segment',[[70,0],[70,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l8 = brd.create('segment',[[80,0],[80,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l9 = brd.create('segment',[[90,0],[90,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-l10 = brd.create('segment',[[100,0],[100,2]], {fixed: true, strokecolor:'black', strokeOpacity:0.6});
-
-a0 = brd.create('glider',[0,1,l0],{name:'a0'});
-a1 = brd.create('glider',[0,1,l1],{name:'a1'});
-a2 = brd.create('glider',[0,1,l2],{name:'a2'});
-a3 = brd.create('glider',[0,1,l3],{name:'a3'});
-a4 = brd.create('glider',[0,1,l4],{name:'a4'});
-a5 = brd.create('glider',[0,1,l5],{name:'a5'});
-a6 = brd.create('glider',[0,1,l6],{name:'a6'});
-a7 = brd.create('glider',[0,1,l7],{name:'a7'});
-a8 = brd.create('glider',[0,1,l8],{name:'a8'});
-a9 = brd.create('glider',[0,1,l9],{name:'a9'});
-a10 = brd.create('glider',[0,1,l10],{name:'a10'});
-p.push(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
-
-
-
-// c = brd.create('curve', JXG.Math.Numerics.bezier(p), {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
-c = brd.create('spline', p, {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
-
-function saveSegment(toString){
-
-  data={}
-  data['a0'] = +a0.Y().toFixed(2)
-  data['a1'] = +a1.Y().toFixed(2)
-  data['a2'] = +a2.Y().toFixed(2)
-  data['a3'] = +a3.Y().toFixed(2)
-  data['a4'] = +a4.Y().toFixed(2)
-  data['a5'] = +a5.Y().toFixed(2)
-  data['a6'] = +a6.Y().toFixed(2)
-  data['a7'] = +a7.Y().toFixed(2)
-  data['a8'] = +a8.Y().toFixed(2)
-  data['a9'] = +a9.Y().toFixed(2)
-  data['a10'] = +a10.Y().toFixed(2)
-  
-
-  if(toString){
-    data = '&flowrate='+JSON.stringify(data)
-  }
-  return data;
-}
-
-
-function loadSegment(y0,y1,y2,y3,y4,y5,y6,y7,y8,y9,y10) {
-  brd.suspendUpdate();
-  removeSegment();
-
-  a0 = brd.create('glider',[0,y0,l0],{name:'a0'});
-  a1 = brd.create('glider',[0,y1,l1],{name:'a1'});
-  a2 = brd.create('glider',[0,y2,l2],{name:'a2'});
-  a3 = brd.create('glider',[0,y3,l3],{name:'a3'});
-  a4 = brd.create('glider',[0,y4,l4],{name:'a4'});
-  a5 = brd.create('glider',[0,y5,l5],{name:'a5'});
-  a6 = brd.create('glider',[0,y6,l6],{name:'a6'});
-  a7 = brd.create('glider',[0,y7,l7],{name:'a7'});
-  a8 = brd.create('glider',[0,y8,l8],{name:'a8'});
-  a9 = brd.create('glider',[0,y9,l9],{name:'a9'});
-  a10 = brd.create('glider',[0,y10,l10],{name:'a10'});
-  p.push(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
-  
-  c = brd.create('spline', p, {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
-  brd.unsuspendUpdate();
-};
-             
-function removeSegment() {
-  brd.suspendUpdate();
-  brd.removeObject(p[10]);
-  brd.removeObject(p[9]);
-  brd.removeObject(p[8]);
-  brd.removeObject(p[7]);
-  brd.removeObject(p[6]);
-  brd.removeObject(p[5]);
-  brd.removeObject(p[4]);
-  brd.removeObject(p[3]);
-  brd.removeObject(p[2]);
-  brd.removeObject(p[1]);
-  brd.removeObject(p[0]);
-  p.splice(0,11);
-  brd.removeObject(c);
-  brd.unsuspendUpdate();
-};
 
 
 
 
-    
+
+
+
