@@ -111,7 +111,8 @@ class Cleaning(object):
         # for i in range(zIncrement):
         #     generate.check_pressure()   
         #     generate.linear_move_z(0.2,speed)
-        generate.linear_move_z(zMovement, speed)     
+        generate.linear_move_z(zMovement, speed)
+        generate.wait_ms(500)
         generate.toggle_valve()
         generate.set_absolute()
 
