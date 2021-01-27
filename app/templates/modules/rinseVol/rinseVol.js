@@ -2,7 +2,7 @@
 
 $("#pump_manual").on('click',function(e){
     event.preventDefault();
-    console.log($("#static-form").serialize());
+    console.log($("#rinse-form").serialize());
     $.ajax({
     method: 'POST',
     url:    window.location.origin+'/staticpurge/',
@@ -14,4 +14,14 @@ $("#pump_manual").on('click',function(e){
     }
     function staticCleanMethodError(jqXHR, textStatus, errorThrown){}
     })
+
+$("#valveToggle").on('click',function(e){
+    event.preventDefault();
+    sendToMachine('G40');
+    if ($("#toggleText").html() == "Open Valve"){
+        $("#toggleText").html("Close Valve");
+    } else {
+        $("#toggleText").html("Open Valve");
+    }
+})
 

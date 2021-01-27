@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-               
+            <p>Automatic rinsing</p>
                   <form id='rinse-form' method="post"> {% csrf_token %}
                     <div class="input-group">
                       <label for="id_rinse_volume" class="col-xl-2 col-form-label col-form-label-sm text-truncate">Volume</label>
@@ -28,15 +28,28 @@
                     </div>
                   </br>
                   </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary btn-icon-split btn-sm" id='pump_manual' type="submit">
+                  <div class="float-right">
+                  <button class="btn btn-secondary btn-icon-split btn-sm" id='pump_manual' type="submit">
                     <span class="icon text-white-50">
                       <i class="fas fa-gas-pump"></i>
                     </span>
                     <span class="text">Start!</span>
                   </button>
+                </div>
             </div>
+            <div class="modal-header"></div>
+            <div class="modal-body">
+              <p>Manual Rinsing</p>
+              <div class="float-right">
+              <button class="btn btn-secondary btn-icon-split btn-sm" id='valveToggle' type="button">
+                <span class="text" id="toggleText">Open Valve</span>
+                <span class="icon text-white-50">
+                  <i class="fas fa-bath"></i>
+                </span>
+              </button>
+            </div>
+            </div>
+            
         </div>
     </div>
 </div>
