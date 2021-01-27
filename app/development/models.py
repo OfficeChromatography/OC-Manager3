@@ -56,3 +56,4 @@ class BandSettings_Dev_Db(models.Model):
 class Flowrate_Db(models.Model):
     development = models.ForeignKey(Development_Db, related_name='flowrates', null=True, on_delete=models.CASCADE, blank=True)
     value = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+
