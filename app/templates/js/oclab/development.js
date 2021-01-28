@@ -184,6 +184,9 @@ var setData = function (data){
         $('input[name='+key+']').prop('checked', false);
       }
     }
+    if (key=="fluid"){
+      $('select[name='+key+']').val(value);
+    }
   })
   flowGraph.loadSegment(data.flowrate)
   $(".change-graph-size-parameter").trigger("change")
