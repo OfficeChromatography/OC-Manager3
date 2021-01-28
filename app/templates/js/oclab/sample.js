@@ -9,8 +9,12 @@ $(document).ready(function() {
 $(".change-graph-size-parameter").on("change", function(){
     changeGraphSize()
     mainCalculations()
-    createBandsTable()
+    //createBandsTable()
     calcVol()
+})
+
+$(".change-bands-table").on("change", function(){
+    createBandsTable()
 })
 
 $(".change-volume-parameter").on("change", function(){
