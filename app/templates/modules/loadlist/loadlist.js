@@ -8,6 +8,7 @@ class listOfSaved{
 
         this.$click_new_button_handler()
         this.$click_save_button_handler()
+        this.$click_export_button_handler()
     }
 
     loadList(){
@@ -145,6 +146,34 @@ class listOfSaved{
             mainList.loadEvent(data)
         })
     }
+
+    $click_export_button_handler(){
+        let mainList = this;
+        $("#export_bttn").on("click",function (e){
+            e.preventDefault();
+            mainList.$exportToCsv();
+        })
+    }
+
+    $exportToCsv = function(){
+        let data = $('form').serializeArray();
+        let filename = $(".active").find(".saved_element").text();
+      
+        let csvContent = "data:text/csv;charset=utf-8,";
+      
+        data.forEach(function(dataPart) {
+            let row = [dataPart["name"], dataPart["value"]]
+            csvContent += row + "\r\n";
+        });
+      
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", filename + ".csv");
+        document.body.appendChild(link); // Required for FF
+      
+        link.click();
+      }
 }
 
 
