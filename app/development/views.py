@@ -8,17 +8,6 @@ from connection.forms import OC_LAB
 import json
 from finecontrol.calculations.DevCalc import calculateDevelopment
 
-
-forms = {
-    'Development_Form': Development_Form(),
-    'PlateProperties_Form': PlateProperties_Form(),
-    'DevelopmentBandSettings_Form': DevelopmentBandSettings_Form(),
-    'PressureSettings_Form': PressureSettings_Form(),
-    'ZeroPosition_Form': ZeroPosition_Form(),
-    'Flowrate_Form': Flowrate_Form(),
-}
-
-
 class DevelopmentView(FormView):
     def get(self, request):
         """Manage the HTML view in Development"""
