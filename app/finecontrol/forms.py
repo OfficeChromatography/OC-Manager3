@@ -73,3 +73,25 @@ class ZeroPosition_Form(forms.ModelForm):
 
 
 
+
+def data_validations(**kwargs):
+    # Iterate each form and run validations
+    forms_data = {}
+    for key_form, form in kwargs.items():
+        if form.is_valid():
+            forms_data.update(form.cleaned_data)
+        else:
+            print("ERROR")
+            return JsonResponse({'error':f'Check {key_form}'})
+    return forms_data
+
+
+# returns a dictionary with all objects saved.
+def data_validations_and_save(**kwargs):
+    objects_saved = {}
+    for key_form, form in kwargs.items():
+        if form.is_valid():
+            objects_saved[key_form] = form.save()
+        else:
+            return JsonResponse({'error':f'Check {key_form}'})
+    return objects_saved
