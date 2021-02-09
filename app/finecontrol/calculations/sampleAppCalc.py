@@ -61,6 +61,11 @@ def returnDropEstimateVol(data):
         results.append(values)
     return results
 
+def minusOneUntilZero(number):
+    number = number -1
+    if number < 0: number = 0
+    return number
+
 
 def calculate(data):
 
@@ -80,15 +85,18 @@ def calculate(data):
 
     volEstimate = returnDropEstimateVol(data)
     print(returnDropEstimateVol(data))
-
+    sampleTimes = volEstimate[:]['times']
+    
     list_of_bands = []
 
     deltaX = float(data.delta_x)
     deltaY = float(data.delta_y)
-    for i in range(0,n_bands):
-        bandlist = []
-        zeros=(i*(length+data.gap))+data.offset_left
-        for j in range(volEstimate[i]['times']):
+    j = 0
+    while sum(sampleTimes)!=0:
+        for i in range(0,n_bands):
+            if sampleTimes[i]==0: break
+            bandlist = []
+            zeros=(i*(length+data.gap))+data.offset_left
             if j % 2:
                 current_height = deltaY/2
                 while current_height <= data.height:
@@ -109,7 +117,9 @@ def calculate(data):
                         current_length+=deltaX
                     bandlist.append(applicationline)
                     current_height+=deltaY
-        list_of_bands.append(bandlist)
+            list_of_bands.append(bandlist)
+        j += 1
+        sampleTimes = map(sampleTimes,minusOneUntilZero)
 
     # Creates the Gcode for the application and return it
     return gcode_generation(list_of_bands, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
