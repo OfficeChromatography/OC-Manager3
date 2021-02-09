@@ -398,8 +398,8 @@ data = {
     'frequency': 1400,
     'temperature': 0, 
     'nozzlediameter': '0.08', 
-    'zero_x': 5, 
-    'zero_y': 18, 
+    'zero_x': 20, 
+    'zero_y': 20, 
     'table': [{'band': '1', 'description': '', 'volume (ul)': '', 'type': 'Water', 'density': '', 'viscosity': ''}]
     }
 
@@ -422,6 +422,6 @@ for idx,x in enumerate(xlist):
         gcode = calculate(data)
         listgcode.extend(gcode)
 
-with open('SampleAppTest.txt', 'w') as f:
+with open('SampleAppTest.gcode', 'w') as f:
     for item in listgcode:
         f.write("%s\n" % item)

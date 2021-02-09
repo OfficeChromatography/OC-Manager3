@@ -53,13 +53,12 @@ class InstallationProcess:
         # as they may inject arbitrary code!
         # https://queirozf.com/entries/python-3-subprocess-examples#run-raw-string-as-a-shell-command-line
         self.command = {
-            "sudo su": ["sudo", "su"],
-            "update": ["apt-get", "update"],
-            "upgrade": ["apt-get", "upgrade"],
-            "download_docker": ["curl", "-fsSL", "https://get.docker.com", "-o", "get-docker.sh"],
-            "install_docker": ["sh", "get-docker.sh"],
-            "install_docker_compose": ["pip3", "install", "docker-compose"],
-            "install_libraries": ["apt-get", "install", "-y", "libffi-dev", "libssl-dev"],
+            "update": ["sudo","apt-get", "update"],
+            "upgrade": ["sudo","apt-get", "upgrade"],
+            "download_docker": ["sudo","curl", "-fsSL", "https://get.docker.com", "-o", "get-docker.sh"],
+            "install_docker": ["sudo","sh", "get-docker.sh"],
+            "install_docker_compose": ["sudo","pip3", "install", "docker-compose"],
+            "install_libraries": ["sudo","apt-get", "install", "-y", "libffi-dev", "libssl-dev"],
         }
 
         title(self.main_title)

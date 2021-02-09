@@ -180,7 +180,7 @@ class FixDistortionImage:
                                           -0.061287983893568314]])
 
 
-        self.rotation_angle = 1.2
+        self.rotation_angle = 0.5
 
         # Undistort the image
         self.undistort()
@@ -206,9 +206,9 @@ class FixDistortionImage:
         self.path_photo = f'{os.path.splitext(self.path_photo)[0]}_corrected{os.path.splitext(self.path_photo)[1]}'
 
         new_image = self.rotate_image(dst, self.rotation_angle)
-        #crop_img = new_image[100:500, 300:900]
+        crop_img = new_image[40:1190, 310:1490]
 
-        cv2.imwrite(self.path_photo, new_image)
+        cv2.imwrite(self.path_photo, crop_img)
 
     def rotate_image(self, image, angle):
         image_center = tuple(np.array(image.shape[1::-1]) / 2)
