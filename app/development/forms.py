@@ -47,3 +47,5 @@ class ZeroPosition_Form(forms.ModelForm):
     class Meta:
         model = ZeroPosition_Db
         fields = ['zero_x','zero_y']
+
+
