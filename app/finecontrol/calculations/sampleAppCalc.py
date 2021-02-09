@@ -84,8 +84,9 @@ def calculate(data):
 
 
     volEstimate = returnDropEstimateVol(data)
-    print(returnDropEstimateVol(data))
-    sampleTimes = volEstimate[:]['times']
+    #print(returnDropEstimateVol(data))
+    sampleTimes = [d['times'] for d in volEstimate]
+    
     
     list_of_bands = []
 
@@ -94,7 +95,7 @@ def calculate(data):
     j = 0
     while sum(sampleTimes)!=0:
         for i in range(0,n_bands):
-            if sampleTimes[i]==0: break
+            if sampleTimes[i]==0: continue
             bandlist = []
             zeros=(i*(length+data.gap))+data.offset_left
             if j % 2:
@@ -119,7 +120,8 @@ def calculate(data):
                     current_height+=deltaY
             list_of_bands.append(bandlist)
         j += 1
-        sampleTimes = map(sampleTimes,minusOneUntilZero)
+        sampleTimes = list(map(minusOneUntilZero,sampleTimes))
+        #print(sampleTimes)
 
     # Creates the Gcode for the application and return it
     return gcode_generation(list_of_bands, data.motor_speed, data.frequency, data.temperature, data.pressure, [data.zero_x,data.zero_y])
@@ -162,4 +164,5 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
         generate.report_bed_temperature(0)
     #Homming
     generate.homming("XY")
+    #print(generate.list_of_gcodes)
     return generate.list_of_gcodes
