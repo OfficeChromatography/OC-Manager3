@@ -159,7 +159,7 @@ class CalcVol(View):
                                         zero_position_form       =   ZeroPosition_Form(request.POST))
         forms_data.update({'table':json.loads(request.POST.get('table'))})
         data = SimpleNamespace(**forms_data)
-        results = returnDropEstimateVol(data)
+        results = calculate_volume_application_info(data)
         return JsonResponse({'results':results})
 
 # AUX Functions

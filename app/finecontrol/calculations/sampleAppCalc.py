@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 
-def calculate_drop_estimated_volume(data):
+def calculate_volume_application_info(data):
     working_area = calculate_working_area(data)
 
     if int(data.main_property) == 1:
@@ -19,8 +19,8 @@ def calculate_drop_estimated_volume(data):
     for table in data.table:
 
         drop_volume = FlowCalc(pressure=float(data.pressure), nozzleDiameter=data.nozzlediameter,
-                              timeOrFrequency=float(data.frequency), fluid=table['type'], density=table['density'],
-                              viscosity=table['viscosity']).calcVolumeFrequency()
+                               timeOrFrequency=float(data.frequency), fluid=table['type'], density=table['density'],
+                               viscosity=table['viscosity']).calcVolumeFrequency()
 
         x_number_of_points = calculate_number_of_points(length, data.delta_x)
         y_number_of_points = calculate_number_of_points(data.height, data.delta_y)
@@ -75,7 +75,7 @@ def calculate_number_of_times_to_apply(volume_per_band, vol, vol2):
 
 
 def calculate_number_of_points(length, distance_between_points):
-    number_of_points = int(length/distance_between_points) + 1
+    number_of_points = int(length / distance_between_points) + 1
     return number_of_points
 
 
@@ -109,31 +109,32 @@ def calculate(data):
     else:
         n_bands, length = precalculations_when_length_option_selected(data, working_area[0])
 
-    volume_estimated = calculate_drop_estimated_volume(data)
+    application_volume_info = calculate_volume_application_info(data)
 
-    sampleTimes = [data_band['times'] for data_band in volume_estimated]
+    band_application_times = [info_band['times'] for info_band in application_volume_info]
 
     list_of_bands = []
 
-    deltaX = float(data.delta_x)
-    deltaY = float(data.delta_y)
+    delta_x = float(data.delta_x)
+    delta_y = float(data.delta_y)
+
     j = 0
-    while sum(sampleTimes) != 0:
+    while sum(band_application_times) != 0:
         for i in range(0, n_bands):
-            if sampleTimes[i] == 0: continue
+            if band_application_times[i] == 0: continue
             bandlist = []
             zeros = (i * (length + data.gap)) + data.offset_left
             if j % 2:
-                current_height = deltaY / 2
+                current_height = delta_y / 2
                 while current_height <= data.height:
                     applicationline = []
-                    current_length = deltaX / 2
+                    current_length = delta_x / 2
                     while current_length <= length:
                         applicationline.append(
                             [current_length + float(zeros), float(data.offset_bottom) + current_height])
-                        current_length += deltaX
+                        current_length += delta_x
                     bandlist.append(applicationline)
-                    current_height += deltaY
+                    current_height += delta_y
             else:
                 current_height = 0.
                 while current_height <= data.height:
@@ -142,55 +143,67 @@ def calculate(data):
                     while current_length <= length:
                         applicationline.append(
                             [current_length + float(zeros), float(data.offset_bottom) + current_height])
-                        current_length += deltaX
+                        current_length += delta_x
                     bandlist.append(applicationline)
-                    current_height += deltaY
+                    current_height += delta_y
             list_of_bands.append(bandlist)
         j += 1
-        sampleTimes = list(map(minusOneUntilZero, sampleTimes))
-        # print(sampleTimes)
+        band_application_times = list(map(minusOneUntilZero, band_application_times))
+
+    print_process = PrintingProcess(list_of_bands,
+                                    data.motor_speed,
+                                    data.frequency,
+                                    data.temperature,
+                                    data.pressure,
+                                    [data.zero_x, data.zero_y])
 
     # Creates the Gcode for the application and return it
-    return gcode_generation(list_of_bands, data.motor_speed, data.frequency, data.temperature, data.pressure,
-                            [data.zero_x, data.zero_y])
+    return print_process.printing_process()
 
 
-def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zeroPosition):
-    generate = GcodeGenerator(True)
+class PrintingProcess:
+    def __init__(self, list_of_bands, speed, frequency, temperature, pressure, zeroPosition) -> object:
+        self.list_of_bands = list_of_bands
+        self.speed = speed
+        self.frequency = frequency
+        self.temperature = temperature
+        self.pressure = pressure
+        self.zeroPosition = zeroPosition
+        self._gcode_generator = GcodeGenerator(save_in_list=True)
 
-    # No HEATBED CASE
-    if temperature != 0:
-        generate.wait_bed_temperature(temperature)
-        generate.hold_bed_temperature(temperature)
-        generate.report_bed_temperature(4)
+    def printing_process(self):
+        self._set_temperature()
+        self._rinse()
+        self._bands_printing()
+        self._final_steps_after_print()
+        return self._gcode_generator.list_of_gcodes
 
-    # Move to the home
-    # generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
+    def _set_temperature(self):
+        if self.temperature != 0:
+            self._gcode_generator.wait_bed_temperature(self.temperature)
+            self._gcode_generator.hold_bed_temperature(self.temperature)
+            self._gcode_generator.report_bed_temperature(4)
 
-    # Application
-    # generate.pressurize(pressure)
+    def _rinse(self):
+        self._gcode_generator.rinsing()
+        self._gcode_generator.set_new_zero_position(self.zeroPosition[0], self.zeroPosition[1], self.speed)
 
-    generate.rinsing()
-    generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
-    jj = 0
-    for band in list_of_bands:
-        for index, list_of_points in enumerate(band):
-            if jj > 50:
-                generate.rinsing()
-                generate.set_new_zero_position(zeroPosition[0], zeroPosition[1], speed)
-                jj = 0
-            for point in list_of_points:
-                generate.linear_move_xy(point[0], point[1], speed)
-                generate.finish_moves()
-                generate.pressurize(pressure)
-                generate.open_valve(frequency)
-                generate.finish_moves()
-                jj += 1
-    # Stop heating
-    if (temperature != 0):
-        generate.hold_bed_temperature(0)
-        generate.report_bed_temperature(0)
-    # Homming
-    generate.homming("XY")
-    # print(generate.list_of_gcodes)
-    return generate.list_of_gcodes
+    def _bands_printing(self):
+        number_of_drops_applied = 0
+        for band in self.list_of_bands:
+            for index, list_of_points in enumerate(band):
+                if number_of_drops_applied > 50:
+                    self.rinse()
+                    number_of_drops_applied = 0
+                for point in list_of_points:
+                    self._gcode_generator.linear_move_xy(point[0], point[1], self.speed)
+                    self._gcode_generator.finish_moves()
+                    self._gcode_generator.pressurize(self.pressure)
+                    self._gcode_generator.open_valve(self.frequency)
+                    self._gcode_generator.finish_moves()
+                    number_of_drops_applied += 1
+
+    def _final_steps_after_print(self):
+        self._gcode_generator.hold_bed_temperature(0)
+        self._gcode_generator.report_bed_temperature(0)
+        self._gcode_generator.homming("XY")
