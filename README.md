@@ -1,4 +1,4 @@
-# OC-Lab-2.0
+# OC-Manager 3.0
 ## Install
 The installation process is really simple. You just need to follow the next steps.
 
@@ -41,10 +41,12 @@ this will install:
 docker
 docker-compose
 ```
-If everything was correctly execute, you should see a shortcut of OC-Manager in your Desktop.
 Now OC-Manager it's installed in your device.
 
 ### 3.Execute OC-Manager
 
 In case of using OC-LAB, before you execute the OC-Manager, be sure that it is connected to your device (PC, MAC, raspi, etc.)
-Double click in your Desktop shortcut.
+Navigate to the path where OC-Manager was installed and execute ./run.py file.
+```
+python3 run.py 
+```
