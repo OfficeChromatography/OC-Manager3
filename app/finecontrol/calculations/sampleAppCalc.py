@@ -193,7 +193,7 @@ class PrintingProcess:
         for band in self.list_of_bands:
             for index, list_of_points in enumerate(band):
                 if number_of_drops_applied > 50:
-                    self.rinse()
+                    self._rinse()
                     number_of_drops_applied = 0
                 for point in list_of_points:
                     self._gcode_generator.linear_move_xy(point[0], point[1], self.speed)
