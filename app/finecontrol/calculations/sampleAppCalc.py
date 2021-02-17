@@ -26,8 +26,8 @@ def calculate_volume_application_info(data):
         y_number_of_points = calculate_number_of_points(data.height, data.delta_y)
 
         vol2 = (x_number_of_points - 1) * (y_number_of_points - 1) * drop_volume
-        vol = y_number_of_points * y_number_of_points * drop_volume
-        # print(vol,vol2)
+        vol = x_number_of_points * y_number_of_points * drop_volume
+
 
         # THIS GOES IN THE CLEAN FORM NOT HERE
         volume_per_band = (table['volume'])
@@ -41,6 +41,7 @@ def calculate_volume_application_info(data):
                   "estimated_drop_volume": drop_volume,
                   "times": times_to_apply,
                   "minimum_volume": vol}
+        print(values)
         results.append(values)
     return results
 
@@ -75,6 +76,8 @@ def calculate_number_of_times_to_apply(volume_per_band, vol, vol2):
 
 
 def calculate_number_of_points(length, distance_between_points):
+    print(f"DISTANCE: {distance_between_points}")
+    print(f"LENGTH: {length}")
     number_of_points = int(length / distance_between_points) + 1
     return number_of_points
 
