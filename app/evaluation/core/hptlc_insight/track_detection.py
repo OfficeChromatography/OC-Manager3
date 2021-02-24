@@ -19,8 +19,8 @@
 
 from django.http import HttpResponse
 from os import path
-from scripts.hptlc_insight.track_detection_core import calculate_tracks, image_to_sobel_signal, _normalize, _get_sobel_gray_img, _scan_x_axis, _extract_peaks
-from scripts.hptlc_insight.file_utils import load_rgb_img, create_dir, save_rgb_image
+from .track_detection_core import calculate_tracks, image_to_sobel_signal, _normalize, _get_sobel_gray_img, _scan_x_axis, _extract_peaks
+from .file_utils import load_rgb_img, create_dir, save_rgb_image
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.signal import savgol_filter
@@ -169,7 +169,7 @@ class TrackDetection():
                 label = str(idx) if idx > 9 else " " + str(idx)
                 ax.text(t.img_idx - 5, h + offset, label)
 
-        # ax.imshow(img_to_show, extent=[0, w, 0, h])
+        ax.imshow(img_to_show, extent=[0, w, 0, h])
 
 
 
@@ -179,9 +179,9 @@ class TrackDetection():
         plt.savefig(buf, format='png')
         buf.seek(0)
 
-        plt.savefig("media/trackimage.png", transparent=True, bbox_inches="tight")  # ADDED SAVE IMAGE HERE
+        plt.savefig(buf, transparent=True, bbox_inches="tight")  # ADDED SAVE IMAGE HERE
         plt.close()
-        return [h,w, self._track_width]
+        return buf
 
     def save_tracks_as_files(self, save_dir):
         """ 

@@ -21,7 +21,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import medfilt, savgol_filter, find_peaks, peak_prominences, peak_widths
-from scripts.hptlc_insight.track import Track
+from .track import Track
 
 def _extract_prominences(signal, peaks):
     prominences, _, _ = peak_prominences(signal, peaks=peaks)
