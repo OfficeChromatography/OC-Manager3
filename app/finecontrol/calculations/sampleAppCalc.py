@@ -189,7 +189,7 @@ class PrintingProcess:
 
     def _rinse(self):
         self._gcode_generator.rinsing()
-        self._gcode_generator.set_new_zero_position(self.zeroPosition[0], self.zeroPosition[1], self.speed)
+        self._gcode_generator.set_new_zero_position_x(self.zeroPosition[0], self.speed)
 
     def _bands_printing(self):
         number_of_drops_applied = 0
