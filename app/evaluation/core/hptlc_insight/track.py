@@ -66,7 +66,7 @@ class Track():
         return "pos_" + str(self.track_start) + "-" + str(
             self.track_end) + "_int_" + str(self.intensity)
 
-    def to_image(self, img, is_rotated=True):
+    def to_image(self, img: np.ndarray, is_rotated=True):
         """
         extracts image containing this track
         @param img numpy matrix format

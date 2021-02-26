@@ -27,6 +27,8 @@ from scipy.signal import savgol_filter
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 import io
+import cv2
+import numpy as np
 from PIL import Image
 
 # crops image to the selected bands start and front variables
@@ -100,7 +102,6 @@ class TrackDetection():
         self._height, self._width, _ = img.shape
         self._number_of_tracks = int(number_of_tracks)
         self._track_width = float(float(track_width) / float(self._width))
-        #self._scale_factor = float(scale_factor)
         self._bands_start = float(float(bands_start) / float(self._height))
         self._front = float(float(front) / float(self._height))
         # would cause error, important for initial track detection run
@@ -116,6 +117,7 @@ class TrackDetection():
     
     @property
     def tracks(self):
+        # Calculate the tracks when self.tracks is assigned
         img = self.img
         return calculate_tracks(img, self._number_of_tracks, self._track_width)
 
@@ -132,6 +134,7 @@ class TrackDetection():
                              signal_colour='#e6e6e6'):
         """plots found tracks on chromatogram image"""
         img = self.img
+        print(type(self.img))
         img_to_show = self.img_original
         h, w, _ = self.img_original.shape
         start_px = self._bands_start * h
@@ -195,3 +198,18 @@ class TrackDetection():
             track_img = t.to_image(img)
             save_name = path.join(save_dir, name + '.jpg')
             save_rgb_image(track_img, save_name)
+
+    def save_tracks_as_list_of_buffer(self):
+
+        """
+        Retrives the tracks images in bufferIO
+        :return: list of bufferIO with the track images in it
+        """
+        img = self.img
+        tracks_buffers = []
+        for track in self.tracks:
+            track_image = track.to_image(img)
+            is_success, buffer = cv2.imencode(".png", track_image)
+            buf = io.BytesIO(buffer)
+            tracks_buffers.append(buf)
+        return tracks_buffers
