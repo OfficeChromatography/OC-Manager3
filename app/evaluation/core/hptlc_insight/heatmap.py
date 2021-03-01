@@ -1,13 +1,15 @@
-from scripts.hptlc_insight.analysis_core import imgs_to_densitograms, get_tracks, _create_reference_list, create_combined_data
+from .analysis_core import imgs_to_densitograms, get_tracks, _create_reference_list, create_combined_data
+
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import pandas as pd
-
+import io
 ### Heatmap
 
 def plot_corr_matrix(signals, type, references):
+    heatmap_buf = io.BytesIO()
     fig, ax = plt.subplots(figsize=(24, 16))
     corr = signals.corr()
     hm = sns.heatmap(corr, annot=True, ax=ax, cmap="coolwarm",fmt='.2f',
@@ -17,8 +19,10 @@ def plot_corr_matrix(signals, type, references):
         ax.add_patch(Rectangle((0, entry), signals.shape[1], 1, fill=False, edgecolor="black", lw=3))
         ax.add_patch(Rectangle((entry, 0), 1, signals.shape[1], fill=False, edgecolor="black", lw=3))
     ax.set(title="Track Correlation of the Combined %s Dataset\n" % type, xlabel="\nTrack Number", ylabel="Track Number\n")
-    fig.savefig("media/heatmap-%s.png" % str(type.lower()), transparent=True, bbox_inches="tight")
+    fig.savefig(heatmap_buf, transparent=True, bbox_inches="tight")
+    heatmap_buf.seek(0)
     fig.clf()
+    return heatmap_buf
 
 class Heatmap():
     def __init__(self, track_detection, reference):
@@ -42,5 +46,5 @@ class Heatmap():
         # plot_corr_matrix(b, "Blue", self.reference)
         combined = pd.DataFrame(data=self.combined).transpose()
         combined.columns = cols
-        plot_corr_matrix(combined, "RGB", self.reference)
+        return plot_corr_matrix(combined, "RGB", self.reference)
 

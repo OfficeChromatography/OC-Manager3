@@ -31,6 +31,11 @@ services:
       pip install channels-redis==2.4.1 &&
       pip install pytest &&
       pip install matplotlib &&
+      pip install pandas &&
+      pip install sklearn &&
+      pip install seaborn &&
+      export PYTHONPATH='/usr/lib/python3/dist-packages' &&
+      PYTHONPATH='/usr/lib/python3/dist-packages' &&
       python manage.py runserver 0.0.0.0:8000"
 
 

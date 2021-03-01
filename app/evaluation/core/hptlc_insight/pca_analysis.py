@@ -16,7 +16,8 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import numpy as np
-from scripts.hptlc_insight.analysis_core import _create_reference_list, get_tracks, imgs_to_densitograms, create_combined_data
+import io
+from .analysis_core import _create_reference_list, get_tracks, imgs_to_densitograms, create_combined_data
 import pandas as pd
 from sklearn.decomposition import PCA
 #from sklearn import preprocessing
@@ -86,6 +87,8 @@ class PCA_Analysis():
 
     # Plot scree plot
     def plot_explained_variance(self):
+        explained_variance_buf = io.BytesIO()
+
         labels = _create_labels('', len(self.var))
         plt.bar(x=range(1, len(self.var) + 1), 
                 height=self.var, 
@@ -100,11 +103,14 @@ class PCA_Analysis():
         plt.ylabel('Percentage\n')
         plt.xlabel('\nPrincipal Components')
         plt.title('Explained Variance\n')
-        plt.savefig('media/explained_variance.png', transparent=True, bbox_inches="tight")
+        plt.savefig(explained_variance_buf, transparent=True, bbox_inches="tight")
+        explained_variance_buf.seek(0)
         plt.close()
+        return explained_variance_buf
 
     # Plot PCA
     def plot_pca(self):
+        pcaplot_buf = io.BytesIO()
         pca_df = _create_pca_df(self.data, self.pca_d)
         ref_df = pca_df.iloc[self.reference_tracks, :]
         per_var = _calculate_perc_var(self.pca)
@@ -116,5 +122,7 @@ class PCA_Analysis():
         for sample in pca_df.index:
             plt.annotate(sample,
                          (pca_df.PC1.loc[sample], pca_df.PC2.loc[sample]))
-        plt.savefig('media/pcaplot.png', transparent=True, bbox_inches="tight")
+        plt.savefig(pcaplot_buf, transparent=True, bbox_inches="tight")
+        pcaplot_buf.seek(0)
         plt.close()
+        return pcaplot_buf

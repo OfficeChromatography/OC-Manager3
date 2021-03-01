@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import io
 import matplotlib.pyplot as plt
 
 def tracks_to_densitograms(td):
@@ -30,20 +31,29 @@ def eval_track_list(track_list, num_tracks):
         return list(filter(lambda x: x >= 0 and x < num_tracks, nums))
     except ValueError:
         print("track list is illegal!")
-        return []
+        return []`
 """
 
-class TrackInspection():    
+class TrackInspection():
             
     def show_densitogram_and_signal(td, inspection_track):
         densitograms = tracks_to_densitograms(td)
         track_imgs = tracks_to_imgs(td)
+
+        track_image_buf = io.BytesIO()
+        rgb_densitogram_buf = io.BytesIO()
+
         plt.imshow(track_imgs[int(inspection_track)-1]), plt.show()
         plt.gca().set(title='Track ' + str(inspection_track), ylabel="Track Width\n[px]\n")
-        plt.savefig('media/track-image.png', transparent=True, bbox_inches="tight")
+        plt.savefig(track_image_buf, transparent=True, bbox_inches="tight")
         plt.close()
 
-        plot_rgb_signal(densitograms[int(inspection_track)-1]),      
+        track_image_buf.seek(0)
+
+        plot_rgb_signal(densitograms[int(inspection_track)-1]),
         plt.gca().set(xlabel="\nLocation on Track [px]", ylabel="Intensity\n")
-        plt.savefig('media/rgb-densitogram.png', transparent=True, bbox_inches="tight")
+        plt.savefig(rgb_densitogram_buf, transparent=True, bbox_inches="tight")
         plt.close()
+
+        rgb_densitogram_buf.seek(0)
+        return track_image_buf, rgb_densitogram_buf

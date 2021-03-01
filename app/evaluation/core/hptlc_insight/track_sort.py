@@ -15,12 +15,11 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-from scripts.hptlc_insight.track_detection import *
-from scripts.hptlc_insight.track import _rotate_track
-from scripts.hptlc_insight.track_detection_core import _scan_x_axis
+from .track_detection import *
+from .track import _rotate_track
+from .track_detection_core import _scan_x_axis
 import numpy as np
-
+import io
 
 def _get_intensity_on_rf(track, c_img, idx, width=1):
     t_img = track.to_image(c_img)
@@ -77,6 +76,7 @@ class TrackSort():
     #helper function for plotting multiple tracks
     def plot_multiple_tracks(tracks, track_imgs, rows, cols, rf):
         all_track_idxs = []
+        tracksort_buf = io.BytesIO()
         for track in tracks:
             all_track_idxs.append(track.img_idx)
         all_track_idxs = sorted(all_track_idxs)
@@ -94,8 +94,10 @@ class TrackSort():
         ax = plt.gca()
         ax.axes.xaxis.set_visible(False)
         #fig.text(0.5, 0.3, 'Track Width as Specified by the User [px]', ha='center')
-        plt.savefig('media/tracksort.png', transparent=True, bbox_inches="tight")
+        plt.savefig(tracksort_buf, transparent=True, bbox_inches="tight")
+        tracksort_buf.seek(0)
         plt.close()
+        return tracksort_buf
 
     # returns a sorted list (descending) of hptlc_insight.track.Track objects 
     def sort_tracks_by_intensity(self):
@@ -107,6 +109,7 @@ class TrackSort():
     def sort_tracks_by_rf(self, rf):
         sorted_tracks = self.sort_tracks_by_intensity()
         track_imgs = [t.to_image(self._td.img, False) for t in sorted_tracks]
-        TrackSort.plot_multiple_tracks(sorted_tracks, track_imgs, 1, len(track_imgs), rf)
+        return TrackSort.plot_multiple_tracks(sorted_tracks, track_imgs, 1, len(track_imgs), rf)
+
 
 
