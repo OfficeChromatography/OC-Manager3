@@ -150,6 +150,12 @@ class GcodeGenerator:
         self.set_position_x(0)
         self.finish_moves()
 
+    def set_new_zero_position_y(self, y, speed):
+        self.homming("Y")
+        self.linear_move_y(y, speed)
+        self.set_position_y(0)
+        self.finish_moves()
+
     
 
 

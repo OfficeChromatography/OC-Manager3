@@ -177,6 +177,7 @@ class PrintingProcess:
     def printing_process(self):
         self._set_temperature()
         self._rinse()
+        self._set_yhome()
         self._bands_printing()
         self._final_steps_after_print()
         return self._gcode_generator.list_of_gcodes
@@ -186,6 +187,9 @@ class PrintingProcess:
             self._gcode_generator.wait_bed_temperature(self.temperature)
             self._gcode_generator.hold_bed_temperature(self.temperature)
             self._gcode_generator.report_bed_temperature(4)
+
+    def _set_yhome(self):
+        self._gcode_generator.set_new_zero_position_y(self.zeroPosition[1], self.speed)
 
     def _rinse(self):
         self._gcode_generator.rinsing()
