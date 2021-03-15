@@ -11,6 +11,8 @@ import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
+from django.views.generic import FormView, View
+from django.http import JsonResponse
 
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
@@ -18,6 +20,15 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'steps':50,
                             'pressure':20}
 form ={}
+
+
+class MethodList(FormView):
+
+    def get(self, request):
+        """Returns a list with all the Methods saved in DB"""
+        method = Method_Db.objects.filter(auth_id=request.user).order_by('-id')
+        data_saved = [[i.filename,i.id] for i in method]
+        return JsonResponse(data_saved, safe=False)
 
 
 class OcLabControl(View):

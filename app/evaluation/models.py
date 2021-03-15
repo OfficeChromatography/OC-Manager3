@@ -20,32 +20,3 @@ class Evaluation_Db(models.Model):
     # hca =
 
 
-class Method_Db(models.Model):
-    auth = models.ForeignKey(
-                get_user_model(),
-                null=True,
-                on_delete=models.CASCADE,
-                blank=True,
-                )
-    filename = models.CharField(null=True, max_length=120)
-
-    sampleapp = models.OneToOneField(
-        SampleApplication_Db,
-        on_delete=models.CASCADE,
-        blank = True,
-    )
-    development = models.OneToOneField(
-        Development_Db,
-        on_delete=models.CASCADE,
-        blank = True,
-    )
-    detection = models.OneToOneField(
-        Images_Db,
-        on_delete=models.CASCADE,
-        blank = True,
-    )
-    evaluation = models.OneToOneField(
-        Evaluation_Db,
-        on_delete=models.CASCADE,
-        blank = True,
-    )

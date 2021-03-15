@@ -1,3 +1,5 @@
 from django.contrib import admin
+from finecontrol.models import Method_Db
 
-# Register your models here.
+
+admin.site.register(Method_Db)
