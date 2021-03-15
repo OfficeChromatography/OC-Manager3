@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import os
+
+from finecontrol.models import Method_Db
+
 AWB_MODES = [('0', 'off'),
             ('1', 'auto'),
             ('2', 'sunlight'),
@@ -286,6 +289,7 @@ class Images_Db(Images):
     user_conf = models.OneToOneField(UserControls_Db, on_delete=models.CASCADE, null=True)
     leds_conf = models.OneToOneField(Leds_Db, on_delete=models.CASCADE, null=True)
     camera_conf = models.OneToOneField(CameraControls_Db, on_delete=models.CASCADE, null=True)
+    method = models.ForeignKey(Method_Db, on_delete = models.CASCADE, null=True, blank=True)
 
     def file_name(self):
         return os.path.splitext(os.path.basename(self.image.name))[0]

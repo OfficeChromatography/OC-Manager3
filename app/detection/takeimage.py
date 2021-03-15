@@ -2,6 +2,8 @@ from app.settings import STATIC_ROOT, MEDIA_ROOT
 from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
 from .models import Images_Db
 
+from finecontrol.forms import Method_Form
+
 from django.core.files import File
 from PIL import Image
 import PIL.ExifTags
@@ -97,6 +99,7 @@ class PhotoShootManager:
         self.user_config_form = UserControlsForm(request.POST or None)
         self.format_config_form = ShootConfigurationForm(request.POST or None)
         self.led_config_form = LedsControlsForm(request.POST or None)
+        self.method_form = Method_Form(request.POST or None)
 
         self.path_photo = None
 
@@ -152,6 +155,7 @@ class PhotoShootManager:
             image.user_conf = self.user_config_form.save()
             image.leds_conf = self.led_config_form.save()
             image.camera_conf = self.camera_config_form.save()
+            image.method = self.method_form.save()
             image.save()
             return image
 
