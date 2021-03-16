@@ -29,12 +29,15 @@ class InstallationProcess:
         self.command = {
             "update": ["sudo", "apt-get", "update"],
             "upgrade": ["sudo", "apt-get", "upgrade", "-y"],
+            "pip3": ['sudo', 'apt', 'install', 'python3-pip', '-y'],
+            "curl": ['sudo', 'apt-get', 'install', 'curl', '-y'],
             "docker download": ["sudo", "curl", "-fsSL", "https://get.docker.com", "-o", "get-docker.sh"],
             "docker installation": ["sudo", "sh", "get-docker.sh"],
+            
             "install_docker_compose": ["sudo", "pip3", "install", "docker-compose"],
             "install_libraries": ["sudo", "apt-get", "install", "-y", "libffi-dev", "libssl-dev"],
             "pulling OC_manager_v3": ["sudo", "docker", "pull", "ocmanager/ocmanager"],
-            "creating media folder": ["mkdir", "./app/media/images"],
+            "creating media folder": ["mkdir", "app/media"],
         }
 
         print(self.main_title)
