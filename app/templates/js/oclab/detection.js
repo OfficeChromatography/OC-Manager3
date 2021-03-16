@@ -98,10 +98,18 @@ $('#uv255text').on('change',function(){
   $('#id_uv255_power').val($(this).val())
 })
 
+var methodSelected = [{name: "id", value: "id"},{name: "filename", value: "filename"}]
+function loadMethodSelected(){
+    methodSelected[0].value = $('[aria-selected="true"]').attr("id"),
+    methodSelected[1].value = $('[aria-selected="true"]').text()
+}
+                    
+
 // TakePhoto Button
 $('#shootbttn').on('click', function (e) {
   event.preventDefault()
-  $formData = [...$('form').serializeArray(),...colorSelected]
+  loadMethodSelected()
+  $formData = [...$('form').serializeArray(),...colorSelected,...methodSelected]
   console.log($formData);
   $endpoint = captureEndpoint
   $.ajax({

@@ -33,8 +33,6 @@ function listener4LoadedImages(){
 $('.list-group-item').on('click', function (e) {
     e.preventDefault()
     data={'id':this.id, 'LOADFILE':''}
-    console.log(data)
-    console.log(data);
     $.ajax({
     method: 'GET',
     url:    window.location.origin+'/capture/',
@@ -44,13 +42,41 @@ $('.list-group-item').on('click', function (e) {
     })
 })
 function loadImageMethodSuccess(data, textStatus, jqXHR){
-$("#image_id").attr("src",data.url);
-$("#image_id").attr("alt",data.id);
-$("#image_id").attr("name",data.filename);
-$("#new_filename").val(data.filename)
+$("#image_id").attr("src",data.url[0]);
+$("#image_id").attr("src-list",data.url);
+$("#image_id").attr("alt",data.id[0]);
+$("#image_id").attr("alt-list",data.id);
+$("#image_id").attr("name",data.filename[0]);
+$("#image_id").attr("name-list",data.filename);
+$("#image_id").attr("position",0);
+//$("#new_filename").val(data.filename[0])
 
 }
 function loadImageMethodError(jqXHR, textStatus, errorThrown){}
+}
+
+function switchPicture(direction){
+  src_list = $("#image_id").attr("src-list").split(',');
+  alt_list = $("#image_id").attr("alt-list").split(',');
+  name_list = $("#image_id").attr("name-list").split(',');
+  position = $("#image_id").attr("position");
+  //console.log(src_list.length)
+  if (direction == 'left'){
+    position -= 1
+    if (position < 0){
+      position = src_list.length - 1;
+    } 
+  } else {
+    position = parseInt(position) + 1
+    if (position >= src_list.length){
+      position = 0;
+    }
+  }
+  //console.log(position)
+  $("#image_id").attr("src",src_list[position]);
+  $("#image_id").attr("alt",alt_list[position]);
+  $("#image_id").attr("name",name_list[position]);
+  $("#image_id").attr("position",position);
 }
 
 //Save name Button

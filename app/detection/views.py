@@ -91,10 +91,10 @@ class Capture_View(View):
     def post(self, request):
         # SAVE IMAGE
         if 'RENAME' in request.POST:
-            methods = Images_Db.objects.filter(auth=request.user)
-            method = methods.get(id=request.POST['id'])
-            method.filename = request.POST['filename']
-            method.save()
+            images = Images_Db.objects.filter(uploader=request.user)
+            image = images.get(id=request.POST['id'])
+            image.filename = request.POST['filename']
+            image.save()
             return JsonResponse({'success':'File saved!'})
 
         elif 'SAVE_NOTE' in request.POST:
