@@ -32,12 +32,12 @@ div.show-image button.image-config-load {
 
 div.show-image button.image-right {
     position: absolute;
-    bottom: 150px;
-    right: 16px;
+    bottom: 42%;
+    right: 20px;
 }
 
 div.show-image button.image-left {
     position: absolute;
-    bottom: 150px;
+    bottom: 42%;
     left: 16px;
 }

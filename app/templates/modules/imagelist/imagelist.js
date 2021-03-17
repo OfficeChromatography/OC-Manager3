@@ -42,42 +42,21 @@ $('.list-group-item').on('click', function (e) {
     })
 })
 function loadImageMethodSuccess(data, textStatus, jqXHR){
-$("#image_id").attr("src",data.url[0]);
-$("#image_id").attr("src-list",data.url);
-$("#image_id").attr("alt",data.id[0]);
-$("#image_id").attr("alt-list",data.id);
-$("#image_id").attr("name",data.filename[0]);
-$("#image_id").attr("name-list",data.filename);
-$("#image_id").attr("position",0);
-//$("#new_filename").val(data.filename[0])
+  pos = data.id.length - 1
+  $("#image_id").attr("src",data.url[pos]);
+  $("#image_id").attr("src-list",data.url);
+  $("#image_id").attr("alt",data.id[pos]);
+  $("#image_id").attr("alt-list",data.id);
+  $("#image_id").attr("name",data.filename[pos]);
+  $("#image_id").attr("name-list",data.filename);
+  $("#image_id").attr("position",pos);
+  $("#new_filename").val(data.filename[pos])
 
 }
 function loadImageMethodError(jqXHR, textStatus, errorThrown){}
 }
 
-function switchPicture(direction){
-  src_list = $("#image_id").attr("src-list").split(',');
-  alt_list = $("#image_id").attr("alt-list").split(',');
-  name_list = $("#image_id").attr("name-list").split(',');
-  position = $("#image_id").attr("position");
-  //console.log(src_list.length)
-  if (direction == 'left'){
-    position -= 1
-    if (position < 0){
-      position = src_list.length - 1;
-    } 
-  } else {
-    position = parseInt(position) + 1
-    if (position >= src_list.length){
-      position = 0;
-    }
-  }
-  //console.log(position)
-  $("#image_id").attr("src",src_list[position]);
-  $("#image_id").attr("alt",alt_list[position]);
-  $("#image_id").attr("name",name_list[position]);
-  $("#image_id").attr("position",position);
-}
+
 
 //Save name Button
 $('#renamebttn').on('click', function (e) {
@@ -147,23 +126,71 @@ $('#load_config').on('click', function (e) {
         data:   {'GETCONFIG':'','id':$("#image_id").attr('alt')},
         success: getConfigMethodSuccess,
         error: getConfigMethodError,
-    })
+    }) 
+})
 
-    function getConfigMethodSuccess(data, textStatus, jqXHR){
-        //Load User Controls
+function getConfigMethodSuccess(data, textStatus, jqXHR){
+  //Load User Controls
 
-        for (var [key, value] of Object.entries(data.user_conf)) {
-            $("#id_"+key).val(String(value))
-        }
-        // Load LEDs conf
-        $("#id_uv255_power").val(data.leds_conf.uv255_power).change()
-        $("#id_uv365_power").val(data.leds_conf.uv365_power).change()
-        $('#picker').colpickSetColor({r:data.leds_conf.red, g:data.leds_conf.green, b:data.leds_conf.blue})
+  for (var [key, value] of Object.entries(data.user_conf)) {
+      $("#id_"+key).val(String(value))
+  }
+  // Load LEDs conf
+  $("#id_uv255_power").val(data.leds_conf.uv255_power).change()
+  $("#id_uv365_power").val(data.leds_conf.uv365_power).change()
+  $('#picker').colpickSetColor({r:data.leds_conf.red, g:data.leds_conf.green, b:data.leds_conf.blue})
 
-        // Load Camera conf
-        for (var [key, value] of Object.entries(data.camera_conf)) {
-            $("#id_"+key).val(String(value))
-        }
+  // Load Camera conf
+  for (var [key, value] of Object.entries(data.camera_conf)) {
+      $("#id_"+key).val(String(value))
+  }
+  console.log('working')
+}
+function getConfigMethodError(jqXHR, textStatus, errorThrown){console.log('error')}
+
+function switchPicture(direction){
+  src_list = $("#image_id").attr("src-list").split(',');
+  alt_list = $("#image_id").attr("alt-list").split(',');
+  name_list = $("#image_id").attr("name-list").split(',');
+  position = $("#image_id").attr("position");
+  //console.log(src_list.length)
+  if (direction == 'left'){
+    position -= 1
+    if (position < 0){
+      position = src_list.length - 1;
+    } 
+  } else {
+    position = parseInt(position) + 1
+    if (position >= src_list.length){
+      position = 0;
     }
-    function getConfigMethodError(jqXHR, textStatus, errorThrown){}
+  }
+  //console.log(position)
+  $("#image_id").attr("src",src_list[position]);
+  $("#image_id").attr("alt",alt_list[position]);
+  $("#image_id").attr("name",name_list[position]);
+  $("#image_id").attr("position",position);
+  $("#new_filename").val(name_list[position])
+}
+
+$('#right').on('click', function (e) {
+  switchPicture('right');
+  $.ajax({
+    method: 'GET',
+    url:    window.location.origin+'/capture/',
+    data:   {'GETCONFIG':'','id':$("#image_id").attr('alt')},
+    success: getConfigMethodSuccess,
+    error: getConfigMethodError,
+  });
+})
+
+$('#left').on('click', function (e) {
+  switchPicture('left');
+  $.ajax({
+    method: 'GET',
+    url:    window.location.origin+'/capture/',
+    data:   {'GETCONFIG':'','id':$("#image_id").attr('alt')},
+    success: getConfigMethodSuccess,
+    error: getConfigMethodError,
+  });
 })

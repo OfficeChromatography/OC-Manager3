@@ -49,30 +49,28 @@ class Capture_View(View):
 
         elif 'GETCONFIG' in request.GET:
             id = int(request.GET.get('id'))
-            method = Method_Db.objects.get(id=id, auth=request.user)
-            images = Images_Db.objects.filter(method=method)
-            user_conf=[]
-            leds_conf=[]
-            camera_conf=[]
-            for image in images:
-                user_conf.append(model_to_dict(image.user_conf,
-                                        fields=[field.name for field in image.user_conf._meta.fields]))
-                leds_conf.append(model_to_dict(image.leds_conf,
-                                        fields=[field.name for field in image.leds_conf._meta.fields]))
-                camera_conf.append(model_to_dict(image.camera_conf,
-                                        fields=[field.name for field in image.camera_conf._meta.fields]))
+            #method = Method_Db.objects.get(id=id, auth=request.user)
+            image = Images_Db.objects.get(id=id)
+            
+            user_conf = model_to_dict(image.user_conf,
+                                    fields=[field.name for field in image.user_conf._meta.fields])
+            leds_conf = model_to_dict(image.leds_conf,
+                                    fields=[field.name for field in image.leds_conf._meta.fields])
+            camera_conf = model_to_dict(image.camera_conf,
+                                    fields=[field.name for field in image.camera_conf._meta.fields])
             response = {**{'user_conf': user_conf,
                            'leds_conf': leds_conf,
                            'camera_conf': camera_conf
                            }}
+            print(id)
             return JsonResponse(response)
 
         elif 'LOAD_NOTE' in request.GET:
             id = int(request.GET.get('id'))
-            method = Method_Db.objects.get(id=id, auth=request.user)
-            images = Images_Db.objects.filter(method=method)
-            notes = [image.note for image in images]
-            return JsonResponse({'note':notes}, safe=False)
+            images = Images_Db.objects.filter(uploader=request.user)
+            image = images.get(id=id)
+            note = image.note
+            return JsonResponse({'note':note}, safe=False)
 
         else:
             initial = basic_conf()

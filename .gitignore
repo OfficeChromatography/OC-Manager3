@@ -71,3 +71,10 @@ venv.bak/
 /media
 **/db.sqlite3
 **/**/migrations
+app/derivatization/__init__.py
+.gitignore
+app/derivatization/admin.py
+app/derivatization/apps.py
+app/derivatization/models.py
+app/derivatization/tests.py
+app/derivatization/views.py
