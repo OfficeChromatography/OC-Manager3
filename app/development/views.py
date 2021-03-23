@@ -16,14 +16,6 @@ class DevelopmentView(FormView):
         return render(request, 'development.html', {})
 
 
-# class DevelopmentList(FormView):
-
-#     def get(self, request):
-#         """Returns a list with all the SampleApplications save in DB"""
-#         developments = Development_Db.objects.filter(auth_id=request.user).order_by('-id')
-#         data_saved = [[development.filename, development.pk] for development in developments]
-#         return JsonResponse(data_saved, safe=False)
-
 class DevelopmentDetail(View):
     def delete(self, request, id):
         Method_Db.objects.get(pk=id).delete()
@@ -128,26 +120,3 @@ class DevelopmentAppPlay(View):
             OC_LAB.print_from_list(gcode)
             return JsonResponse({'error': 'f.errors'})
 
-# AUX Functions
-
-def data_validations(**kwargs):
-    # Iterate each form and run validations
-    forms_data = {}
-    for key_form, form in kwargs.items():
-        if form.is_valid():
-            forms_data.update(form.cleaned_data)
-        else:
-            print(f'Error on {key_form}')
-            return
-    return forms_data
-
-
-def data_validations_and_save(**kwargs):
-    objects_saved = {}
-    for key_form, form in kwargs.items():
-        if form.is_valid():
-            objects_saved[key_form] = form.save()
-        else:
-            print(form.errors)
-            return JsonResponse({'error':f'Check {key_form}'})
-    return objects_saved

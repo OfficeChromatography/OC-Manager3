@@ -1,3 +1,4 @@
+from django.views.generic import FormView, View
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -19,113 +20,135 @@ from .takeimage import *
 from django.core.exceptions import ObjectDoesNotExist
 import os
 
+from finecontrol.forms import data_validations, data_validations_and_save
+
 MOTION_MODEL = ((0, 'Translation'),
                     (1, 'Euclidean'),
                     (2, 'Affine'),
                     (3, 'Homography'))
 
 
-# Create your views here.
-form={}
-class Capture_View(View):
+class DetectionView(FormView):
     def get(self, request):
-        # FILE LOADING
+        """Manage the HTML view in Development"""
+        form={}
+        initial = basic_conf()
+        form['FormatControlsForm'] = ShootConfigurationForm(initial=initial)
+        form['CameraControlsForm'] = CameraControlsForm(initial=initial)
+        form['UserControlsForm'] = UserControlsForm(initial=initial)
+        form['LedsControlsForm'] = LedsControlsForm(initial=initial)
+        image_info={'url': 'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
+        return render(request, 'capture.html', {**form, **image_info})
+
+class TakeImage(View):
+    def post(self,request):
+        photo_shoot = PhotoShootManager(request)
+        photo_shoot.are_shoot_options_correct()
+        photo_shoot.set_camera_configurations()
+        photo_shoot.shoot()
+        photo_shoot.photo_correction()
+        photo_object = photo_shoot.save_photo_in_db()
+        photo_info = {
+            'url': request.META['HTTP_ORIGIN']+photo_object.image.url,
+            'new_name': photo_object.image.url,
+            'id': photo_object.id,
+        }
+        return JsonResponse(photo_info)
+
+class DetectionDetail(View):
+    def delete(self, request, id):
+        Method_Db.objects.get(pk=id).delete()
+        return JsonResponse({})
+
+    def get(self, request, id):
+        """Loads an object specified by ID"""
+        id_object = id
+        response = {}
+        method = Method_Db.objects.get(id=id_object, auth=request.user)
+        images = Images_Db.objects.filter(method=method)
+
+
+        if not Method_Db.objects.get(id=id_object, auth=request.user) or images.count()==0:
+            response.update({"filename":getattr(method,"filename")})
+            response.update({"id":id_object})
         
-        if 'LOADFILE' in request.GET:
-            id = int(request.GET.get('id'))
-            method = Method_Db.objects.get(id=id, auth=request.user)
-            
-            images = Images_Db.objects.filter(method=method)
-            response = {**{'url':[image.image.url for image in images],
-                            'filename':[image.filename for image in images],
-                            'id': [image.id for image in images]}}
-
-            return JsonResponse(response)
-
-        elif 'LISTLOAD' in request.GET:
-            methods = Method_Db.objects.filter(auth=request.user).order_by('-id')
-            names = [[i.filename,i.id] for i in methods]
-            return JsonResponse(names, safe=False)
-
-        elif 'GETCONFIG' in request.GET:
-            id = int(request.GET.get('id'))
-            #method = Method_Db.objects.get(id=id, auth=request.user)
-            image = Images_Db.objects.get(id=id)
-            
-            user_conf = model_to_dict(image.user_conf,
-                                    fields=[field.name for field in image.user_conf._meta.fields])
-            leds_conf = model_to_dict(image.leds_conf,
-                                    fields=[field.name for field in image.leds_conf._meta.fields])
-            camera_conf = model_to_dict(image.camera_conf,
-                                    fields=[field.name for field in image.camera_conf._meta.fields])
-            response = {**{'user_conf': user_conf,
-                           'leds_conf': leds_conf,
-                           'camera_conf': camera_conf
-                           }}
-            print(id)
-            return JsonResponse(response)
-
-        elif 'LOAD_NOTE' in request.GET:
-            id = int(request.GET.get('id'))
-            images = Images_Db.objects.filter(uploader=request.user)
-            image = images.get(id=id)
-            note = image.note
-            return JsonResponse({'note':note}, safe=False)
-
         else:
-            initial = basic_conf()
-            form['FormatControlsForm'] = ShootConfigurationForm(initial=initial)
-            form['CameraControlsForm'] = CameraControlsForm(initial=initial)
-            form['UserControlsForm'] = UserControlsForm(initial=initial)
-            form['LedsControlsForm'] = LedsControlsForm(initial=initial)
-            form['list_load'] = Method_Db.objects.filter(auth=request.user).order_by('-id')
-            image_info={'url': 'https://bitsofco.de/content/images/2018/12/Screenshot-2018-12-16-at-21.06.29.png'}
-            return render(
-                            request,
-                            "capture.html",
-                            {**form, **image_info}
-                            )
+            url_list=[]
+            id_list=[]
+
+            
+            pos = images.count() - 1
+            if (pos<0): pos=0 
+            imageconf = images[pos]
+            
+            user_conf = model_to_dict(imageconf.user_conf,
+                                    fields=[field.name for field in imageconf.user_conf._meta.fields])
+            leds_conf = model_to_dict(imageconf.leds_conf,
+                                    fields=[field.name for field in imageconf.leds_conf._meta.fields])
+            camera_conf = model_to_dict(imageconf.camera_conf,
+                                    fields=[field.name for field in imageconf.camera_conf._meta.fields])
+            
+            for image in images:
+                url_list.append(image.image.url)
+                id_list.append(image.id)
+
+            response.update({**{
+                        'url': url_list,
+                        'filename': image.method.filename,
+                        'id': id_object,
+                        'id_list': id_list,
+                        'user_conf': user_conf,
+                        'leds_conf': leds_conf,
+                        'camera_conf': camera_conf,
+                        'note': imageconf.note,
+                        }})
+        return JsonResponse(response)
 
     def post(self, request):
-        # SAVE IMAGE
-        if 'RENAME' in request.POST:
-            images = Images_Db.objects.filter(uploader=request.user)
-            image = images.get(id=request.POST['id'])
-            image.filename = request.POST['filename']
-            image.save()
-            return JsonResponse({'success':'File saved!'})
+        """Save and Update Data"""
+        
+        id = request.POST.get("selected-element-id")
+        image_id = request.POST.get("image_id")
+        # if not id or not Images_Db.objects.filter(method=Method_Db.objects.get(pk=id)):
+        #     detection_form = Detection_Form(request.POST)
+        #     if detection_form.is_valid():
+        #         detection_instance = detection_form.save(commit=False)
+        #         detection_instance.auth = request.user
+        method_form = Method_Form(request.POST)
 
-        elif 'SAVE_NOTE' in request.POST:
-            user_images = Images_Db.objects.filter(uploader=request.user)
-            photo = user_images.get(pk=request.POST['id'])
-            photo.note = request.POST['note']
-            photo.save()
-            return JsonResponse({'success': 'Note saved!'})
-
-        elif 'REMOVE' in request.POST:
-            try:
-                file = Images_Db.objects.get(id=request.POST.get('id'), uploader=request.user)
-                path = os.path.join(MEDIA_ROOT, str(file.image))
-                if os.path.exists(path):
-                    os.remove(path)
-                    file.delete()
-            except:
-                return JsonResponse({'warning': 'Something went wrong!'})
-            return JsonResponse({'success': 'File removed!'})
-
+        if not id:
+            method = method_form.save(commit=False)
+            method.auth = request.user
+            method.save()
         else:
-            photo_shoot = PhotoShootManager(request)
-            photo_shoot.are_shoot_options_correct()
-            photo_shoot.set_camera_configurations()
-            photo_shoot.shoot()
-            photo_shoot.photo_correction()
-            photo_object = photo_shoot.save_photo_in_db()
-            photo_info = {
-                'url': request.META['HTTP_ORIGIN']+photo_object.image.url,
-                'new_name': photo_object.image.url,
-                'id': photo_object.id,
-            }
-            return JsonResponse(photo_info)
+            method = Method_Db.objects.get(pk=id)
+            method_form = Method_Form(request.POST, instance=method)
+            method_form.save()
+            if image_id:
+                image_instance = Images_Db.objects.get(id=image_id)
+                image_instance.method = method
+                image_instance.note = request.POST.get("note")
+                image_instance.save()
+
+        return JsonResponse({'message':'Data !!'})
+
+class GetConfig(View):
+    def get(self, request, id):
+        image = Images_Db.objects.get(pk=id)
+        response = {}
+        user_conf = model_to_dict(image.user_conf,
+                                fields=[field.name for field in image.user_conf._meta.fields])
+        leds_conf = model_to_dict(image.leds_conf,
+                                fields=[field.name for field in image.leds_conf._meta.fields])
+        camera_conf = model_to_dict(image.camera_conf,
+                                fields=[field.name for field in image.camera_conf._meta.fields])
+        response.update({**{
+                        'user_conf': user_conf,
+                        'leds_conf': leds_conf,
+                        'camera_conf': camera_conf,
+                        'note': image.note,
+                        }})
+        return JsonResponse(response)
 
 class Hdr_View(View):
     def get(self, request):

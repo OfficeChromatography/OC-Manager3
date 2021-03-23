@@ -28,6 +28,7 @@ urlpatterns = [
     path('', include('detection.urls')),
     path('', include('sampleapp.urls')),
     path('', include('development.urls')),
+    path('', include('derivatization.urls')),
 ]
 
 if settings.DEBUG:

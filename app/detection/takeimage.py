@@ -89,7 +89,7 @@ def filter_data(data):
 class PhotoShootManager:
 
     def __init__(self, request):
-        
+        print(request)
         self.camera = Camera()
         self.nm_255 = UvLed(5)
         self.nm_365 = UvLed(4)
@@ -104,7 +104,6 @@ class PhotoShootManager:
 
         self.id = request.POST.get("id")
         print(request.POST)
-
         self.path_photo = None
 
     def are_shoot_options_correct(self):

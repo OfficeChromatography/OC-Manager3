@@ -14,6 +14,11 @@ from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 from django.views.generic import FormView, View
 from django.http import JsonResponse
 
+from sampleapp.models import SampleApplication_Db
+from development.models import Development_Db
+from derivatization.models import Derivatization_Db
+from detection.models import Images_Db
+
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
                             'stop_frequency':500,
@@ -27,7 +32,18 @@ class MethodList(FormView):
     def get(self, request):
         """Returns a list with all the Methods saved in DB"""
         method = Method_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = [[i.filename,i.id] for i in method]
+        data_saved = []
+        for i in method:
+            icons = [1,1,1,1]
+            if not SampleApplication_Db.objects.filter(method=i):
+                icons[0] = 0.3
+            if not Development_Db.objects.filter(method=i):
+                icons[1] = 0.3
+            if not Derivatization_Db.objects.filter(method=i):
+                icons[2] = 0.3
+            if not Images_Db.objects.filter(method=i):
+                icons[3] = 0.3
+            data_saved.append([i.filename,i.id,icons])
         return JsonResponse(data_saved, safe=False)
 
 
