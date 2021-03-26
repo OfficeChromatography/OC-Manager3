@@ -18,6 +18,20 @@ $('#image_new_tab_bttn').on('click', function (e) {
     window.open($('#image_id').attr('src'))
 })
 
+$('#delete_image').on('click', function (e) {
+    event.preventDefault()
+    id = $("#image_id").attr('alt')
+    $.ajax({
+      type: 'DELETE',
+      url:    window.location.origin+'/capture/delete/'+ id,
+      success: deleteMethodSuccess,
+      error: deleteMethodError,
+    });
+})
+function deleteMethodSuccess(data, textStatus, jqXHR){
+    list_of_saved.loadList()
+}
+function deleteMethodError(jqXHR, textStatus, errorThrown){console.log('error')}
 
 
 

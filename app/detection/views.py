@@ -210,3 +210,17 @@ class Detection_Homming(View):
             last_zero_position = Detection_ZeroPosition.objects.filter(uploader=request.user).order_by('-id')[0]
             OC_LAB.send(f'G0X{last_zero_position.zero_x}Y{last_zero_position.zero_y}\nG92X0Y0')
         return JsonResponse({'message':'ok'})
+
+class DeleteImage(View):
+    def delete(self, request, id):
+        if not Images_Db.objects.get(pk=id):
+            print('error')
+            return JsonResponse({'warning': 'Something went wrong!'})
+        else:
+            image = Images_Db.objects.get(pk=id)
+            path = os.path.join(MEDIA_ROOT, str(image.image))
+            print(path)
+            if os.path.exists(path):
+                os.remove(path)
+                image.delete()
+            return JsonResponse({'success': 'File removed!'})
