@@ -6,7 +6,7 @@ from .models import *
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 import json
-from finecontrol.calculations.DevCalc import calculateDevelopment
+from finecontrol.calculations.DerivatCalc import calculateDerivatization
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
 
@@ -102,7 +102,7 @@ class DerivatizationAppPlay(View):
             forms_data = data_validations( plate_properties=PlateProperties_Form(request.POST),
                                             pressure_settings=PressureSettings_Form(request.POST),
                                             zero_position=ZeroPosition_Form(request.POST),
-                                            band_settings=DevelopmentBandSettings_Form(request.POST))
+                                            band_settings=DerivatizationBandSettings_Form(request.POST))
 
             gcode = calculateDerivatization(forms_data)
             OC_LAB.print_from_list(gcode)

@@ -49,7 +49,7 @@ $(".development-flowrate-insidence").on("change", function (){
     plotPreview.eliminateAllPoints()
     newdata = []
     newdata[0]={y:offset_bottom_size,x:offset_left_size}
-    newdata[1]={y:offset_bottom_size+band_height,x:offset_left_size}
+    newdata[1]={y: plate_y_size - offset_top_size, x:offset_left_size}
     newdata[2]={y:offset_bottom_size+band_height,x:band_size+offset_left_size}
     newdata[3]={y:offset_bottom_size,x:band_size+offset_left_size}
     newdata[4]=newdata[0]
