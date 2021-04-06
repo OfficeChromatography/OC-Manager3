@@ -17,6 +17,7 @@ services:
       - redis
     environment:
       - UDEV=1
+      - DJANGO_SETTINGS_MODULE=app.settings
     ports:
       - "8000:8000" # Map 8000 to 8000 of our docker image
     privileged: true
