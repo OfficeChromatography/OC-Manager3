@@ -166,3 +166,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
+
