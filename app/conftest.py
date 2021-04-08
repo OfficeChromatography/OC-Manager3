@@ -1,4 +1,4 @@
 
 pytest_plugins = [
-     # "evaluation.test.fixtures",
+     "analysis.test.fixtures",
   ]
