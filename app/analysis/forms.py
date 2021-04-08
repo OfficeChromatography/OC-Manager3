@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from .models import *
 from django.core.exceptions import ValidationError
-
+from detection.models import Images_Db
 
 class TrackDetectionForm(forms.ModelForm):
     class Meta:

@@ -1,19 +1,18 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from detection.models import Images_Db
-
-
 # Create your models here.
 class Track_Db(models.Model):
     number = models.DecimalField(null=True, decimal_places=0, max_digits=6)
 
+
 class TrackDetection_Db(models.Model):
-    image = models.ForeignKey('Images_Db', on_delete=models.CASCADE)
+    image = models.ForeignKey('detection.Images_Db', on_delete=models.CASCADE)
     number_of_tracks = models.IntegerField(null=True)
     track_width = models.FloatField(null=True)
     bands_start = models.FloatField(null=True)
     front = models.FloatField(null=True)
+
 
 class PlotOnChromatograms_Db(models.Model):
     track_detection = models.ForeignKey('TrackDetection_Db', on_delete=models.CASCADE)
@@ -45,10 +44,13 @@ class PCAAnalysis_Db(models.Model):
     explained_variance = models.ImageField(upload_to='images/pca_analysis/explained_variance/')
     pca = models.ImageField(upload_to='images/pca_analysis/pca/')
 
+
 class Heatmap_Db(models.Model):
     track_detection = models.ForeignKey('TrackDetection_Db', on_delete=models.CASCADE)
     reference = models.CharField(max_length=20)
     heatmap = models.ImageField(upload_to='images/heatmap/')
+
+
 #
 class HCAAnalysis_Db(models.Model):
     track_detection = models.ForeignKey('TrackDetection_Db', on_delete=models.CASCADE)
@@ -73,15 +75,3 @@ class HCAAnalysis_Db(models.Model):
     # os.remove('hca_img.png')
     # os.remove('hca_tracks_img.png')
 
-class Images_Db(models.Model):
-    id = models.AutoField(primary_key=True)
-    image = models.ImageField(upload_to='images/', default='/default.jpeg')
-    filename = models.CharField(max_length=100, null=True)
-    uploader = models.ForeignKey(
-        get_user_model(),
-        null=True,
-        on_delete=models.CASCADE,
-        blank=True,
-    )
-    datetime = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    note = models.TextField(default="", null=True, blank=True)

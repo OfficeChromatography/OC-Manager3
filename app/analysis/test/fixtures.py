@@ -1,13 +1,15 @@
 import pytest
 import os
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from app.settings import MEDIA_ROOT
 from django.core.files import File
-from ..models import Images_Db, TrackDetection_Db, PlotOnChromatograms_Db, TrackInspection_Db, TrackSort_Db, PCAAnalysis_Db, Heatmap_Db, HCAAnalysis_Db
-
-USERNAME = "root"
+from ..models import TrackDetection_Db, PlotOnChromatograms_Db, TrackInspection_Db, TrackSort_Db, PCAAnalysis_Db, Heatmap_Db, HCAAnalysis_Db
+from detection.models import Images_Db
+from django.test import Client
+USERNAME = "asado"
 PASSWORD = "123456"
 
+User = get_user_model()
 TEST_IMAGE_PATH = os.path.join(MEDIA_ROOT, "test.png")
 
 @pytest.fixture
@@ -16,13 +18,18 @@ def media_root():
 
 @pytest.fixture
 def user():
-    return User.objects.create_user(username=USERNAME, password=PASSWORD)
+    try:
+        object = User.objects.create_user(username=USERNAME, password=PASSWORD)
+    finally:
+        object = User.objects.get(username=USERNAME)
+        return object
 
 
 @pytest.fixture
-def client(client):
-    client.login(username=USERNAME, password=PASSWORD)
-    return client
+def client():
+    c = Client()
+    c.login(username=USERNAME, password=PASSWORD)
+    return c
 
 
 @pytest.fixture
