@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'detection',
     'sampleapp',
     'development',
+    'analysis',
     # 'users',
     # 'users_api',
     # 'rest_framework',
