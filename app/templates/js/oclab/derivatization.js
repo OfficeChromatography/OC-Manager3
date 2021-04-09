@@ -25,8 +25,11 @@ $(".development-flowrate-insidence").on("change", function (){
     let offset_bottom_size = parseFloat($("#id_offset_bottom").val());
   
     let volume = parseFloat($("#id_develop_volume").val());
-    let printBothways = $('#printBothwaysButton').text();
-  
+    let applications = parseFloat($("#id_applications").val());
+    
+    let width = plate_y_size - offset_top_size - offset_bottom_size;
+    let gap = width / (applications - 1);
+
     let band_height = 0.1;
   
   
@@ -42,18 +45,21 @@ $(".development-flowrate-insidence").on("change", function (){
     if(areErrors('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
   
     // Check if the vertical sizes is enough
-    if(areErrors('#id_space_error',working_area[1]<band_height)){return}
+    // if(areErrors('#id_space_error',working_area[1]<band_height)){return}
   
     band_size = working_area[0]
   
-    plotPreview.eliminateAllPoints()
-    newdata = []
-    newdata[0]={y:offset_bottom_size,x:offset_left_size}
-    newdata[1]={y: plate_y_size - offset_top_size, x:offset_left_size}
-    newdata[2]={y:offset_bottom_size+band_height,x:band_size+offset_left_size}
-    newdata[3]={y:offset_bottom_size,x:band_size+offset_left_size}
-    newdata[4]=newdata[0]
-    plotPreview.addData2Chart('1','black', newdata)
+    plotPreview.eliminateAllPoints();
+    for (var i = 0; i < applications; i++){
+      newdata = [];
+      newdata[0]={y:offset_top_size + i * gap,x:offset_left_size}
+      newdata[1]={y:offset_top_size + i * gap + band_height,x:offset_left_size}
+      newdata[2]={y:offset_top_size + i * gap + band_height,x:band_size+offset_left_size}
+      newdata[3]={y:offset_top_size + i * gap,x:band_size+offset_left_size}
+      newdata[4]=newdata[0]
+      plotPreview.addData2Chart('1','black', newdata);
+    }
+    plotPreview.update()
   }
   
   //Calculates the Working Area
@@ -203,7 +209,8 @@ $(".development-flowrate-insidence").on("change", function (){
   
   $(document).ready(function() {
     flowrateCalc();
-    list_of_saved.loadList()
+    list_of_saved.loadList();
+    mainCalculations();
   });
   
   
