@@ -10,6 +10,13 @@ from finecontrol.calculations.DevCalc import calculateDevelopment
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
 
+class DevelopmentDelete(View):
+
+    def delete(self, request, id):
+        apps = Development_Db.objects.filter(method=Method_Db.objects.get(pk=id))
+        apps.delete()
+        return JsonResponse({})
+
 class DevelopmentView(FormView):
     def get(self, request):
         """Manage the HTML view in Development"""

@@ -8,6 +8,7 @@ urlpatterns = [
 
     path('derivatization/load/<int:id>/', DerivatizationDetail.as_view(), name='derivatization_element'),
     path('derivatization/save/', DerivatizationDetail.as_view(), name='derivatization_element'),
+    path('derivatization/delete/<int:id>/', DerivatizationDelete.as_view(), name='derivatizationdelete'),
 
     path('derivatization/start/', DerivatizationAppPlay.as_view(), name='derivatization_element'),
 ]

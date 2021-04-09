@@ -31,6 +31,13 @@ class SampleView(FormView):
 #         data_saved = [[i.filename,i.id] for i in sample_application]
 #         return JsonResponse(data_saved, safe=False)
 
+class SampleDelete(View):
+
+    def delete(self, request, id):
+        apps = SampleApplication_Db.objects.filter(method=Method_Db.objects.get(pk=id))
+        apps.delete()
+        return JsonResponse({})
+
 class SampleDetails(View):
 
     def delete(self, request, id):

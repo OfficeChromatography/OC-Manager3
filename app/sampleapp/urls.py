@@ -9,6 +9,7 @@ urlpatterns = [
 
     path('sample/load/<int:id>/', SampleDetails.as_view(), name='sampleload'),
     path('sample/save/', SampleDetails.as_view(), name='samplesave'),
+    path('sample/delete/<int:id>/', SampleDelete.as_view(), name='sampledelete'),
 
     path('sample/start/', SampleAppPlay.as_view(), name='sampleplay'),
     path('samplecalc/', CalcVol.as_view(), name='samplecalc'),

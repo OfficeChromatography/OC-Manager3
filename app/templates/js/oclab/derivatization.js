@@ -200,7 +200,8 @@ $(".development-flowrate-insidence").on("change", function (){
       "http://127.0.0.1:8000/derivatization/list",
       "http://127.0.0.1:8000/derivatization/load",
       getData,
-      setData
+      setData,
+      "http://127.0.0.1:8000/derivatization/delete"
       )
   
   var application_control = new ApplicationControl('http://127.0.0.1:8000/oclab/control/',

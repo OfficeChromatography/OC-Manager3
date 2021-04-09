@@ -20,7 +20,8 @@ var list_of_saved = new listOfSaved("http://127.0.0.1:8000/sample/save/",
     "http://127.0.0.1:8000/sample/list",
     "http://127.0.0.1:8000/sample/load",
     getData,
-    setData
+    setData,
+    "http://127.0.0.1:8000/sample/delete",
     )
 
 var application_control = new ApplicationControl('http://127.0.0.1:8000/oclab/control/',

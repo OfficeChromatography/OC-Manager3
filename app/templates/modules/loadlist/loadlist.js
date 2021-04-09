@@ -1,10 +1,11 @@
 class listOfSaved{
-    constructor(save_url, list_url, get_url, saveEvent, loadEvent){
+    constructor(save_url, list_url, get_url, saveEvent, loadEvent, delete_app_url){
         this.save_url = save_url;
         this.list_url = list_url;
         this.get_url = get_url;
         this.saveEvent = saveEvent;
         this.loadEvent = loadEvent;
+        this.delete_app_url = delete_app_url;
 
         this.$click_new_button_handler()
         this.$click_save_button_handler()
@@ -73,10 +74,13 @@ class listOfSaved{
 
     $delete_element_handler(){
         let mainList = this;
-        $(".saved_element_trash_can").on("click mouseover mouseout", function (e){
+        $(".saved_element_trash_can").on("dblclick click mouseover mouseout", function (e){
             switch (e.type){
-                case "click":
+                case "dblclick":
                     mainList.$delete_element($(this).siblings('a'))
+                    break;
+                case "click":
+                    mainList.$delete_element_app($(this).siblings('a'))
                     break;
                 case "mouseover":
                     $(this).animate({
@@ -130,6 +134,16 @@ class listOfSaved{
         let mainList = this;
         $.ajax({
             url: mainList.get_url+"/"+object.attr("value_saved"),
+            type: 'DELETE',
+        }).done(function (){
+            mainList.loadList()
+        })
+    }
+
+    $delete_element_app(object){
+        let mainList = this;
+        $.ajax({
+            url: mainList.delete_app_url+"/"+object.attr("value_saved"),
             type: 'DELETE',
         }).done(function (){
             mainList.loadList()

@@ -10,6 +10,13 @@ from finecontrol.calculations.DerivatCalc import calculateDerivatization
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
 
+class DerivatizationDelete(View):
+
+    def delete(self, request, id):
+        apps = Derivatization_Db.objects.filter(method=Method_Db.objects.get(pk=id))
+        apps.delete()
+        return JsonResponse({})
+
 class DerivatizationView(FormView):
     def get(self, request):
         """Manage the HTML view in Derivatization"""

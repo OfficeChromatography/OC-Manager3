@@ -224,3 +224,13 @@ class DeleteImage(View):
                 os.remove(path)
                 image.delete()
             return JsonResponse({'success': 'File removed!'})
+
+class DeleteImages(View):
+    def delete(self, request, id):
+        apps = Images_Db.objects.filter(method=Method_Db.objects.get(pk=id))
+        for image in apps:
+            path = os.path.join(MEDIA_ROOT, str(image.image))
+            if os.path.exists(path):
+                os.remove(path)
+        apps.delete()
+        return JsonResponse({})

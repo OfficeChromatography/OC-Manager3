@@ -141,6 +141,7 @@ var list_of_saved = new listOfSaved("http://127.0.0.1:8000/capture/save/",
 "http://127.0.0.1:8000/capture/load",
 getData,
 setData,
+"http://127.0.0.1:8000/capture/deleteall"
 );
   
 function getData(){
