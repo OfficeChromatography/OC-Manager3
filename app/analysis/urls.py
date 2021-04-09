@@ -2,8 +2,9 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('evaluation/', MethodList.as_view(), name='evaluation'),
     path('trackdetection/<int:id>/', TrackDetectionAPI.as_view(), name='trackdetection'),
+    path('trackdetection/', TrackDetectionAPI.as_view(), name='trackdetectionlist'),
+
     path('chromatogram/<int:id>/', ChromatogramPlot.as_view(), name='chromatogram'),
 
     path('trackinspect/<int:id>/<int:track>/', TrackInspectionAPI.as_view(), name='trackinspect'),

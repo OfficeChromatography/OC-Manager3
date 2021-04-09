@@ -27,29 +27,13 @@ def buffered_image_to_cv(buffered_image):
     img = cv2.imdecode(image_as_np, cv2.IMREAD_COLOR)
     return img
 
-
-@method_decorator(csrf_exempt, name='dispatch')
-class MethodList(View):
-
-    def get(self, request):
-        """Returns a list with all the Methods saved in DB"""
-        method = Method_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = [[i.filename, i.id] for i in method]
-        return JsonResponse(data_saved, safe=False)
-
-    # def post(self, request):
-    #     buffered_image = request.FILES['image'].file.read()  # IoBytes image
-    #     image_as_np = np.frombuffer(buffered_image, dtype=np.uint8)
-    #     img = cv2.imdecode(image_as_np, cv2.IMREAD_COLOR)
-    #
-    #     return JsonResponse({'works': "DSADSAD", })
-
-
 @method_decorator(csrf_exempt, name='dispatch')
 class TrackDetectionAPI(View):
     def dispatch(self, request, *args, **kwargs):
         if 'UPDATE' in request.POST:
             return self.update(request, *args, **kwargs)
+        if 'LIST' in request.GET:
+            return self.list(request, *args, **kwargs)
         else:
             return super().dispatch(request, *args, **kwargs)
 
@@ -57,6 +41,10 @@ class TrackDetectionAPI(View):
         track_detection = TrackDetection_Db.objects.get(id=id)
         track_detection_object_dict = model_to_dict(track_detection)
         return JsonResponse({'data': track_detection_object_dict})
+
+    def list(self, request):
+        track_detection_objects = list(TrackDetection_Db.objects.all().values())
+        return JsonResponse({'data': track_detection_objects}, safe=False)
 
     def post(self, request, id):
         image = Images_Db.objects.get(id=id)
