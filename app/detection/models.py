@@ -286,16 +286,10 @@ class Images(models.Model):
 
 class Images_Db(Images):
     image = models.ImageField(upload_to ='images/', default='/default.jpeg')
-<<<<<<< HEAD
     user_conf = models.OneToOneField(UserControls_Db, on_delete=models.CASCADE, null=True)
     leds_conf = models.OneToOneField(Leds_Db, on_delete=models.CASCADE, null=True)
     camera_conf = models.OneToOneField(CameraControls_Db, on_delete=models.CASCADE, null=True)
     method = models.ForeignKey(Method_Db, on_delete = models.CASCADE, null=True, blank=True)
-=======
-    user_conf = models.OneToOneField(UserControls_Db, on_delete=models.CASCADE, null=True, blank=True)
-    leds_conf = models.OneToOneField(Leds_Db, on_delete=models.CASCADE, null=True, blank=True)
-    camera_conf = models.OneToOneField(CameraControls_Db, on_delete=models.CASCADE, null=True, blank=True)
->>>>>>> hptlc_insight
 
     def file_name(self):
         return os.path.splitext(os.path.basename(self.image.name))[0]

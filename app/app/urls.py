@@ -28,11 +28,8 @@ urlpatterns = [
     path('', include('detection.urls')),
     path('', include('sampleapp.urls')),
     path('', include('development.urls')),
-<<<<<<< HEAD
     path('', include('derivatization.urls')),
-=======
     path('', include('analysis.urls')),
->>>>>>> hptlc_insight
 ]
 
 if settings.DEBUG:
