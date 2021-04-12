@@ -7,6 +7,15 @@ from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 import json
 from finecontrol.calculations.DevCalc import calculateDevelopment
+from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
+from finecontrol.models import Method_Db
+
+class DevelopmentDelete(View):
+
+    def delete(self, request, id):
+        apps = Development_Db.objects.filter(method=Method_Db.objects.get(pk=id))
+        apps.delete()
+        return JsonResponse({})
 
 class DevelopmentView(FormView):
     def get(self, request):
@@ -14,33 +23,31 @@ class DevelopmentView(FormView):
         return render(request, 'development.html', {})
 
 
-class DevelopmentList(FormView):
-
-    def get(self, request):
-        """Returns a list with all the SampleApplications save in DB"""
-        developments = Development_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = [[development.filename, development.pk] for development in developments]
-        return JsonResponse(data_saved, safe=False)
-
 class DevelopmentDetail(View):
     def delete(self, request, id):
-        Development_Db.objects.get(pk=id).delete()
+        Method_Db.objects.get(pk=id).delete()
         return JsonResponse({})
 
     def get(self, request, id):
         """Loads an object specified by ID"""
         id_object = id
         response = {}
-        dev_config = Development_Db.objects.get(pk=id_object)
+        method = Method_Db.objects.get(pk=id_object)
 
-        response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
-        response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
-        response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id",]))
-        response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
-        response.update(model_to_dict(dev_config))
+        if not Development_Db.objects.filter(method=method):
+            response.update({"filename":getattr(method,"filename")})
+            response.update({"id":id_object})
+        else:
 
-        flowrate_entry = Flowrate_Db.objects.filter(development=id_object).values('value')
-        response.update({'flowrate': [entry for entry in flowrate_entry]})
+            dev_config = Development_Db.objects.get(method=method)
+            response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(method))
+
+            flowrate_entry = Flowrate_Db.objects.filter(development=dev_config.id).values('value')
+            response.update({'flowrate': [entry for entry in flowrate_entry]})
 
         return JsonResponse(response)
 
@@ -51,11 +58,20 @@ class DevelopmentDetail(View):
         flowrate = request.POST.get('flowrate')
         flowrate = json.loads(flowrate)
 
-        if not id:
+        if not id or not Development_Db.objects.filter(method=Method_Db.objects.get(pk=id)):
             development_form = Development_Form(request.POST)
             if development_form.is_valid():
                 development_instance = development_form.save(commit=False)
                 development_instance.auth = request.user
+                method_form = Method_Form(request.POST)
+
+                if not id:
+                    method = method_form.save(commit=False)
+                    method.auth = request.user
+                    method.save()
+                else:
+                    method = Method_Db.objects.get(pk=id)
+                development_instance.method = method
                 development_instance.save()
                 objects_save = data_validations_and_save(
                     plate_properties=PlateProperties_Form(request.POST),
@@ -69,9 +85,14 @@ class DevelopmentDetail(View):
                 development_instance.band_settings.add(objects_save["band_settings"])
 
         else:
-            development_instance = Development_Db.objects.get(pk=id)
+            method = Method_Db.objects.get(pk=id)
+            method_form = Method_Form(request.POST, instance=method)
+            method_form.save()
+            development_instance = Development_Db.objects.get(method=method)
             development_form = Development_Form(request.POST, instance=development_instance)
-            development_form.save()
+            dev_inst = development_form.save(commit=False)
+            dev_inst.method = method
+            dev_inst.save()
             data_validations_and_save(
                     plate_properties=PlateProperties_Form(request.POST,
                                                           instance=development_instance.plate_properties.get()),
@@ -106,26 +127,3 @@ class DevelopmentAppPlay(View):
             OC_LAB.print_from_list(gcode)
             return JsonResponse({'error': 'f.errors'})
 
-# AUX Functions
-
-def data_validations(**kwargs):
-    # Iterate each form and run validations
-    forms_data = {}
-    for key_form, form in kwargs.items():
-        if form.is_valid():
-            forms_data.update(form.cleaned_data)
-        else:
-            print(f'Error on {key_form}')
-            return
-    return forms_data
-
-
-def data_validations_and_save(**kwargs):
-    objects_saved = {}
-    for key_form, form in kwargs.items():
-        if form.is_valid():
-            objects_saved[key_form] = form.save()
-        else:
-            print(form.errors)
-            return JsonResponse({'error':f'Check {key_form}'})
-    return objects_saved

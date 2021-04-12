@@ -64,7 +64,7 @@ class FlowCalc:
         lohms= math.sqrt(self.nozzleLohms**2 + 4750**2 + 2600**2)
 
         #empiricly determined correctionfactor
-        correctionFactor = 5
+        correctionFactor = 1
         #flowrate in ul per s
         flowRateI = correctionFactor * unitConversionKonstantK / lohms * math.sqrt( self.pressure / self.density ) / 60. * 1000
         return flowRateI

@@ -41,7 +41,7 @@ def calculate_volume_application_info(data):
                   "estimated_drop_volume": drop_volume,
                   "times": times_to_apply,
                   "minimum_volume": vol}
-        print(values)
+        #print(values)
         results.append(values)
     return results
 
@@ -76,8 +76,8 @@ def calculate_number_of_times_to_apply(volume_per_band, vol, vol2):
 
 
 def calculate_number_of_points(length, distance_between_points):
-    print(f"DISTANCE: {distance_between_points}")
-    print(f"LENGTH: {length}")
+    #print(f"DISTANCE: {distance_between_points}")
+    #print(f"LENGTH: {length}")
     number_of_points = int(length / distance_between_points) + 1
     return number_of_points
 

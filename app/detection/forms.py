@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import CameraControls_Db, UserControls_Db, Leds_Db
+from .models import CameraControls_Db, UserControls_Db, Leds_Db, Images_Db
 from django.contrib.auth.models import User
 
 FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
@@ -18,6 +18,10 @@ FORMATS = ((0,'YU12'),    # (Planar YUV 4:2:0)
             (12,'NV21'),   # (Y/CrCb 4:2:0)
             (13,'BGR4'))   # (32-bit BGRA/X 8-8-8-8))
 
+class Detection_Form(forms.ModelForm):
+    class Meta:
+        model = Images_Db
+        fields = ['filename', 'method']
 
 class SaveShot(forms.Form):
 

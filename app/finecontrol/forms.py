@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import CleaningProcess_Db, ZeroPosition
+from .models import CleaningProcess_Db, ZeroPosition, Method_Db
 from django import forms
 
 class CleaningProcessForm(forms.ModelForm):
@@ -71,6 +71,11 @@ class ZeroPosition_Form(forms.ModelForm):
         model = ZeroPosition
         fields = ['zero_x','zero_y']
 
+class Method_Form(forms.ModelForm):
+
+    class Meta:
+        model = Method_Db
+        fields = ['filename']
 
 
 

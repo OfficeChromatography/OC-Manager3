@@ -2,6 +2,9 @@ from app.settings import STATIC_ROOT, MEDIA_ROOT
 from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
 from .models import Images_Db
 
+from finecontrol.forms import Method_Form
+from finecontrol.models import Method_Db
+
 from django.core.files import File
 from PIL import Image
 import PIL.ExifTags
@@ -86,7 +89,7 @@ def filter_data(data):
 class PhotoShootManager:
 
     def __init__(self, request):
-
+        print(request)
         self.camera = Camera()
         self.nm_255 = UvLed(5)
         self.nm_365 = UvLed(4)
@@ -97,7 +100,10 @@ class PhotoShootManager:
         self.user_config_form = UserControlsForm(request.POST or None)
         self.format_config_form = ShootConfigurationForm(request.POST or None)
         self.led_config_form = LedsControlsForm(request.POST or None)
+        #self.method_form = Method_Form(request.POST or None)
 
+        self.id = request.POST.get("id")
+        print(request.POST)
         self.path_photo = None
 
     def are_shoot_options_correct(self):
@@ -152,6 +158,9 @@ class PhotoShootManager:
             image.user_conf = self.user_config_form.save()
             image.leds_conf = self.led_config_form.save()
             image.camera_conf = self.camera_config_form.save()
+            image.method = Method_Db.objects.get(pk=self.id)
+            
+            #print(self.camera_config_form,self.method_form)
             image.save()
             return image
 

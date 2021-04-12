@@ -6,7 +6,7 @@ from .models import *
 class SampleApplication_Form(forms.ModelForm):
     class Meta:
         model = SampleApplication_Db
-        fields = ['filename']
+        fields = ['filename','method']
 
 class PlateProperties_Form(forms.ModelForm):
     class Meta:

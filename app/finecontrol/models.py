@@ -64,7 +64,7 @@ class PlateProperties_Db(models.Model):
     class Meta:
         abstract = True
 
-class Application_Db(models.Model):
+class Method_Db(models.Model):
     auth = models.ForeignKey(
                 get_user_model(),
                 null=True,
@@ -73,5 +73,16 @@ class Application_Db(models.Model):
                 )
     filename = models.CharField(null=True, max_length=120)
 
+class Application_Db(models.Model):
+    auth = models.ForeignKey(
+                get_user_model(),
+                null=True,
+                on_delete=models.CASCADE,
+                blank=True,
+                )
+    filename = models.CharField(null=True, max_length=120)
+    method = models.ForeignKey(Method_Db, on_delete = models.CASCADE, null=True, blank=True)
     class Meta:
         abstract = True
+
+
