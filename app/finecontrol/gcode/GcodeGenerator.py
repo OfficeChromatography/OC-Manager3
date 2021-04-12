@@ -134,7 +134,7 @@ class GcodeGenerator:
         return self.check_return(f"G95P")
 
     def rinsing(self):
-        self.homming("XY")
+        self.homming("X")
         self.pressurize("60")
         self.open_valve("2")
 
@@ -143,5 +143,19 @@ class GcodeGenerator:
         self.linear_move_xy(x, y, speed)
         self.set_position_xy(0, 0)
         self.finish_moves()
+
+    def set_new_zero_position_x(self, x, speed):
+        self.homming("X")
+        self.linear_move_x(x, speed)
+        self.set_position_x(0)
+        self.finish_moves()
+
+    def set_new_zero_position_y(self, y, speed):
+        self.homming("Y")
+        self.linear_move_y(y, speed)
+        self.set_position_y(0)
+        self.finish_moves()
+
+    
 
 
