@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'sampleapp',
     'development',
     'derivatization',
+    'evaluation',
     'analysis',
     # 'users',
     # 'users_api',
