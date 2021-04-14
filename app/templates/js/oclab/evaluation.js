@@ -52,7 +52,6 @@ function selectImage(imageID, idList){
 function getBandSetup(){
     methodID= $('[aria-selected="true"]').find("a").attr("value_saved")
     $.get(window.location.origin+'/evaluation/bandsetup/'+methodID+"/").done(function (data){
-        console.log(data)
         if (data.main_property == 1){
             number_of_tracks = parseInt(data.value)
             track_width = (data.size_x - data.offset_left - data.offset_right ) / number_of_tracks - (number_of_tracks - 1) * data.gap
@@ -62,7 +61,6 @@ function getBandSetup(){
             + Math.sqrt(((track_width - data.gap) / (2 * data.gap))**2 + (data.size_x - data.offset_left - data.offset_right) / data.gap)
         }
         bands_start = parseInt(data.offset_left)
-        console.log({number_of_tracks, track_width, bands_start})
         return {number_of_tracks, track_width, bands_start}
     })
 }
