@@ -172,25 +172,50 @@ class listOfSaved{
     }
 
     $exportToCsv = function(){
-        let data = $('form').serializeArray();
-        let filename = $(".active").find(".saved_element").text();
-      
-        let csvContent = "data:text/csv;charset=utf-8,";
-      
-        data.forEach(function(dataPart) {
-            let row = [dataPart["name"], dataPart["value"]]
-            csvContent += row + "\r\n";
-        });
-      
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", filename + ".csv");
-        document.body.appendChild(link); // Required for FF
-      
-        link.click();
-      }
-}
+        // let data = $('form').serializeArray();
+        let methodID = $('[aria-selected="true"]').find("a").attr("value_saved")
+        $.get(window.location.origin+'/export/'+methodID+"/").done(function (data){
+            console.log(data)
+            let filename = $(".active").find(".saved_element").text();
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            var result = []
+            for(var i in data)
+                result.push([i,data[i]]);
+            
+
+            result.forEach(function(dataPart) {
+                
+                if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' ) {
+                    var conf = []
+                    for(var j in dataPart[1])
+                        conf.push([j,dataPart[1][j]]);
+                        console.log(conf)
+                    conf.forEach(function(confPart) {
+                        let row = [confPart[0], confPart[1]]
+                        console.log(row)
+                        csvContent += row + "\r\n";
+                    })
+                } else {
+                    let row = [dataPart[0], dataPart[1]]
+                    csvContent += row + "\r\n";
+                }
+                
+            });
+        
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", filename + ".csv");
+            document.body.appendChild(link); // Required for FF
+        
+            link.click();
+        })
+
+        
+      };
+    };
+
 
 
 

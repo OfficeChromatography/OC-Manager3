@@ -12,4 +12,6 @@ urlpatterns = [
     path('tempControl/', TempControl.as_view(), name='tempcontrol'),
     path('fan/', Fan.as_view(), name='fan'),
     path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
+
+    path('export/<int:id>/', Export.as_view(), name='export')
 ]
