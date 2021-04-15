@@ -59,8 +59,8 @@ class Export(View):
             response.update(model_to_dict(sample_config.band_settings.get(), exclude=["id",]))
             response.update(model_to_dict(sample_config.zero_properties.get(), exclude=["id",]))
             response.update(model_to_dict(sample_config.movement_settings.get(), exclude=["id",]))
-            # bands_components = BandsComponents_Db.objects.filter(sample_application=sample_config.id).values()
-            # response.update({'bands_components': [entry for entry in bands_components]})
+            bands_components = BandsComponents_Db.objects.filter(sample_application=sample_config.id).values()
+            response.update({'bands_components': [entry for entry in bands_components]})
         if Development_Db.objects.filter(method=method):
             dev_config = Development_Db.objects.get(method=method)
             response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))

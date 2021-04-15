@@ -186,15 +186,26 @@ class listOfSaved{
 
             result.forEach(function(dataPart) {
                 
-                if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' ) {
+                if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' || dataPart[0] == 'bands_components' ) {
                     var conf = []
                     for(var j in dataPart[1])
                         conf.push([j,dataPart[1][j]]);
                         console.log(conf)
                     conf.forEach(function(confPart) {
-                        let row = [confPart[0], confPart[1]]
-                        console.log(row)
-                        csvContent += row + "\r\n";
+                        if (dataPart[0] == 'bands_components'){
+                            var conf2 = []
+                            for(var jj in confPart[1])
+                                conf2.push([jj,confPart[1][jj]]);
+                            conf2.forEach(function(confPart) {
+                                let row = [confPart[0], confPart[1]]
+                                console.log(row)
+                                csvContent += row + "\r\n";
+                            })    
+                        } else {
+                            let row = [confPart[0], confPart[1]]
+                            console.log(row)
+                            csvContent += row + "\r\n";
+                        }  
                     })
                 } else {
                     let row = [dataPart[0], dataPart[1]]
