@@ -158,14 +158,15 @@ def calculate(data):
                                     data.frequency,
                                     data.temperature,
                                     data.pressure,
-                                    [data.zero_x, data.zero_y])
+                                    [data.zero_x, data.zero_y],
+                                    data.waitTime)
 
     # Creates the Gcode for the application and return it
     return print_process.printing_process()
 
 
 class PrintingProcess:
-    def __init__(self, list_of_bands, speed, frequency, temperature, pressure, zeroPosition) -> object:
+    def __init__(self, list_of_bands, speed, frequency, temperature, pressure, zeroPosition, waitTime) -> object:
         self.list_of_bands = list_of_bands
         self.speed = speed
         self.frequency = frequency
@@ -173,6 +174,7 @@ class PrintingProcess:
         self.pressure = pressure
         self.zeroPosition = zeroPosition
         self._gcode_generator = GcodeGenerator(save_in_list=True)
+        self.waitTime = waitTime
 
     def printing_process(self):
         self._set_temperature()
@@ -196,19 +198,27 @@ class PrintingProcess:
         self._gcode_generator.set_new_zero_position_x(self.zeroPosition[0], self.speed)
 
     def _bands_printing(self):
+        '''
+        rinses after 50 drops applied,
+        after all fraction of bands are applied will wait for waitTime 
+        '''
         number_of_drops_applied = 0
+        directionX = 0
         for band in self.list_of_bands:
             for index, list_of_points in enumerate(band):
                 if number_of_drops_applied > 50:
                     self._rinse()
                     number_of_drops_applied = 0
                 for point in list_of_points:
+                    if (directionX - point[0] > 0):
+                        self._gcode_generator.wait(self.waitTime)
                     self._gcode_generator.linear_move_xy(point[0], point[1], self.speed)
                     self._gcode_generator.finish_moves()
                     self._gcode_generator.pressurize(self.pressure)
                     self._gcode_generator.open_valve(self.frequency)
                     self._gcode_generator.finish_moves()
                     number_of_drops_applied += 1
+                    directionX = point[0]
 
     def _final_steps_after_print(self):
         self._gcode_generator.hold_bed_temperature(0)
