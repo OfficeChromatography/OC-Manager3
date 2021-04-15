@@ -220,8 +220,6 @@ class PrintingProcess:
                     number_of_drops_applied += 1
                     directionY = point[0]
 
-              
-        print(self._gcode_generator.list_of_gcodes)
 
     def _final_steps_after_print(self):
         self._gcode_generator.hold_bed_temperature(0)
