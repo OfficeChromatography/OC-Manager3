@@ -46,6 +46,7 @@ class BandSettings_Db(models.Model):
     value = models.DecimalField(null=True, decimal_places=2, max_digits=5)
     height = models.DecimalField(null=True, decimal_places=2, max_digits=5)
     gap = models.DecimalField(null=True, decimal_places=2, max_digits=5)
+    wait = models.DecimalField(null=True, decimal_places=2, max_digits=5)
 
 class MovementSettings_Db(models.Model):
     sample_application = models.ForeignKey(SampleApplication_Db,

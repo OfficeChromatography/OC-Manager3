@@ -17,7 +17,7 @@ class PlateProperties_Form(forms.ModelForm):
 class BandSettings_Form(forms.ModelForm):
     class Meta:
         model = BandSettings_Db
-        fields = ['main_property','value','height','gap']
+        fields = ['main_property','value','height','gap','wait']
 
         def clean_main_property(self):
             return int(self.main_property)
