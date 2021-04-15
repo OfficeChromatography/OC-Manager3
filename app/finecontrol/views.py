@@ -14,10 +14,12 @@ from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 from django.views.generic import FormView, View
 from django.http import JsonResponse
 
-from sampleapp.models import SampleApplication_Db
+from sampleapp.models import SampleApplication_Db, BandsComponents_Db
 from development.models import Development_Db
 from derivatization.models import Derivatization_Db
 from detection.models import Images_Db
+
+from django.forms.models import model_to_dict
 
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
@@ -27,7 +29,7 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
 form ={}
 
 
-class MethodList(FormView):
+class MethodList(View):
 
     def get(self, request):
         """Returns a list with all the Methods saved in DB"""
@@ -45,6 +47,52 @@ class MethodList(FormView):
                 icons[3] = 0.3
             data_saved.append([i.filename,i.id,icons])
         return JsonResponse(data_saved, safe=False)
+
+class Export(View):
+    def get(self, request, id):
+        response={}
+        method = Method_Db.objects.get(pk=id)
+        if SampleApplication_Db.objects.filter(method=method):
+            sample_config = SampleApplication_Db.objects.get(method=method)
+            response.update(model_to_dict(sample_config.pressure_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(sample_config.plate_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(sample_config.band_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(sample_config.zero_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(sample_config.movement_settings.get(), exclude=["id",]))
+            bands_components = BandsComponents_Db.objects.filter(sample_application=sample_config.id).values()
+            response.update({'bands_components': [entry for entry in bands_components]})
+        if Development_Db.objects.filter(method=method):
+            dev_config = Development_Db.objects.get(method=method)
+            response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
+            flowrate_entry = Flowrate_Db.objects.filter(development=dev_config.id).values('value')
+            response.update({'flowrate': [entry for entry in flowrate_entry]})
+        if Derivatization_Db.objects.filter(method=method):
+            der_config = Derivatization_Db.objects.get(method=method)
+            response.update(model_to_dict(der_config.pressure_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(der_config.plate_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(der_config.band_settings.get(), exclude=["id",]))
+            response.update(model_to_dict(der_config.zero_properties.get(), exclude=["id",]))
+        if Images_Db.objects.filter(method=method):
+            images = Images_Db.objects.filter(method=method)
+            for imageconf in images:
+                user_conf = model_to_dict(imageconf.user_conf,
+                                    fields=[field.name for field in imageconf.user_conf._meta.fields])
+                leds_conf = model_to_dict(imageconf.leds_conf,
+                                        fields=[field.name for field in imageconf.leds_conf._meta.fields])
+                camera_conf = model_to_dict(imageconf.camera_conf,
+                                        fields=[field.name for field in imageconf.camera_conf._meta.fields])
+                response.update({**{
+                        'url': imageconf.image.url,
+                        'user_conf': user_conf,
+                        'leds_conf': leds_conf,
+                        'camera_conf': camera_conf,
+                        'note': imageconf.note,
+                        }})
+
+        return JsonResponse(response)
 
 
 class OcLabControl(View):
