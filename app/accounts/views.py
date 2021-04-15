@@ -62,7 +62,7 @@ def register_view(request):
         user.set_password(password)
         user.save()
         # Check if the user exist and login
-        new_user = authenticate(username=user.USERNAME, password=password)
+        new_user = authenticate(username=user.username, password=password)
         login(request, new_user)
         return redirect("/")
 
@@ -80,7 +80,7 @@ def profile_view(request):
         if form.is_valid():
             username_qs = User.objects.get(username=USER_INFO['username'])
             if form.cleaned_data.get('username'):
-                username_qs.USERNAME = form.cleaned_data.get('username')
+                username_qs.username = form.cleaned_data.get('username')
             if form.cleaned_data.get('email'):
                 username_qs.email = form.cleaned_data.get('email')
             username_qs.save()
