@@ -15,7 +15,7 @@ from django.views.generic import FormView, View
 from django.http import JsonResponse
 
 from sampleapp.models import SampleApplication_Db, BandsComponents_Db
-from development.models import Development_Db
+from development.models import Development_Db, Flowrate_Db
 from derivatization.models import Derivatization_Db
 from detection.models import Images_Db
 
