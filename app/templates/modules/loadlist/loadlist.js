@@ -42,21 +42,29 @@ class listOfSaved{
     $newListElement(text, db_id, iconOpacity){
         // Creates the new element in list
         let mainList = this;
-        console.log(iconOpacity)
+
         let flex_container = $("<div class=\"d-flex py-0 flex-row justify-content-between align-items-center\"></div>")
         let element = $("<a class=\"saved_element py-2\" style=\"width:100%\">"+ text +"</a>")
-        let icons = $("<i class=\"fas fa-eye-dropper\" style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:5px;opacity:"+iconOpacity[1]+";\"></i><i class=\"fas fa-spray-can\" style=\"padding-right:5px;opacity:"+iconOpacity[2]+";\"></i><i class=\"fas fa-microscope\" style=\"padding-right:20px;opacity:"+iconOpacity[3]+";\"></i>")
         let trash_can = $("<i class=\"fas fa-trash saved_element_trash_can\"></i>")
-
         flex_container.addClass('list-group-item list-group-item-action')
         flex_container.attr('role','tab')
         flex_container.attr('href','#list-home')
         flex_container.attr('data-toggle','list')
         flex_container.attr('aria-controls',"home")
-
         element.attr('value_saved',db_id)
 
-        flex_container.append(element,icons,trash_can)
+        if (typeof iconOpacity === 'undefined'){
+            flex_container.append(element,trash_can)
+        } else {
+            let icons = $("<i class=\"fas fa-eye-dropper\" style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:5px;opacity:"+iconOpacity[1]+";\"></i><i class=\"fas fa-spray-can\" style=\"padding-right:5px;opacity:"+iconOpacity[2]+";\"></i><i class=\"fas fa-microscope\" style=\"padding-right:20px;opacity:"+iconOpacity[3]+";\"></i>")
+            flex_container.append(element,icons,trash_can)
+        }
+        
+        
+
+        
+
+        
         return flex_container
     }
 

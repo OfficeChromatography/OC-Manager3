@@ -1,0 +1,153 @@
+{% load static %}
+<form class="volume-calculation-parameter" id="plateform">
+    {% include 'modules/sampleapp/platesizes.html' %}
+    {% include 'modules/sampleapp/offsets.html' %}
+</br>
+    <p><b>Variations<hr></b><p>
+        <div class="alert alert-warning collapse" id='id_variation_error' role="alert">
+            You can only select two variables
+        </div>
+
+        <div class="col-xl-6 m-0 p-0">
+            <div class="form-group row">
+                <div class="input-group input-group-sm">
+                    <label for="id_pressure_axis" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate font-weight-bold">Pressure</label>
+                    <select name="pressure_axis" class="form-control change-volume-parameter" maxlength="120" id="id_pressure_axis">
+                        <option value="x" selected="">x</option>
+                        <option value="y">y</option>
+                        <option value="">-</option>
+                    </select>
+                    <div class="input-group-append">
+                        <span class="input-group-text">axis</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_pressure_start" id=pressure_start class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Start</label>
+                    <input type="number" name="pressure_start" value="5" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_pressure_start">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[psi]</span>
+                    </div>
+                </div>
+            </div>
+            <div id="pressure-variation">
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_pressure_end" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">End</label>
+                    <input type="number" name="pressure_end" value="45" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_pressure_end">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[psi]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_pressure_steps" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Step-Size</label>
+                    <input type="number" name="pressure_steps" value="5" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_pressure_steps">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[psi]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+            <div class="form-group row">
+                <div class="input-group input-group-sm">
+                    <label for="id_frequency_axis" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate font-weight-bold">Frequency</label>
+                    <select name="frequency_axis" class="form-control change-volume-parameter" maxlength="120" id="id_frequency_axis">
+                        <option value="x">x</option>
+                        <option value="y" selected="">y</option>
+                        <option value="">-</option>
+                    </select>
+                    <div class="input-group-append">
+                        <span class="input-group-text">axis</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_frequency_start" id=frequency_start class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Start</label>
+                    <input type="number" name="frequency_start" value="600" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_frequency_start">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[Hz]</span>
+                    </div>
+                </div>
+            </div>
+            <div id="frequency-variation">
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_frequency_end" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">End</label>
+                    <input type="number" name="frequency_end" value="1400" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_frequency_end">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[Hz]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_frequency_steps" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Step-Size</label>
+                    <input type="number" name="frequency_steps" value="200" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_frequency_steps">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[Hz]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="input-group input-group-sm">
+                <label for="id_deltax_axis" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate font-weight-bold">Delta x</label>
+                <select name="deltax_axis" class="form-control change-volume-parameter" maxlength="120" id="id_deltax_axis">
+                    <option value="x">x</option>
+                    <option value="y">y</option>
+                    <option value="" selected="">-</option>
+                </select>
+                <div class="input-group-append">
+                    <span class="input-group-text">axis</span>
+                </div>
+            </div>
+        </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_deltax_start" id=deltax_start class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Start</label>
+                    <input type="number" name="deltax_start" value="0.5" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_deltax_start">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[mm]</span>
+                    </div>
+                </div>
+            </div>
+            <div id="deltax-variation">
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_deltax_end" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">End</label>
+                    <input type="number" name="deltax_end" value="1" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_deltax_end">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[mm]</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="input-group input-group-sm col p-0">
+                    <label for="id_deltax_steps" class="col-xl-3 col-lg-3 col-form-label col-form-label-sm text-truncate px-0 mx-1">Step-Size</label>
+                    <input type="number" name="deltax_steps" value="0.1" 
+                    class="form-control change-graph-size-parameter development-flowrate-insidence" step="0.01" required="" id="id_deltax_steps">
+                    <div class="input-group-append">
+                        <span class="input-group-text">[mm]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+    
+</form>

@@ -85,4 +85,38 @@ class Application_Db(models.Model):
     class Meta:
         abstract = True
 
+class NozzleTest_Db(models.Model):
+    auth = models.ForeignKey(
+                get_user_model(),
+                null=True,
+                on_delete=models.CASCADE,
+                blank=True,
+                )
+    filename = models.CharField(null=True, max_length=120)
+    temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
+    nozzlediameter = models.CharField(max_length=120, default='0.08')
+    motor_speed = models.DecimalField(null=True, decimal_places=1, max_digits=5)
+    size_x = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    size_y = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_left = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_right = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_top = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    offset_bottom = models.DecimalField(decimal_places=2, max_digits=5, null=True)
+    zero_x = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    zero_y = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    pressure_axis = models.CharField(max_length=120, default='Off', blank=True, null=True)
+    pressure_start = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    pressure_end = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    pressure_steps = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    frequency_axis = models.CharField(max_length=120, default='Off', blank=True, null=True)
+    frequency_start = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    frequency_end = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    frequency_steps = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    deltax_axis = models.CharField(max_length=120, default='Off', blank=True, null=True)
+    deltax_start = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    deltax_end = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    deltax_steps = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+
+
+
 

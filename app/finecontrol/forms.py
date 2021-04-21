@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import CleaningProcess_Db, ZeroPosition, Method_Db
+from .models import CleaningProcess_Db, ZeroPosition, Method_Db, NozzleTest_Db
 from django import forms
 
 class CleaningProcessForm(forms.ModelForm):
@@ -100,3 +100,28 @@ def data_validations_and_save(**kwargs):
         else:
             return JsonResponse({'error':f'Check {key_form}'})
     return objects_saved
+
+class NozzleTest_Form(forms.ModelForm):
+    class Meta:
+        model = NozzleTest_Db
+        fields = ['filename','auth',
+        'temperature',
+        'nozzlediameter',
+        'motor_speed',
+        'zero_x',
+        'zero_y',
+        'pressure_axis',
+        'pressure_start',
+        'pressure_end',
+        'pressure_steps',
+        'frequency_axis',
+        'frequency_start',
+        'frequency_end',
+        'frequency_steps',
+        'deltax_axis',
+        'deltax_start',
+        'deltax_end',
+        'deltax_steps',
+        'size_x','size_y','offset_left','offset_right','offset_top','offset_bottom']
+
+    

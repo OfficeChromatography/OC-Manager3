@@ -9,6 +9,7 @@ from .forms import *
 from .models import *
 import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
+from finecontrol.calculations.nozzletestCalc import calculate2
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 from django.views.generic import FormView, View
@@ -441,3 +442,83 @@ class Fan(View):
             request,
             "./fancontrol.html",
             form)
+
+class NozzleTestList(View):
+    def get(self, request):
+        """Returns a list with all the NozzleTests saved in DB"""
+        method = NozzleTest_Db.objects.filter(auth_id=request.user).order_by('-id')
+        data_saved = []
+        for i in method:
+            data_saved.append([i.filename,i.id])
+            print(i.filename)
+        return JsonResponse(data_saved, safe=False)
+
+class NozzleTest(View):
+    def get (self, request):
+        return render(
+            request,
+            "./nozzletest.html",
+            form)
+class NozzleTestDetails(View):
+    def delete(self, request, id):
+        NozzleTest_Db.objects.get(pk=id).delete()
+        return JsonResponse({})
+
+    def get (self, request, id):
+        """Loads an object specified by ID"""
+        id_object = id
+        response = {}
+        
+        if not NozzleTest_Db.objects.get(id=id_object):
+            response.update({"filename":getattr(method,"filename")})
+            response.update({"id":id_object})
+        else:       
+            sample_config = NozzleTest_Db.objects.get(id=id_object)
+            response.update(model_to_dict(sample_config))
+            
+        return JsonResponse(response)
+
+    def post(self, request):
+        """Save and Update Data"""
+        print(request.POST)
+        id = request.POST.get("selected-element-id")
+        if not id or not NozzleTest_Db.objects.get(pk=id):
+            sample_form = NozzleTest_Form(request.POST)
+            sample_instance = sample_form.save(commit=False)
+            sample_instance.pressure_axis = request.POST.get("pressure_axis")
+            sample_instance.pressure_start = request.POST.get("pressure_start")
+            sample_instance.pressure_end = request.POST.get("pressure_end")
+            sample_instance.pressure_steps = request.POST.get("pressure_steps")
+            sample_instance.frequency_axis = request.POST.get("frequency_axis")
+            sample_instance.frequency_start = request.POST.get("frequency_start")
+            sample_instance.frequency_end = request.POST.get("frequency_end")
+            sample_instance.frequency_steps = request.POST.get("frequency_steps")
+            sample_instance.deltax_axis = request.POST.get("deltax_axis")
+            sample_instance.deltax_start = request.POST.get("deltax_start")
+            sample_instance.deltax_end = request.POST.get("deltax_end")
+            sample_instance.deltax_steps = request.POST.get("deltax_steps")
+            sample_instance.auth = request.user
+            sample_instance.save()
+        else:
+            
+            sample_instance = NozzleTest_Db.objects.get(pk=id)
+            sample_form = NozzleTest_Form(request.POST, instance=sample_instance)
+            sample_inst = sample_form.save(commit=False)
+            sample_inst.auth = request.user
+            sample_inst.save()
+
+        return JsonResponse({'message':'Data !!'})
+
+class NozzleTestPlay(View):
+    def post(self, request):
+        # Run the form validations and return the clean data
+        forms_data = data_validations(
+            nozzletest=NozzleTest_Form(request.POST),
+        )
+        #print(forms_data)
+        # With the data, gcode is generated
+        gcode = calculate2(forms_data)
+        print(gcode)
+        # Printrun
+        OC_LAB.print_from_list(gcode)
+        return JsonResponse({'error':'f.errors'})
