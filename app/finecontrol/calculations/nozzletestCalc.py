@@ -33,7 +33,7 @@ def calculate2(data):
     data["main_property"] = 1
     data["value"] = 1
     data["height"] = 0
-    data["gap"] = 1
+    data["gap"] = 4
     data["delta_y"] = 1.5
     
     data["size_x"]=float(data["size_x"])
