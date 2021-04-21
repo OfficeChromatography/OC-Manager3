@@ -33,7 +33,7 @@ def calculate2(data):
     data["main_property"] = 1
     data["value"] = 1
     data["height"] = 0
-    data["gap"] = 4
+    data["gap"] = 0
     data["delta_y"] = 1.5
     
     data["size_x"]=float(data["size_x"])
@@ -52,12 +52,12 @@ def calculate2(data):
                     data["size_y"]-data["offset_bottom"]-data["offset_top"]]
     
     for idx,x in enumerate(xlist):
-        data["offset_left"] = offset_left + idx*working_area[0]/len(xlist) # 2.5 34.16 65,83
+        data["offset_left"] = offset_left + idx*working_area[0]/len(xlist) + 2 # 2.5 34.16 65,83
 
         if len(xlist)<=1:
-            data["offset_right"] = offset_right + (len(xlist)-idx)*(working_area[0]) - working_area[0]
+            data["offset_right"] = offset_right + (len(xlist)-idx)*(working_area[0]) - working_area[0] + 2
         else:
-            data["offset_right"] = offset_right + (len(xlist)-idx)*(working_area[0])/len(xlist) - (working_area[0])/len(xlist)
+            data["offset_right"] = offset_right + (len(xlist)-idx)*(working_area[0])/len(xlist) - (working_area[0])/len(xlist) + 2
         
         data[xlabel] = x
         
