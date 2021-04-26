@@ -131,7 +131,7 @@ function shootMethodError(jqXHR, textStatus, errorThrown){}
 //put camera into position
 $('#cameraposbttn').on('click', function (e) {
     event.preventDefault()
-    gcode = 'G28Y\nG1Y165'
+    gcode = 'G28Y\nG1Y170'
     console.log(gcode);
     sendToMachine(gcode)
   })
