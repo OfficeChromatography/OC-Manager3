@@ -51,9 +51,10 @@ class MethodList(View):
 
 class Export(View):
     def get(self, request, id):
-        response={}
+        all_response={}
         method = Method_Db.objects.get(pk=id)
         if SampleApplication_Db.objects.filter(method=method):
+            response={}
             sample_config = SampleApplication_Db.objects.get(method=method)
             response.update(model_to_dict(sample_config.pressure_settings.get(), exclude=["id",]))
             response.update(model_to_dict(sample_config.plate_properties.get(), exclude=["id",]))
@@ -62,7 +63,9 @@ class Export(View):
             response.update(model_to_dict(sample_config.movement_settings.get(), exclude=["id",]))
             bands_components = BandsComponents_Db.objects.filter(sample_application=sample_config.id).values()
             response.update({'bands_components': [entry for entry in bands_components]})
+            all_response.update({'Sample_application': response})
         if Development_Db.objects.filter(method=method):
+            response={}
             dev_config = Development_Db.objects.get(method=method)
             response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
             response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
@@ -70,13 +73,17 @@ class Export(View):
             response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
             flowrate_entry = Flowrate_Db.objects.filter(development=dev_config.id).values('value')
             response.update({'flowrate': [entry for entry in flowrate_entry]})
+            all_response.update({'Development': response})
         if Derivatization_Db.objects.filter(method=method):
+            response={}
             der_config = Derivatization_Db.objects.get(method=method)
             response.update(model_to_dict(der_config.pressure_settings.get(), exclude=["id",]))
             response.update(model_to_dict(der_config.plate_properties.get(), exclude=["id",]))
             response.update(model_to_dict(der_config.band_settings.get(), exclude=["id",]))
             response.update(model_to_dict(der_config.zero_properties.get(), exclude=["id",]))
+            all_response.update({'Derivatization': response})
         if Images_Db.objects.filter(method=method):
+            response={}
             images = Images_Db.objects.filter(method=method)
             for imageconf in images:
                 user_conf = model_to_dict(imageconf.user_conf,
@@ -92,8 +99,9 @@ class Export(View):
                         'camera_conf': camera_conf,
                         'note': imageconf.note,
                         }})
+            all_response.update({'Detection': response})
 
-        return JsonResponse(response)
+        return JsonResponse(all_response)
 
 
 class OcLabControl(View):

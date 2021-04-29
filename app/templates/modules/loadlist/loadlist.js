@@ -191,35 +191,45 @@ class listOfSaved{
             for(var i in data)
                 result.push([i,data[i]]);
             
-
-            result.forEach(function(dataPart) {
+            
+            result.forEach(function(application) {
                 
-                if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' || dataPart[0] == 'bands_components' ) {
-                    var conf = []
-                    for(var j in dataPart[1])
-                        conf.push([j,dataPart[1][j]]);
-                        console.log(conf)
-                    conf.forEach(function(confPart) {
-                        if (dataPart[0] == 'bands_components'){
-                            var conf2 = []
-                            for(var jj in confPart[1])
-                                conf2.push([jj,confPart[1][jj]]);
-                            conf2.forEach(function(confPart) {
+                let row = [application[0]]
+                csvContent +="\r\n"+ row + "\r\n"+ "\r\n";
+
+                data = application[1]
+                console.log(data)
+                var result2 = []
+                for(var i in data)
+                    result2.push([i,data[i]]);
+
+                result2.forEach(function(dataPart) {
+                    if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' || dataPart[0] == 'bands_components' ) {
+                        var conf = []
+                        for(var j in dataPart[1])
+                            conf.push([j,dataPart[1][j]]);
+                            console.log(conf)
+                        conf.forEach(function(confPart) {
+                            if (dataPart[0] == 'bands_components'){
+                                var conf2 = []
+                                for(var jj in confPart[1])
+                                    conf2.push([jj,confPart[1][jj]]);
+                                conf2.forEach(function(confPart) {
+                                    let row = [confPart[0], confPart[1]]
+                                    console.log(row)
+                                    csvContent += row + "\r\n";
+                                })    
+                            } else {
                                 let row = [confPart[0], confPart[1]]
                                 console.log(row)
                                 csvContent += row + "\r\n";
-                            })    
-                        } else {
-                            let row = [confPart[0], confPart[1]]
-                            console.log(row)
-                            csvContent += row + "\r\n";
-                        }  
-                    })
-                } else {
-                    let row = [dataPart[0], dataPart[1]]
-                    csvContent += row + "\r\n";
-                }
-                
+                            }  
+                        })
+                    } else {
+                        let row = [dataPart[0], dataPart[1]]
+                        csvContent += row + "\r\n";
+                    }
+                })
             });
         
             var encodedUri = encodeURI(csvContent);
