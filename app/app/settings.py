@@ -25,7 +25,7 @@ SECRET_KEY = '&b5x3h*k6m5w#d&)&o@ecznzj0j()!mrn_7-3!3vjv%h&ch(86'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','192.168.2.109','134.176.158.47']
+ALLOWED_HOSTS = ['127.0.0.1','192.168.2.109','134.176.158.47','testserver']
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'development',
     'derivatization',
     'evaluation',
+    'analysis',
     # 'users',
     # 'users_api',
     # 'rest_framework',
@@ -168,3 +169,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
+

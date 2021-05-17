@@ -199,18 +199,18 @@ class PrintingProcess:
 
     def _bands_printing(self):
         '''
-        rinses after 50 drops applied,
-        after all fraction of bands are applied will wait for waitTime 
+        will rinse after 50 drops applied
+        will wait for waitTime before going in -y direction
         '''
         number_of_drops_applied = 0
-        directionX = 0
+        directionY = 0
         for band in self.list_of_bands:
             for index, list_of_points in enumerate(band):
                 if number_of_drops_applied > 50:
                     self._rinse()
                     number_of_drops_applied = 0
                 for point in list_of_points:
-                    if (directionX - point[0] > 0):
+                    if (directionY-point[0])>0:
                         self._gcode_generator.wait(self.waitTime)
                     self._gcode_generator.linear_move_xy(point[0], point[1], self.speed)
                     self._gcode_generator.finish_moves()
@@ -218,7 +218,8 @@ class PrintingProcess:
                     self._gcode_generator.open_valve(self.frequency)
                     self._gcode_generator.finish_moves()
                     number_of_drops_applied += 1
-                    directionX = point[0]
+                    directionY = point[0]
+
 
     def _final_steps_after_print(self):
         self._gcode_generator.hold_bed_temperature(0)

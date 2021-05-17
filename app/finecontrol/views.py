@@ -9,18 +9,15 @@ from .forms import *
 from .models import *
 import os
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
-from finecontrol.calculations.nozzletestCalc import calculate2
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 from django.views.generic import FormView, View
 from django.http import JsonResponse
 
-from sampleapp.models import SampleApplication_Db, BandsComponents_Db
-from development.models import Development_Db, Flowrate_Db
+from sampleapp.models import SampleApplication_Db
+from development.models import Development_Db
 from derivatization.models import Derivatization_Db
 from detection.models import Images_Db
-
-from django.forms.models import model_to_dict
 
 
 CLEANINGPROCESS_INITIALS = {'start_frequency':100,
@@ -30,7 +27,7 @@ CLEANINGPROCESS_INITIALS = {'start_frequency':100,
 form ={}
 
 
-class MethodList(View):
+class MethodList(FormView):
 
     def get(self, request):
         """Returns a list with all the Methods saved in DB"""
@@ -48,60 +45,6 @@ class MethodList(View):
                 icons[3] = 0.3
             data_saved.append([i.filename,i.id,icons])
         return JsonResponse(data_saved, safe=False)
-
-class Export(View):
-    def get(self, request, id):
-        all_response={}
-        method = Method_Db.objects.get(pk=id)
-        if SampleApplication_Db.objects.filter(method=method):
-            response={}
-            sample_config = SampleApplication_Db.objects.get(method=method)
-            response.update(model_to_dict(sample_config.pressure_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(sample_config.plate_properties.get(), exclude=["id",]))
-            response.update(model_to_dict(sample_config.band_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(sample_config.zero_properties.get(), exclude=["id",]))
-            response.update(model_to_dict(sample_config.movement_settings.get(), exclude=["id",]))
-            bands_components = BandsComponents_Db.objects.filter(sample_application=sample_config.id).values()
-            response.update({'bands_components': [entry for entry in bands_components]})
-            all_response.update({'Sample_application': response})
-        if Development_Db.objects.filter(method=method):
-            response={}
-            dev_config = Development_Db.objects.get(method=method)
-            response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
-            flowrate_entry = Flowrate_Db.objects.filter(development=dev_config.id).values('value')
-            response.update({'flowrate': [entry for entry in flowrate_entry]})
-            all_response.update({'Development': response})
-        if Derivatization_Db.objects.filter(method=method):
-            response={}
-            der_config = Derivatization_Db.objects.get(method=method)
-            response.update(model_to_dict(der_config.pressure_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(der_config.plate_properties.get(), exclude=["id",]))
-            response.update(model_to_dict(der_config.band_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(der_config.zero_properties.get(), exclude=["id",]))
-            all_response.update({'Derivatization': response})
-        if Images_Db.objects.filter(method=method):
-            response={}
-            images = Images_Db.objects.filter(method=method)
-            for imageconf in images:
-                user_conf = model_to_dict(imageconf.user_conf,
-                                    fields=[field.name for field in imageconf.user_conf._meta.fields])
-                leds_conf = model_to_dict(imageconf.leds_conf,
-                                        fields=[field.name for field in imageconf.leds_conf._meta.fields])
-                camera_conf = model_to_dict(imageconf.camera_conf,
-                                        fields=[field.name for field in imageconf.camera_conf._meta.fields])
-                response.update({**{
-                        'url': imageconf.image.url,
-                        'user_conf': user_conf,
-                        'leds_conf': leds_conf,
-                        'camera_conf': camera_conf,
-                        'note': imageconf.note,
-                        }})
-            all_response.update({'Detection': response})
-
-        return JsonResponse(all_response)
 
 
 class OcLabControl(View):
@@ -450,83 +393,3 @@ class Fan(View):
             request,
             "./fancontrol.html",
             form)
-
-class NozzleTestList(View):
-    def get(self, request):
-        """Returns a list with all the NozzleTests saved in DB"""
-        method = NozzleTest_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = []
-        for i in method:
-            data_saved.append([i.filename,i.id])
-            print(i.filename)
-        return JsonResponse(data_saved, safe=False)
-
-class NozzleTest(View):
-    def get (self, request):
-        return render(
-            request,
-            "./nozzletest.html",
-            form)
-class NozzleTestDetails(View):
-    def delete(self, request, id):
-        NozzleTest_Db.objects.get(pk=id).delete()
-        return JsonResponse({})
-
-    def get (self, request, id):
-        """Loads an object specified by ID"""
-        id_object = id
-        response = {}
-        
-        if not NozzleTest_Db.objects.get(id=id_object):
-            response.update({"filename":getattr(method,"filename")})
-            response.update({"id":id_object})
-        else:       
-            sample_config = NozzleTest_Db.objects.get(id=id_object)
-            response.update(model_to_dict(sample_config))
-            
-        return JsonResponse(response)
-
-    def post(self, request):
-        """Save and Update Data"""
-        print(request.POST)
-        id = request.POST.get("selected-element-id")
-        if not id or not NozzleTest_Db.objects.get(pk=id):
-            sample_form = NozzleTest_Form(request.POST)
-            sample_instance = sample_form.save(commit=False)
-            sample_instance.pressure_axis = request.POST.get("pressure_axis")
-            sample_instance.pressure_start = request.POST.get("pressure_start")
-            sample_instance.pressure_end = request.POST.get("pressure_end")
-            sample_instance.pressure_steps = request.POST.get("pressure_steps")
-            sample_instance.frequency_axis = request.POST.get("frequency_axis")
-            sample_instance.frequency_start = request.POST.get("frequency_start")
-            sample_instance.frequency_end = request.POST.get("frequency_end")
-            sample_instance.frequency_steps = request.POST.get("frequency_steps")
-            sample_instance.deltax_axis = request.POST.get("deltax_axis")
-            sample_instance.deltax_start = request.POST.get("deltax_start")
-            sample_instance.deltax_end = request.POST.get("deltax_end")
-            sample_instance.deltax_steps = request.POST.get("deltax_steps")
-            sample_instance.auth = request.user
-            sample_instance.save()
-        else:
-            
-            sample_instance = NozzleTest_Db.objects.get(pk=id)
-            sample_form = NozzleTest_Form(request.POST, instance=sample_instance)
-            sample_inst = sample_form.save(commit=False)
-            sample_inst.auth = request.user
-            sample_inst.save()
-
-        return JsonResponse({'message':'Data !!'})
-
-class NozzleTestPlay(View):
-    def post(self, request):
-        # Run the form validations and return the clean data
-        forms_data = data_validations(
-            nozzletest=NozzleTest_Form(request.POST),
-        )
-        #print(forms_data)
-        # With the data, gcode is generated
-        gcode = calculate2(forms_data)
-        print(gcode)
-        # Printrun
-        OC_LAB.print_from_list(gcode)
-        return JsonResponse({'error':'f.errors'})

@@ -12,13 +12,4 @@ urlpatterns = [
     path('tempControl/', TempControl.as_view(), name='tempcontrol'),
     path('fan/', Fan.as_view(), name='fan'),
     path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
-
-    path('export/<int:id>/', Export.as_view(), name='export'),
-
-    path('nozzletest/', NozzleTest.as_view(), name='nozzletest'),
-    path('nozzletest/list/', NozzleTestList.as_view(), name='nozzletestlist'),
-    path('nozzletest/load/<int:id>/', NozzleTestDetails.as_view(), name='nozzletestload'),
-    path('nozzletest/save/', NozzleTestDetails.as_view(), name='nozzletestsave'),
-    path('nozzletest/delete/<int:id>/', NozzleTestDetails.as_view(), name='nozzletestdelete'),
-    path('nozzletest/start/', NozzleTestPlay.as_view(), name='nozzletestplay'),
 ]

@@ -42,29 +42,21 @@ class listOfSaved{
     $newListElement(text, db_id, iconOpacity){
         // Creates the new element in list
         let mainList = this;
-
+        console.log(iconOpacity)
         let flex_container = $("<div class=\"d-flex py-0 flex-row justify-content-between align-items-center\"></div>")
         let element = $("<a class=\"saved_element py-2\" style=\"width:100%\">"+ text +"</a>")
+        let icons = $("<i class=\"fas fa-eye-dropper\" style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:5px;opacity:"+iconOpacity[1]+";\"></i><i class=\"fas fa-spray-can\" style=\"padding-right:5px;opacity:"+iconOpacity[2]+";\"></i><i class=\"fas fa-microscope\" style=\"padding-right:20px;opacity:"+iconOpacity[3]+";\"></i>")
         let trash_can = $("<i class=\"fas fa-trash saved_element_trash_can\"></i>")
+
         flex_container.addClass('list-group-item list-group-item-action')
         flex_container.attr('role','tab')
         flex_container.attr('href','#list-home')
         flex_container.attr('data-toggle','list')
         flex_container.attr('aria-controls',"home")
+
         element.attr('value_saved',db_id)
 
-        if (typeof iconOpacity === 'undefined'){
-            flex_container.append(element,trash_can)
-        } else {
-            let icons = $("<i class=\"fas fa-eye-dropper\" style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:5px;opacity:"+iconOpacity[1]+";\"></i><i class=\"fas fa-spray-can\" style=\"padding-right:5px;opacity:"+iconOpacity[2]+";\"></i><i class=\"fas fa-microscope\" style=\"padding-right:20px;opacity:"+iconOpacity[3]+";\"></i>")
-            flex_container.append(element,icons,trash_can)
-        }
-        
-        
-
-        
-
-        
+        flex_container.append(element,icons,trash_can)
         return flex_container
     }
 
@@ -180,71 +172,25 @@ class listOfSaved{
     }
 
     $exportToCsv = function(){
-        // let data = $('form').serializeArray();
-        let methodID = $('[aria-selected="true"]').find("a").attr("value_saved")
-        $.get(window.location.origin+'/export/'+methodID+"/").done(function (data){
-            console.log(data)
-            let filename = $(".active").find(".saved_element").text();
-            let csvContent = "data:text/csv;charset=utf-8,";
-
-            var result = []
-            for(var i in data)
-                result.push([i,data[i]]);
-            
-            
-            result.forEach(function(application) {
-                
-                let row = [application[0]]
-                csvContent +="\r\n"+ row + "\r\n"+ "\r\n";
-
-                data = application[1]
-                console.log(data)
-                var result2 = []
-                for(var i in data)
-                    result2.push([i,data[i]]);
-
-                result2.forEach(function(dataPart) {
-                    if (dataPart[0] == 'user_conf' || dataPart[0] == 'leds_conf' || dataPart[0] == 'camera_conf' || dataPart[0] == 'bands_components' ) {
-                        var conf = []
-                        for(var j in dataPart[1])
-                            conf.push([j,dataPart[1][j]]);
-                            console.log(conf)
-                        conf.forEach(function(confPart) {
-                            if (dataPart[0] == 'bands_components'){
-                                var conf2 = []
-                                for(var jj in confPart[1])
-                                    conf2.push([jj,confPart[1][jj]]);
-                                conf2.forEach(function(confPart) {
-                                    let row = [confPart[0], confPart[1]]
-                                    console.log(row)
-                                    csvContent += row + "\r\n";
-                                })    
-                            } else {
-                                let row = [confPart[0], confPart[1]]
-                                console.log(row)
-                                csvContent += row + "\r\n";
-                            }  
-                        })
-                    } else {
-                        let row = [dataPart[0], dataPart[1]]
-                        csvContent += row + "\r\n";
-                    }
-                })
-            });
-        
-            var encodedUri = encodeURI(csvContent);
-            var link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", filename + ".csv");
-            document.body.appendChild(link); // Required for FF
-        
-            link.click();
-        })
-
-        
-      };
-    };
-
+        let data = $('form').serializeArray();
+        let filename = $(".active").find(".saved_element").text();
+      
+        let csvContent = "data:text/csv;charset=utf-8,";
+      
+        data.forEach(function(dataPart) {
+            let row = [dataPart["name"], dataPart["value"]]
+            csvContent += row + "\r\n";
+        });
+      
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", filename + ".csv");
+        document.body.appendChild(link); // Required for FF
+      
+        link.click();
+      }
+}
 
 
 
