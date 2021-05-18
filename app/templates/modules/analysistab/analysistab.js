@@ -7,16 +7,21 @@ $('#analysistab-list a').on('click', function (e) {
 function loadWhichTabIsSelected(){
   selectedTab = $('.nav-link.active').text()
   if (selectedTab=="Chromatogram"){
-    loadChromatogram()
+    //loadChromatogram()
+    postChromatogram()
   } else if (selectedTab=="Trackinspect"){
-    loadTrackInspect()
+    //loadTrackInspect()
+    postTrackinspect()
   } else if (selectedTab=="Tracksort"){
     loadTracksort()
   } else if (selectedTab=="PCA"){
-    loadPCA()
+    //loadPCA()
+    postPCA()
   } else if (selectedTab=="HCA"){
-    loadHCA()
+    //loadHCA()
+    postHCA()
   } else if (selectedTab=="Heatmap"){
-    loadHeatmap()
+    // loadHeatmap()
+    postHeatmap()
   }
 }

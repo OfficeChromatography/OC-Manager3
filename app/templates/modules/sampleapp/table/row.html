@@ -8,7 +8,7 @@
     <thead>
     <tr>
         <th class="text-center">Band</th>
-        <th class="text-center">Description</th>
+        <th class="text-center">Sample</th>
         <th class="text-center">Volume (uL)</th>
         <th class="text-center">Calculations</th>
     </tr>
@@ -16,7 +16,32 @@
     <tbody id='tbody_band'>
     <tr class="band_row">
         <td class="pt-3-half band_column"></td>
-        <td class="pt-3-half description_column" contenteditable="true"></td>
+        <td class="pt-3-half description-column">
+            <form class="m-0 description">
+                <div class="col">
+                    <input name="product_name" type="text" class="form-control form-control-sm product" placeholder="Product Name">
+                </div>
+                <div class="col">
+                    <input name="company" type="text" class="form-control form-control-sm company" placeholder="Company">
+                </div>
+                <div class="col">
+                    <input name="region" type="text" class="form-control form-control-sm region" placeholder="Region">
+                </div>
+                <div class="col">
+                    <input name="year" type="number" class="form-control form-control-sm year" placeholder="Year">
+                </div>
+            </form>
+            <div class="btn btn-primary btn-icon-split copybttn">
+                <span class="icon">
+                  <i class="fas fa-copy"></i>
+                </span>
+            </div>
+            <div class="btn btn-primary btn-icon-split pastebttn">
+                <span class="icon">
+                  <i class="fas fa-paste"></i>
+                </span>
+            </div>
+        </td>
         <td class="pt-3-half volume-cell">
             <form class="m-0 band-component">
                 <div class="form-group row">

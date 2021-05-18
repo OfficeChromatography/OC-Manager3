@@ -30,7 +30,10 @@ class BandsComponents_Db(models.Model):
                                                              on_delete=models.CASCADE,
                                                              blank=True)
     band_number = models.DecimalField(decimal_places=0, max_digits=3, null=True, blank=True)
-    description = models.CharField(null=True, max_length=120, blank=True)
+    product_name = models.CharField(null=True, max_length=120, blank=True)
+    company = models.CharField(null=True, max_length=120, blank=True)
+    region = models.CharField(null=True, max_length=120, blank=True)
+    year = models.DecimalField(decimal_places=0, max_digits=6, null=True, blank=True)
     volume = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     type = models.CharField(null=True, max_length=120, blank=True)
     density = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)

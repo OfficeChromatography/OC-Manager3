@@ -45,16 +45,28 @@ class PressureSettings_Form(forms.ModelForm):
 class BandsComponents_Form(forms.ModelForm):
     class Meta:
         model = BandsComponents_Db
-        fields = ['band_number','description', 'volume', 'type', 'density', 'viscosity']
+        fields = ['band_number','product_name','company','region','year', 'volume', 'type', 'density', 'viscosity']
         exclude = ['sample_application']
 
     def clean_band_number(self):
         band_number = self.cleaned_data.get("band_number")
         return band_number
 
-    def clean_description(self):
-        description = self.cleaned_data.get("description")
-        return description
+    def clean_product_name(self):
+        value = self.cleaned_data.get("product_name")
+        return value
+
+    def clean_company(self):
+        value = self.cleaned_data.get("company")
+        return value
+
+    def clean_region(self):
+        value = self.cleaned_data.get("region")
+        return value
+
+    def clean_year(self):
+        value = self.cleaned_data.get("year")
+        return value
 
     def clean_volume(self):
         volume = self.cleaned_data.get('volume')

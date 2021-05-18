@@ -127,11 +127,43 @@ class Table {
             return this.#sanityUndefined(value)
         }
 
-        setDescription(value){
-            this.row.find('.description-column').text(value)
+        // setDescription(value){
+        //     this.row.find('.description-column').text(value)
+        // }
+        // getDescription(){
+        //     let value = this.row.find('.description-column').text()
+        //     return this.#sanityUndefined(value)
+        // }
+
+        setProduct(value){
+            this.row.find('.product').val(value)
         }
-        getDescription(){
-            let value = this.row.find('.description-column').text()
+        getProduct(){
+            let value = this.row.find('.product').val()
+            return this.#sanityUndefined(value)
+        }
+
+        setCompany(value){
+            this.row.find('.company').val(value)
+        }
+        getCompany(){
+            let value = this.row.find('.company').val()
+            return this.#sanityUndefined(value)
+        }
+
+        setRegion(value){
+            this.row.find('.region').val(value)
+        }
+        getRegion(){
+            let value = this.row.find('.region').val()
+            return this.#sanityUndefined(value)
+        }
+
+        setYear(value){
+            this.row.find('.year').val(value)
+        }
+        getYear(){
+            let value = this.row.find('.year').val()
             return this.#sanityUndefined(value)
         }
 
@@ -204,7 +236,11 @@ class Table {
         getRowData(){
             let data = {
                 "band_number": this.getBandNumber(),
-                "description": this.getDescription(),
+                // "description": this.getDescription(),
+                "product_name": this.getProduct(),
+                "company": this.getCompany(),
+                "region": this.getRegion(),
+                "year": this.getYear(),
                 "volume": this.getVolumeValue(),
                 "type": this.getSolventOption(),
                 "density": this.getDensity(),
@@ -224,7 +260,11 @@ class Table {
 
         loadDataInRow(data){
             this.setBandNumber(data.band_number)
-            this.setDescription(data.description)
+            //this.setDescription(data.description)
+            this.setProduct(data.product_name)
+            this.setCompany(data.company)
+            this.setRegion(data.region)
+            this.setYear(data.year)
             this.setVolumeValue(data.volume)
             this.setSolventOption(data.type)
             this.setDensity(data.density)
@@ -237,4 +277,29 @@ class Table {
     }
 }
 
+$('.product').change(function(){
+    console.log($('.product').val())
+})
 
+
+var productName = "Product Name"
+var company = "Company"
+var region = "Region"
+var year = "Year"
+
+$(document).on('click', '.copybttn', function () {
+    console.log('test')
+    productName = $( this ).parent().find(".product").val()
+    company =  $( this ).parent().find(".company").val()
+    region =  $( this ).parent().find(".region").val()
+    year = $( this ).parent().find(".year").val()
+    console.log(productName,company,region,year)
+});
+
+$(document).on('click', '.pastebttn', function () {
+    console.log('test')
+    $( this ).parent().find(".product").val(productName)
+    $( this ).parent().find(".company").val(company)
+    $( this ).parent().find(".region").val(region)
+    $( this ).parent().find(".year").val(year)
+});

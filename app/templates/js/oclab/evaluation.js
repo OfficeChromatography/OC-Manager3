@@ -39,7 +39,7 @@ function getBandSetup(){
         bands_start = parseInt(data.offset_left)
         console.log([number_of_tracks, track_width, bands_start])
 
-        
+
         $('#id_tracks').val(number_of_tracks)
         setTracksOption()
         $('#id_trackwidth').val(track_width)
@@ -57,7 +57,7 @@ function setTracksOption(){
     for (i = 1; i <= tracks; i++) {
         string = '<option value="'+i+'">'+i+'</option>'
         $('#id_tracknumber').append(string)
-      }    
+      }
 }
 
 $('#id_tracknumber').change(function(){
@@ -71,6 +71,13 @@ $('#id_tracknumber').change(function(){
 $('#id_rf').change(loadWhichTabIsSelected)
 
 $('.chromoption').change(postChromatogram)
+
+// var post = false
+// $('.trackOption').change(function(){
+//     post = true
+//     console.log(post)
+// }
+// )
 
 // ----------------------------------------------------------------------------
 
@@ -96,44 +103,45 @@ function selectImage(imageID, idList){
         document.getElementById(imageID).style.border = "thick solid #5cb85c";
     }
     
-    //get trackdetection. if not there, post trackdetection
+    postTrackdetection(imageID)
+};
+
+function loadTrackdetection(imageID){
     $.ajax({
         method: 'GET',
         url:    window.location.origin+'/trackdetection/'+imageID+'/',
         success: onSuccess,
-        error: onError,
-      })
-      function onSuccess(data, textStatus, jqXHR){
-          console.log(data)
-          $('#evaluationcard').attr("trackdetectionID", data.data.id)
-          loadWhichTabIsSelected()
-        }
-      function onError(jqXHR, textStatus, errorThrown){
-
-        number_of_tracks = $('#id_tracks').val()
-        track_width = $('#id_trackwidth').val()
-        bands_start = $('#id_bandstart').val()
-
-        data = "image="+imageID+"&number_of_tracks="+number_of_tracks+"&track_width="+track_width+
-            "&bands_start="+bands_start+"&front=10"
-        $.ajax({
-            method: 'POST',
-            url:    window.location.origin+'/trackdetection/'+imageID+'/',
-            data:   data,
-            success: onSuccess,
-            error: onError,
+        error: postTrackdetection,
         })
         function onSuccess(data, textStatus, jqXHR){
             console.log(data)
-            $('#evaluationcard').attr("trackdetectionID", data.data.id)
+            $('#evaluationcard').attr("trackdetectionID", data.data.image)
             loadWhichTabIsSelected()
-            }
-        function onError(jqXHR, textStatus, errorThrown){}
-      }
+        }
+}
 
-    
-    
-};
+function postTrackdetection(imageID){
+
+    number_of_tracks = $('#id_tracks').val()
+    track_width = $('#id_trackwidth').val()
+    bands_start = $('#id_bandstart').val()
+
+    data = "image="+imageID+"&number_of_tracks="+number_of_tracks+"&track_width="+track_width+
+        "&bands_start="+bands_start+"&front=10"
+    $.ajax({
+        method: 'POST',
+        url:    window.location.origin+'/trackdetection/'+imageID+'/',
+        data:   data,
+        success: onSuccess,
+        error: onError,
+    })
+    function onSuccess(data, textStatus, jqXHR){
+        console.log(data)
+        $('#evaluationcard').attr("trackdetectionID", data.data.image)
+        loadWhichTabIsSelected()
+        }
+    function onError(jqXHR, textStatus, errorThrown){}
+}
 
 function loadChromatogram(){
     trackdetectionID = $('#evaluationcard').attr("trackdetectionID")
@@ -141,7 +149,7 @@ function loadChromatogram(){
         method: 'GET',
         url:    window.location.origin+'/chromatogram/'+trackdetectionID+'/',
         success: onSuccess,
-        error: onError,
+        error: postChromatogram,
       })
       function onSuccess(data, textStatus, jqXHR){
           console.log(data)
@@ -149,9 +157,6 @@ function loadChromatogram(){
           $('#chromatogramimage').empty()
           $('#chromatogramimage').prepend('<img id="chromatogramID" src="'+data.data.image.slice(4,data.data.image.length)+'" style="width:100%"/>')
         }
-      function onError(jqXHR, textStatus, errorThrown){
-        postChromatogram()
-    }
 }
 
 function postChromatogram(){
@@ -187,7 +192,7 @@ function loadTrackInspect(){
         method: 'GET',
         url:    window.location.origin+'/trackinspect/'+trackdetectionID+'/',//+track+'/',
         success: onSuccess,
-        error: onError,
+        error: postTrackinspect,
       })
       function onSuccess(data, textStatus, jqXHR){
           console.log(data)
@@ -195,11 +200,8 @@ function loadTrackInspect(){
           $('#trackinspectimage').prepend('<img id="trackinspectRgbID" onerror="trackinspectPost()" src="'+data.data.rgb_densitogram+'" style="width:100%"/>')
           $('#trackinspectimage').prepend('<img id="trackinspectID" onerror="trackinspectPost()" src="'+data.data.track_image+'" style="width:100%"/>')
         }
-      function onError(jqXHR, textStatus, errorThrown){
-        trackinspectPost()
-    }
 }
-function trackinspectPost(){
+function postTrackinspect(){
     track = $('#id_tracknumber').val()
     trackdetectionID = $('#evaluationcard').attr("trackdetectionID")
     $.ajax({
@@ -213,7 +215,7 @@ function trackinspectPost(){
         $('#trackinspectimage').empty()
         $('#trackinspectimage').prepend('<img id="trackinspectRgbID" onerror="trackinspectPost()" src="'+data.data.rgb_densitogram+'" style="width:100%"/>')
         $('#trackinspectimage').prepend('<img id="trackinspectID" onerror="trackinspectPost()" src="'+data.data.track_image+'" style="width:100%"/>')
-            
+
     }
     function onError(jqXHR, textStatus, errorThrown){}
 }
@@ -232,12 +234,12 @@ function loadTracksort(){
       function onSuccess(data, textStatus, jqXHR){
           console.log(data)
           $('#tracksortimage').empty()
-          $('#tracksortimage').prepend('<img id="tracksortID" o src="'+data.data.sorted_image+'" style="width:100%"/>')
+          $('#tracksortimage').prepend('<img id="tracksortID" src="'+data.data.sorted_image+'" style="width:100%"/>')
         }
       function onError(jqXHR, textStatus, errorThrown){
     }
 }
-    
+
 function loadPCA(){
     trackdetectionID = $('#evaluationcard').attr("trackdetectionID")
     $.ajax({
@@ -249,23 +251,22 @@ function loadPCA(){
                 $('#pcaimage').prepend('<img id="pca2ID" src="'+data.data.explained_variance+'" style="width:100%"/>')
                 $('#pcaimage').prepend('<img id="pcaID"  src="'+data.data.pca+'" style="width:100%"/>')
               },
-        error: function(jqXHR, textStatus, errorThrown){
-                data2 = "reference=1"
-                console.log('testingerror')
-                $.ajax({
-                    method: 'POST',
-                    url:    window.location.origin+'/pcaanalysis/'+trackdetectionID+'/',
-                    data: data2,
-                    success: function (data, textStatus, jqXHR){
-                        console.log(data)
-                        $('#pcaimage').empty()
-                        $('#pcaimage').prepend('<img id="pca2ID" src="'+data.data.explained_variance+'" style="width:100%"/>')
-                        $('#pcaimage').prepend('<img id="pcaID"  src="'+data.data.pca+'" style="width:100%"/>')
-                        },
-                        })
-                },
+        error: postPCA,
+        })
+}
+function postPCA(){
+    data2 = "reference=1"
+    $.ajax({
+        method: 'POST',
+        url:    window.location.origin+'/pcaanalysis/'+trackdetectionID+'/',
+        data: data2,
+        success: function (data, textStatus, jqXHR){
+            console.log(data)
+            $('#pcaimage').empty()
+            $('#pcaimage').prepend('<img id="pca2ID" src="'+data.data.explained_variance+'" style="width:100%"/>')
+            $('#pcaimage').prepend('<img id="pcaID"  src="'+data.data.pca+'" style="width:100%"/>')
+            },
             })
-        
 }
 
 function loadHCA(){
@@ -279,21 +280,22 @@ function loadHCA(){
                 $('#hcaimage').prepend('<img id="hca2ID" src="'+data.data.hca_tracks+'" style="width:100%"/>')
                 $('#hcaimage').prepend('<img id="hcaID"  src="'+data.data.hca+'" style="width:100%"/>')
               },
-        error: function(jqXHR, textStatus, errorThrown){
-                data2 = "num_clusters=2&reference=1"
-                console.log('testingerror')
-                $.ajax({
-                    method: 'POST',
-                    url:    window.location.origin+'/hcaanalysis/'+trackdetectionID+'/',
-                    data: data2,
-                    success: function (data, textStatus, jqXHR){
-                        console.log(data)
-                        $('#hcaimage').empty()
-                        $('#hcaimage').prepend('<img id="hca2ID" src="'+data.data.hca_tracks+'" style="width:100%"/>')
-                        $('#hcaimage').prepend('<img id="hcaID"  src="'+data.data.hca+'" style="width:100%"/>')
-                                },
-                        })
-                },
+        error: postHCA,
+            })
+}
+function postHCA(){
+    tracks = $('#id_tracks').val()
+    data2 = "num_clusters="+tracks+"&reference=1"
+    $.ajax({
+        method: 'POST',
+        url:    window.location.origin+'/hcaanalysis/'+trackdetectionID+'/',
+        data: data2,
+        success: function (data, textStatus, jqXHR){
+            console.log(data)
+            $('#hcaimage').empty()
+            $('#hcaimage').prepend('<img id="hca2ID" src="'+data.data.hca_tracks+'" style="width:100%"/>')
+            $('#hcaimage').prepend('<img id="hcaID"  src="'+data.data.hca+'" style="width:100%"/>')
+                    },
             })
 }
 
@@ -307,20 +309,20 @@ function loadHeatmap(){
                 $('#heatmapimage').empty()
                 $('#heatmapimage').prepend('<img id="heatmapID"  src="'+data.data.heatmap+'" style="width:100%"/>')
               },
-        error: function(jqXHR, textStatus, errorThrown){
-                console.log('testingerror')
-                data2 = 'reference=1'
-                $.ajax({
-                    method: 'POST',
-                    url:    window.location.origin+'/heatmap/'+trackdetectionID+'/',
-                    data: data2,
-                    success: function (data, textStatus, jqXHR){
-                        console.log(data)
-                        $('#heatmapimage').empty()
-                        $('#heatmapimage').prepend('<img id="heatmapID"  src="'+data.data.heatmap+'" style="width:100%"/>')
-                                },
-                        })
-                },
+        error: postHeatmap(),
+            })
+}
+function postHeatmap(){
+    data2 = 'reference=1'
+    $.ajax({
+        method: 'POST',
+        url:    window.location.origin+'/heatmap/'+trackdetectionID+'/',
+        data: data2,
+        success: function (data, textStatus, jqXHR){
+            console.log(data)
+            $('#heatmapimage').empty()
+            $('#heatmapimage').prepend('<img id="heatmapID"  src="'+data.data.heatmap+'" style="width:100%"/>')
+                    },
             })
 }
 
