@@ -6,8 +6,11 @@ ENV CRYPTOGRAPHY_DONT_BUILD_RUST 1
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install python3-opencv python3-scipy python3-numpy -y
+RUN apt-get install python3-opencv -y
 RUN apt-get install -y v4l-utils
+
+#Libraries for scipy
+RUN apt-get install gfortran libopenblas-dev liblapack-dev -y
 RUN apt-get install curl -y
 
 COPY ./requirements.txt /requirements.txt
