@@ -24,10 +24,10 @@ def calculateDerivatization(data):
     
     zMovement = volumeToZMovement(data.volume,True)
 
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, width, float(data.motor_speed)*60, data.temperature, data.pressure)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, width, float(data.motor_speed)*60, data.temperature, data.pressure, data.waitTime, data.printBothways)
 
 
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, width, speed, temperature, pressure):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, width, speed, temperature, pressure, waitTime, printBothways):
     
     width = float(width) / (int(applications) - 1)
 
@@ -46,34 +46,30 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, width, spee
     generate.finish_moves()
     #Set relative coordinates
     generate.set_relative()
-    generate.pressurize(pressure)
     jj = 0   
     for x in range(int(applications)*2):
         #moving to the end of the line
         if (x%2)==0:
             
-            generate.toggle_valve()
             generate.linear_move_xz(round(length,3),round(zMovement/float(applications),3),speed)
-            # for speedfactor in speedfactorList:
-            #     generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-            generate.toggle_valve()
-            generate.check_pressure()
-            if jj == int(applications):
+            if jj >= int(applications):
                 break
             generate.linear_move_y(round(width,3),speed)
+            generate.wait(waitTime)
             jj += 1
         #moving back to the start of the line
         else:
             
-            generate.toggle_valve()
-            generate.linear_move_xz(round(length,3),round(zMovement/float(applications),3),speed)
-            generate.toggle_valve()
-            generate.check_pressure()
-            if jj == int(applications):
-                break
-            generate.linear_move_y(round(width,3),speed)
-            jj += 1
-            
+            if printBothways == 'True':
+                generate.linear_move_xz(-1*round(length,3),round(zMovement/float(applications),3),speed)
+                if jj >= int(applications):
+                    break
+                generate.linear_move_y(round(width,3),speed)
+                generate.wait(waitTime)
+                jj += 1
+            else:
+                generate.linear_move_x(-1*length,speed)
+
        
     #Stop heating
     if (temperature !=0):
