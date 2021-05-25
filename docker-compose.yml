@@ -12,7 +12,7 @@ services:
   app:
     restart: always
     container_name: oc_manager_cont
-    image: ocmanager/ocmanager:latest
+    image: ocmanager/ocmanager:${ARCH}
     depends_on:
       - redis
     environment:
