@@ -55,7 +55,7 @@ class flowRateGraph{
     loadSegment = function (flowrates){
         this.brd.suspendUpdate();
         this.removeSegment();
-        if(flowrates.length == 0){
+        if(flowrates == undefined){
             this.numberOfDivisions = 5
             this.graphPoints()
         }
