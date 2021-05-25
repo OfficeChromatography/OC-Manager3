@@ -55,11 +55,17 @@ class flowRateGraph{
     loadSegment = function (flowrates){
         this.brd.suspendUpdate();
         this.removeSegment();
-        flowrates.forEach(function (currentValue, index, array){
-            currentValue = parseFloat(currentValue.value)
-            this.addLine(index * 100/(array.length-1))
-            this.addGlider(index,currentValue)
-        }, this)
+        if(flowrates.length == 0){
+            this.numberOfDivisions = 5
+            this.graphPoints()
+        }
+        else{
+            flowrates.forEach(function (currentValue, index, array){
+                currentValue = parseFloat(currentValue.value)
+                this.addLine(index * 100/(array.length-1))
+                this.addGlider(index,currentValue)
+            }, this)
+        }
         this.brd.removeObject(this.curve);
         this.curve = this.brd.create('spline', this.gliders.elements, {strokecolor:'blue', strokeOpacity:0.6, strokeWidth:5});
         this.brd.unsuspendUpdate();
@@ -83,5 +89,6 @@ $(document).ready(function (){
 
 $("#flowrate_stepcontrol").on("change", function (){
     let steps=parseInt($(this).val())
+    console.log("VALOR DE STEPS", steps)
     flowGraph = new flowRateGraph(steps)
 })
