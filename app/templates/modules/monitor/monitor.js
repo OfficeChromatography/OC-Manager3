@@ -1,5 +1,6 @@
 var roomName = 'oc_lab';
 var chatSocket
+const monitorTextArea = document.querySelector('#MonitorTextArea')
 
 chatSocket = new WebSocket('ws://' + window.location.host + '/ws/monitor/' + roomName + '/');
 
@@ -32,8 +33,18 @@ $('#chatform').on('submit', function(event){
     function sendMessageError(jqXHR, textStatus, errorThrown){}
 })
 
-function writeOnTextBox(text){
-  document.querySelector('#MonitorTextArea').value += text;
+function writeOnTextBox(line){
+    const regexp = /\n/g;
+    let newLines = [...monitorTextArea.value.matchAll(regexp)]
+    let rows = monitorTextArea.rows-2
+    text = monitorTextArea.value
+
+    if(newLines.length>rows){
+        monitorTextArea.value = text.slice(newLines[newLines.length-rows].index,text.length)+line
+    }
+    else{
+        monitorTextArea.value += line;
+    }
   $("#MonitorTextArea").scrollTop($("#MonitorTextArea").prop('scrollHeight'))
 }
 

@@ -12,6 +12,7 @@ from django.contrib.auth import (
     update_session_auth_hash,
 )
 from itertools import chain
+from connection.models import Monitor_Db
 
 def to_dict(instance):
     opts = instance._meta
@@ -115,8 +116,7 @@ def log_view(request):
 
 def data_table(request):
     list = []
-    connections = Connection_Db.objects.filter(auth_id=request.user)
-    print(to_dict(connections[1]))
+    connections = Connection_Db.objects.filter(auth_id=request.user)[::-1]
     for i in connections:
         list.append(to_dict(i))
     return JsonResponse(list, safe = False)

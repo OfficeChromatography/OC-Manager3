@@ -3,6 +3,7 @@ from django.views import View
 from django.http import JsonResponse
 from .forms import ConnectionForm, OC_LAB
 from .models import *
+from django.forms.models import model_to_dict
 
 # MainView of Connection
 class Connection_test(View):
@@ -60,5 +61,7 @@ class CommunicationWithOC(View):
         return JsonResponse(response)
 
 
-
-
+class MonitorView(View):
+    def get(self, request, id):
+        response = model_to_dict(Monitor_Db.objects.get(pk=id))
+        return JsonResponse(response)
