@@ -17,11 +17,12 @@ $("#pump_manual").on('click',function(e){
 
 $("#valveToggle").on('click',function(e){
     event.preventDefault();
-    sendToMachine('G40');
     if ($("#toggleText").html() == "Open Valve"){
         $("#toggleText").html("Close Valve");
+        sendToMachine('G41');
     } else {
         $("#toggleText").html("Open Valve");
+        sendToMachine('G40');
     }
 })
 
