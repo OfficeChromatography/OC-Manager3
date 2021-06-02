@@ -109,6 +109,14 @@ class GcodeGenerator:
         open -> close, close -> open"""
         return self.check_return(f"G40")
 
+    def open_valve(self):
+        """This command opens the valve"""
+        return self.check_return(f"G41")
+
+    def close_valve(self):
+        """This command closes the valve"""
+        return self.check_return(f"G42")
+
     def set_pin_state(self, pin, state):
         """For custom hardware not officially supported in Marlin, you can often just connect
         up an unused pin and use M42 to control it."""

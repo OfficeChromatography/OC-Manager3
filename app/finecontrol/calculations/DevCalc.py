@@ -92,10 +92,10 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
         #moving to the end of the line
         if (x%2)==0:
             generate.pressurize(pressure)
-            generate.toggle_valve()
+            generate.open_valve()
             for speedfactor in speedfactorList:
                 generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-            generate.toggle_valve()
+            generate.close_valve()
             generate.check_pressure()
             generate.wait(waitTime)
             jj += 1
@@ -103,10 +103,10 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
         else:
             if printBothways == 'True':
                 generate.pressurize(pressure)
-                generate.toggle_valve()
+                generate.open_valve()
                 for speedfactor in speedfactorList:
                     generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
-                generate.toggle_valve()
+                generate.close_valve()
                 generate.check_pressure()
                 generate.wait(waitTime)
                 jj += 1

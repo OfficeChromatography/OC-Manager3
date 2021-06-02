@@ -21,7 +21,6 @@ class Connection_test(View):
                         )
 
     def post(self, request):
-        print(request.POST)
         # Steps follow after a ConnectionRequest is Send (Connection Form)
         if 'oc_lab' in request.POST:
             connection_form_instance = ConnectionForm(request.POST, user=request.user)
@@ -29,7 +28,6 @@ class Connection_test(View):
                 data = OC_LAB.device_info()
                 connection = connection_form_instance.save()
                 new_monitor = Monitor_Db(connection=connection)
-                print(new_monitor)
                 new_monitor.save()
             else:
                 data = OC_LAB.device_info()
@@ -47,12 +45,9 @@ class CommunicationWithOC(View):
         if OC_LAB.online:
             gcode = request.POST.get('gcode')
             OC_LAB.send(gcode)
-            print(OC_LAB.event_handler[0].messages)
             response['message'] = gcode+' sent'
-            print(response['message'])
         else:
             response['message'] = 'OC is disconnected'
-            print(response['message'])
         return JsonResponse(response)
 
     def get(self, request):
