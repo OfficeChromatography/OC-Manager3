@@ -134,13 +134,13 @@ class Cleaning(object):
         speed = round(speed * 60, 2)
         generate.homming("XY")
         generate.set_relative()
-        generate.toggle_valve()
+        generate.open_valve()
         # for i in range(zIncrement):
         #     generate.check_pressure()   
         #     generate.linear_move_z(0.2,speed)
         generate.linear_move_z(zMovement, speed)
         generate.wait_ms(500)
-        generate.toggle_valve()
+        generate.close_valve()
         generate.set_absolute()
 
         print(generate.list_of_gcodes)
