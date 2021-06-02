@@ -104,18 +104,13 @@ class GcodeGenerator:
         """This command open and close the valve at a certain frequency"""
         return self.check_return(f"G98F{frequency}")
 
-    def toggle_valve(self):
-        """This command toggles the valve. 
-        open -> close, close -> open"""
+    def close_valve(self):
+        """This command closes the valve"""
         return self.check_return(f"G40")
 
     def open_valve(self):
         """This command opens the valve"""
         return self.check_return(f"G41")
-
-    def close_valve(self):
-        """This command closes the valve"""
-        return self.check_return(f"G42")
 
     def set_pin_state(self, pin, state):
         """For custom hardware not officially supported in Marlin, you can often just connect
