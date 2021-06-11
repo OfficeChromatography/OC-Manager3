@@ -9,5 +9,6 @@ admin.site.register(ZeroPosition_Db)
 admin.site.register(PressureSettings_Dev_Db)
 admin.site.register(BandSettings_Dev_Db)
 admin.site.register(Flowrate_Db)
+admin.site.register(WaitTime_Db)
 
 

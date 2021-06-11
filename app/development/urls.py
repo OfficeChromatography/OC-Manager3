@@ -11,4 +11,8 @@ urlpatterns = [
     path('development/delete/<int:id>/', DevelopmentDelete.as_view(), name='developmentdelete'),
 
     path('development/start/', DevelopmentAppPlay.as_view(), name='development_element'),
+
+    path('development/waiting_time/<int:id>/', DevelopmentWaitingTime.as_view(), name='development_waiting_time'),
+    path('development/waiting_time/', DevelopmentWaitingTime.as_view(), name='development_waiting_time'),
+    path('development/waiting_time_view/', DevelopmentViewWaitingTimes.as_view(), name='development_waiting_time'),
 ]

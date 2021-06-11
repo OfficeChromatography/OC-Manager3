@@ -20,7 +20,6 @@ from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 
 def cubicSpline(data):
     step = 100/(len(data)-1)
-    print(data)
     x = np.arange( 0, 100+step, step )
     y = np.array([float(i['value']) for i in data])
 #     print(f"X = \t{x}\nY = \t{y}")
@@ -56,7 +55,6 @@ def flowrate(length, speed, volume):
 
 def calculateDevelopment(data):
     data = SimpleNamespace(**data)
-    print(data)
     length = float(data.size_x)-float(data.offset_left)-float(data.offset_right)
     startPoint = [round(float(data.offset_left)+float(data.zero_x),3), round(float(data.offset_bottom)+float(data.zero_y),3)]
     
@@ -68,10 +66,10 @@ def calculateDevelopment(data):
     speedfactorList = speedWeighting(speedSplineList)
 
     #print(speedfactorList)
-    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.motor_speed)*60, data.temperature, data.pressure, data.waitTime, speedfactorList)
+    return GcodeGenDevelopment(startPoint, length, zMovement, data.applications, data.printBothways, float(data.motor_speed)*60, data.temperature, data.pressure, data.waiting_times, speedfactorList)
 
 
-def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waitTime, speedfactorList):
+def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothways, speed, temperature, pressure, waiting_times, speedfactorList):
     generate = GcodeGenerator(True)
 
     # No HEATBED CASE
@@ -97,7 +95,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                 generate.linear_move_xz(round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
             generate.close_valve()
             generate.check_pressure()
-            generate.wait(waitTime)
+            generate.wait(waiting_times[x].get("waitTime"))
             jj += 1
         #moving back to the start of the line
         else:
@@ -108,7 +106,7 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, printBothwa
                     generate.linear_move_xz(-1*round(length/len(speedfactorList),3),round(zMovement*speedfactor/float(applications)/len(speedfactorList),3),speed)
                 generate.close_valve()
                 generate.check_pressure()
-                generate.wait(waitTime)
+                generate.wait(waiting_times[x].get("waitTime"))
                 jj += 1
             else:
                 generate.linear_move_x(-1*length,speed)

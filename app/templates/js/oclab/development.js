@@ -1,6 +1,9 @@
 // Execute every time something happens wi
 // let flowRateChart = new flowRateGraph()
 
+var table_obj = new TableWaitingTime();
+
+
 $(".development-flowrate-insidence").on("change", function (){
   flowrateCalc()
 })
