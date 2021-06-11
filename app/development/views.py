@@ -1,5 +1,5 @@
 from django.views.generic import FormView, View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from .forms import *
 from .models import *
@@ -9,6 +9,8 @@ import json
 from finecontrol.calculations.DevCalc import calculateDevelopment
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
+from django.core.exceptions import ObjectDoesNotExist
+
 
 class DevelopmentDelete(View):
 
@@ -35,15 +37,15 @@ class DevelopmentDetail(View):
         method = Method_Db.objects.get(pk=id_object)
 
         if not Development_Db.objects.filter(method=method):
-            response.update({"filename":getattr(method,"filename")})
-            response.update({"id":id_object})
+            response.update({"filename": getattr(method, "filename")})
+            response.update({"id": id_object})
         else:
 
             dev_config = Development_Db.objects.get(method=method)
-            response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id",]))
-            response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id",]))
+            response.update(model_to_dict(dev_config.pressure_settings.get(), exclude=["id", ]))
+            response.update(model_to_dict(dev_config.plate_properties.get(), exclude=["id", ]))
+            response.update(model_to_dict(dev_config.band_settings.get(), exclude=["id", ]))
+            response.update(model_to_dict(dev_config.zero_properties.get(), exclude=["id", ]))
             response.update(model_to_dict(method))
 
             flowrate_entry = Flowrate_Db.objects.filter(development=dev_config.id).values('value')
@@ -54,7 +56,6 @@ class DevelopmentDetail(View):
     def post(self, request):
         """Save and Update Data"""
         id = request.POST.get("selected-element-id")
-
         flowrate = request.POST.get('flowrate')
         flowrate = json.loads(flowrate)
 
@@ -83,6 +84,8 @@ class DevelopmentDetail(View):
                 development_instance.plate_properties.add(objects_save["plate_properties"])
                 development_instance.zero_properties.add(objects_save["zero_position"])
                 development_instance.band_settings.add(objects_save["band_settings"])
+            else:
+                return HttpResponseBadRequest({"error", "Please check all the inputs!"})
 
         else:
             method = Method_Db.objects.get(pk=id)
@@ -94,15 +97,15 @@ class DevelopmentDetail(View):
             dev_inst.method = method
             dev_inst.save()
             data_validations_and_save(
-                    plate_properties=PlateProperties_Form(request.POST,
-                                                          instance=development_instance.plate_properties.get()),
-                    pressure_settings=PressureSettings_Form(request.POST,
-                                                            instance=development_instance.pressure_settings.get()),
-                    zero_position=ZeroPosition_Form(request.POST,
-                                                    instance=development_instance.zero_properties.get()),
-                    band_settings=DevelopmentBandSettings_Form(request.POST,
-                                                               instance=development_instance.band_settings.get()),
-                )
+                plate_properties=PlateProperties_Form(request.POST,
+                                                      instance=development_instance.plate_properties.get()),
+                pressure_settings=PressureSettings_Form(request.POST,
+                                                        instance=development_instance.pressure_settings.get()),
+                zero_position=ZeroPosition_Form(request.POST,
+                                                instance=development_instance.zero_properties.get()),
+                band_settings=DevelopmentBandSettings_Form(request.POST,
+                                                           instance=development_instance.band_settings.get()),
+            )
             development_instance.flowrates.all().delete()
 
         for flow_value in flowrate:
@@ -111,19 +114,55 @@ class DevelopmentDetail(View):
                 flowrate_object = flowrate_form.save()
                 development_instance.flowrates.add(flowrate_object)
 
-        return JsonResponse({'message':'Data !!'})
+        return JsonResponse({'message': 'Data !!'})
 
 
 class DevelopmentAppPlay(View):
-        def post(self, request):
-            flowrates = json.loads(request.POST.get('flowrate'))
-            forms_data = data_validations( plate_properties=PlateProperties_Form(request.POST),
-                                            pressure_settings=PressureSettings_Form(request.POST),
-                                            zero_position=ZeroPosition_Form(request.POST),
-                                            band_settings=DevelopmentBandSettings_Form(request.POST))
+    def post(self, request):
+        waiting_times = WaitTime_Db.objects.filter(development=request.POST.get('selected-element-id')).values('waitTime', 'application')
+        flowrates = json.loads(request.POST.get('flowrate'))
+        forms_data = data_validations(plate_properties=PlateProperties_Form(request.POST),
+                                      pressure_settings=PressureSettings_Form(request.POST),
+                                      zero_position=ZeroPosition_Form(request.POST),
+                                      band_settings=DevelopmentBandSettings_Form(request.POST))
 
-            forms_data['flowrate'] = flowrates
-            gcode = calculateDevelopment(forms_data)
-            OC_LAB.print_from_list(gcode)
-            return JsonResponse({'error': 'f.errors'})
+        forms_data['flowrate'] = flowrates
+        forms_data['waiting_times'] = waiting_times
+        gcode = calculateDevelopment(forms_data)
+        OC_LAB.print_from_list(gcode)
+        return JsonResponse({'error': 'f.errors'})
 
+
+class DevelopmentWaitingTime(View):
+
+    def get(self, request, id):
+        query = WaitTime_Db.objects.filter(development=Development_Db.objects.get(pk=id)).values('waitTime',
+                                                                                                 'application')
+        response = list(query)
+        if response == []:
+            return HttpResponseBadRequest({"data": "No Waiting times saved!"})
+        else:
+            return JsonResponse(response, safe=False)
+
+    def post(self, request):
+        data = json.loads(request.POST['data'])
+        dev_id = data['development_id']
+        try:
+            development_object = Development_Db.objects.get(pk=dev_id)
+            old_waitingtime = WaitTime_Db.objects.filter(development=development_object)
+            if old_waitingtime:
+                old_waitingtime.delete()
+            for application in data.get('waitingTimes'):
+                    obj = WaitTime_Db(development=development_object,
+                                      waitTime=application.get('waitingTime'),
+                                      application=application.get('application'))
+                    obj.save()
+            return JsonResponse({"data": f"Data Saved in development_object {dev_id}"})
+        except ObjectDoesNotExist:
+            return HttpResponseBadRequest({"data": "Development id not Found"})
+
+
+class DevelopmentViewWaitingTimes(View):
+
+    def get(self, request):
+        return render(request, 'modules/development/waitingtime/table/table.html', {})

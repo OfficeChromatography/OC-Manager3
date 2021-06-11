@@ -1,3 +1,4 @@
+{% load static %}
 <p><b>Development</b><hr></p>
 <!--Volume-->
 <div class="form-group row">
@@ -22,11 +23,15 @@
 <!--Waiting Time-->
 <div class="form-group row">
     <div class="input-group input-group-sm col p-0">
-        <label for="id_waitTime" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Waiting Time</label>
-        <input type="number" name="waitTime" value="60" class="form-control" step="1" id="id_waitTime">
-        <div class="input-group-append">
-            <span class="input-group-text">[s]</span>
+        <label class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Waiting Time</label>
+        <div class="d-flex align-items-center">
+            <i id="modalWaitingTimesLauncher" class="fas fa-external-link-alt"></i>
         </div>
+
+<!--        <input type="number" name="waitTime" value="60" class="form-control" step="1" id="id_waitTime">-->
+<!--        <div class="input-group-append">-->
+<!--            <span class="input-group-text">[s]</span>-->
+<!--        </div>-->
     </div>
 </div>
 
@@ -64,7 +69,7 @@
 <!--Description-->
 <div class="form-group row">
     <div class="input-group input-group-sm col p-0">
-        <label for="id_waitTime" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Description</label>
+        <label for="id_description" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Description</label>
         <input type="text" name="description" class="form-control" maxlength="120" id="id_description">
     </div>
 </div>
@@ -73,14 +78,15 @@
 <div class="form-group row">
     <div class="col-xl-6 m-0 p-0">
         <div class="input-group input-group-sm col p-0">
-            <label for="id_waitTime" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Print Bothways</label>
-            <input class="btn btn-primary" type="checkbox" name="printBothways" checked>
+            <label for="printBothways_id" class="col-xl-3 col-lg-5 col-form-label col-form-label-sm text-truncate px-0 mx-1">Print Bothways</label>
+            <input class="btn btn-primary" type="checkbox" name="printBothways" id="printBothways_id" checked>
         </div>
     </div>
     <div class="col-xl-6 px-1 pt-lg-3">
         <span id="flowrate">Estimated flowrate: 26 ul/s</span>
     </div>
 </div>
+<script src="{% static 'modules/development/devproperties.js' %}"></script>
 
 
 
