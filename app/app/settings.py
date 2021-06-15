@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'analysis',
     # 'users',
     # 'users_api',
-    # 'rest_framework',
+    'rest_framework',
     # 'rest_framework.authtoken',
 ]
 
