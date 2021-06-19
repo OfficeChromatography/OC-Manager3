@@ -100,7 +100,7 @@ class GcodeGenerator:
         """This command increase the pressure in the system"""
         return self.check_return(f"G97P{pressure}")
 
-    def open_valve(self, frequency):
+    def open_valve_frequency(self, frequency):
         """This command open and close the valve at a certain frequency"""
         return self.check_return(f"G98F{frequency}")
 
@@ -139,7 +139,7 @@ class GcodeGenerator:
     def rinsing(self):
         self.homming("X")
         self.pressurize("40")
-        self.open_valve("2")
+        self.open_valve_frequency("2")
 
     def set_new_zero_position(self, x, y,speed):
         self.homming("XY")
