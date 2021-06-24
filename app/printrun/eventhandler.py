@@ -31,6 +31,10 @@ class PrinterEventHandler():
         Constructor.
         '''
         self.messages = ""
+        self.air_sensor = {
+            "temperature": "-10.00",
+            "humidity": "-100.00",
+        }
         pass
 
     def on_init(self):
@@ -62,6 +66,17 @@ class PrinterEventHandler():
         # aux = Monitor_Db.objects.last()
         # aux.monitortext += line
         # aux.save()
+        if all(x in line for x in ["H:","T:"]):
+            print(line)
+            self.air_sensor = {
+                "temperature": line[2:7],
+                "humidity": line[10::],
+            }
+            async_to_sync(channel_layer.group_send)("monitor_air_sensor",
+                                                {'type': 'chat_message',
+                                                 'message': self.air_sensor
+                                                 })
+
         self.messages += line
         async_to_sync(channel_layer.group_send)("monitor_oc_lab", {'type': 'chat_message', 'message': line[:-1]})
         pass
@@ -87,7 +102,6 @@ class PrinterEventHandler():
         aux.monitortext = self.messages
         aux.save()
         self.messages = ""
-        print("DISCONNECTED EVENT HANDLER")
         async_to_sync(channel_layer.group_send)("monitor_oc_lab_status",
                                                 {'type': 'chat_message',
                                                  'message': {'connected': False},

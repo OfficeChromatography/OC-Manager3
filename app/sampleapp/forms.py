@@ -35,12 +35,19 @@ class MovementSettings_Form(forms.ModelForm):
 class PressureSettings_Form(forms.ModelForm):
     class Meta:
         model = PressureSettings_Db
-        fields = ['pressure','frequency', 'temperature','nozzlediameter']
+        fields = ['pressure','frequency', 'temperature','nozzlediameter', "rinsingPeriod"]
 
-        def clean_temperature(self):
-            temperature = self.temperature
-            if not temperature:
-                return 0
+    def clean_temperature(self):
+        temperature = self.cleaned_data["temperature"]
+        if not temperature:
+            return 0
+        return temperature
+
+    def clean_rinsingPeriod(self):
+        rinsingPeriod = self.cleaned_data["rinsingPeriod"]
+        if not rinsingPeriod:
+            return 999999
+        return rinsingPeriod
 
 class BandsComponents_Form(forms.ModelForm):
     class Meta:

@@ -85,4 +85,12 @@ class Application_Db(models.Model):
     class Meta:
         abstract = True
 
-
+class AirSensor_Db(models.Model):
+    author = models.ForeignKey(
+        get_user_model(),
+        null=True,
+        on_delete=models.CASCADE,
+        blank=True,
+    )
+    temperature = models.DecimalField(null=True, max_digits=5, decimal_places=2)
+    humidity = models.DecimalField(null=True, max_digits=5, decimal_places=2)

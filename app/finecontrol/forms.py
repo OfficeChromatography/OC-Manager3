@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from .models import CleaningProcess_Db, ZeroPosition, Method_Db
 from django import forms
+from django.http import JsonResponse
 
 class CleaningProcessForm(forms.ModelForm):
     class Meta:
@@ -86,7 +87,6 @@ def data_validations(**kwargs):
         if form.is_valid():
             forms_data.update(form.cleaned_data)
         else:
-            print("ERROR")
             return JsonResponse({'error':f'Check {key_form}'})
     return forms_data
 

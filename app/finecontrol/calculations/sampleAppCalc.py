@@ -159,15 +159,17 @@ def calculate(data):
                                     data.temperature,
                                     data.pressure,
                                     [data.zero_x, data.zero_y],
-                                    data.waitTime)
+                                    data.waitTime,
+                                    data.rinsingPeriod)
 
     # Creates the Gcode for the application and return it
     return print_process.printing_process()
 
 
 class PrintingProcess:
-    def __init__(self, list_of_bands, speed, frequency, temperature, pressure, zeroPosition, waitTime) -> object:
+    def __init__(self, list_of_bands, speed, frequency, temperature, pressure, zeroPosition, waitTime, rinsingPeriod) -> object:
         self.list_of_bands = list_of_bands
+        self.rinsingPeriod = rinsingPeriod
         self.speed = speed
         self.frequency = frequency
         self.temperature = temperature
@@ -206,7 +208,7 @@ class PrintingProcess:
         directionY = 0
         for band in self.list_of_bands:
             for index, list_of_points in enumerate(band):
-                if number_of_drops_applied > 50:
+                if number_of_drops_applied > self.rinsingPeriod:
                     self._rinse()
                     number_of_drops_applied = 0
                 for point in list_of_points:

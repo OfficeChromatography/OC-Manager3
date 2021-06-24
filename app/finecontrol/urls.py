@@ -12,4 +12,6 @@ urlpatterns = [
     path('tempControl/', TempControl.as_view(), name='tempcontrol'),
     path('fan/', Fan.as_view(), name='fan'),
     path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
+    path('oclab/airsensor/', AirSensorList.as_view(), name='airsensor'),
+    path('oclab/airsensor/<int:pk>/', AirSensorDetail.as_view(), name='airsensordetail'),
 ]

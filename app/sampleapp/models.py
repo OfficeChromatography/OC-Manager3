@@ -71,7 +71,7 @@ class PressureSettings_Db(models.Model):
     frequency = models.DecimalField(null=True, decimal_places=1, max_digits=5)
     temperature = models.DecimalField(null=True, decimal_places=2, max_digits=5, blank=True)
     nozzlediameter = models.CharField(max_length=120, default='0.08')
-
+    rinsingPeriod = models.DecimalField(null=True, decimal_places=0, max_digits=6)
 
 # class PlateProperties_Db(models.Model):
 #     size_x = models.DecimalField(decimal_places=2, max_digits=5, null=True)

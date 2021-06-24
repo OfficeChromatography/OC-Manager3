@@ -19,12 +19,18 @@ from development.models import Development_Db
 from derivatization.models import Derivatization_Db
 from detection.models import Images_Db
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import JSONParser
+from django.http import Http404
+from .serializers import AirSensorSerializer
 
-CLEANINGPROCESS_INITIALS = {'start_frequency':100,
-                            'stop_frequency':500,
-                            'steps':50,
-                            'pressure':20}
-form ={}
+CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
+                            'stop_frequency': 500,
+                            'steps': 50,
+                            'pressure': 20}
+form = {}
 
 
 class MethodList(FormView):
@@ -34,7 +40,7 @@ class MethodList(FormView):
         method = Method_Db.objects.filter(auth_id=request.user).order_by('-id')
         data_saved = []
         for i in method:
-            icons = [1,1,1,1]
+            icons = [1, 1, 1, 1]
             if not SampleApplication_Db.objects.filter(method=i):
                 icons[0] = 0.3
             if not Development_Db.objects.filter(method=i):
@@ -43,30 +49,31 @@ class MethodList(FormView):
                 icons[2] = 0.3
             if not Images_Db.objects.filter(method=i):
                 icons[3] = 0.3
-            data_saved.append([i.filename,i.id,icons])
+            data_saved.append([i.filename, i.id, icons])
         return JsonResponse(data_saved, safe=False)
 
 
 class OcLabControl(View):
-    def post(self,request):
+    def post(self, request):
         if 'PAUSE' in request.POST:
             OC_LAB.pause()
-            return JsonResponse({'message':'OcLab Paused!'})
+            return JsonResponse({'message': 'OcLab Paused!'})
         if 'STOP' in request.POST:
             OC_LAB.cancelprint()
-            return JsonResponse({'message':'OcLab Stopped!'})
+            return JsonResponse({'message': 'OcLab Stopped!'})
         if 'RESUME' in request.POST:
             OC_LAB.resume()
-            return JsonResponse({'message':'OcLab Resumed!'})
+            return JsonResponse({'message': 'OcLab Resumed!'})
         if 'SEND' in request.POST:
             OC_LAB.send(request.POST['message'])
-            return JsonResponse({'message':f'OcLab {request.POST["message"]} send !'})
+            return JsonResponse({'message': f'OcLab {request.POST["message"]} send !'})
         if 'SEND_NOW' in request.POST:
             OC_LAB.send_now(request.POST['message'])
-            return JsonResponse({'message':f'OcLab {request.POST["message"]} fast send !'})
+            return JsonResponse({'message': f'OcLab {request.POST["message"]} fast send !'})
         if 'RESET' in request.POST:
             OC_LAB.reset()
-            return JsonResponse({'message':f'OcLab {request.POST["message"]} reset !'})
+            return JsonResponse({'message': f'OcLab {request.POST["message"]} reset !'})
+
 
 class SyringeLoad(View):
     # def post:
@@ -96,13 +103,13 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            
-            zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']),False)
+            zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']), False)
             print(zMov)
-            mm_movement = round(37-zMov, 2)
+            mm_movement = round(37 - zMov, 2)
             print(mm_movement)
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
+
 
 class Cleaning(object):
 
@@ -129,8 +136,8 @@ class Cleaning(object):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
         generate = GcodeGenerator(True)
-        zMovement = volumeToZMovement(volume,True)
-        #zIncrement = int(round(zMovement,1)/0.2)
+        zMovement = volumeToZMovement(volume, True)
+        # zIncrement = int(round(zMovement,1)/0.2)
         speed = round(speed * 60, 2)
         generate.homming("XY")
         generate.set_relative()
@@ -189,7 +196,8 @@ clean = Cleaning();
 class StaticPurge(View):
     def post(self, request):
         if request.POST.get('rinse_volume'):
-            gcode = clean.static_cleaning(float(request.POST.get('rinse_volume')),float(request.POST.get('rinse_speed')))
+            gcode = clean.static_cleaning(float(request.POST.get('rinse_volume')),
+                                          float(request.POST.get('rinse_speed')))
             OC_LAB.print_from_list(gcode)
         return JsonResponse({'message': 'ok'})
 
@@ -269,7 +277,6 @@ class GcodeEditor(View):
             request,
             "./gcodeeditor.html",
             form)
-
 
     def post(self, request):
         # print(request.POST)
@@ -362,6 +369,7 @@ class GcodeEditor(View):
             OC_LAB.cancelprint()
             return JsonResponse({'danger': 'STOP'})
 
+
 class Temperature(View):
     # Manage the GET request
     def get(self, request):
@@ -370,14 +378,15 @@ class Temperature(View):
             "./temperature.html",
             form)
 
+
 class TempControl(View):
     def post(self, request):
         generate = GcodeGenerator(True)
-        active=request.POST.get('active')
-        if (active=='On'):
+        active = request.POST.get('active')
+        if (active == 'On'):
             generate.hold_bed_temperature(request.POST.get('temp'))
             generate.report_bed_temperature(4)
-        elif (active=='Off'): 
+        elif (active == 'Off'):
             generate.hold_bed_temperature(0)
             generate.report_bed_temperature(0)
         OC_LAB.print_from_list(generate.list_of_gcodes)
@@ -386,6 +395,7 @@ class TempControl(View):
     def get(self, request):
         return JsonResponse({'message': 'ok'})
 
+
 class Fan(View):
     # Manage the GET request
     def get(self, request):
@@ -393,3 +403,45 @@ class Fan(View):
             request,
             "./fancontrol.html",
             form)
+
+
+
+
+
+class AirSensorList(APIView):
+    parser_classes = [JSONParser]
+
+    def get(self, request, format=None):
+        measure = AirSensor_Db.objects.all()
+        measures = AirSensorSerializer(measure, many=True)
+        return Response(measures.data)
+
+    def post(self, request, format=None):
+        serializer = AirSensorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AirSensorDetail(APIView):
+    parser_classes = [JSONParser]
+
+    def get_object(self, pk):
+        try:
+            return AirSensor_Db.objects.get(pk=pk)
+        except AirSensor_Db.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        measure = self.get_object(pk)
+        serializer = AirSensorSerializer(measure)
+        return Response(serializer.data,  status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        measure = self.get_object(pk)
+        serializer = AirSensorSerializer(measure, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

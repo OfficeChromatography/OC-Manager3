@@ -222,7 +222,7 @@ def gcode_generation(list_of_bands, speed, frequency, temperature, pressure, zer
                 generate.linear_move_xy(point[1], point[0], speed)
                 generate.finish_moves()
                 generate.pressurize(pressure)
-                generate.open_valve(frequency)
+                generate.open_valve_frequency(frequency)
                 generate.finish_moves()
                 jj += 1
                 if jj > 50:

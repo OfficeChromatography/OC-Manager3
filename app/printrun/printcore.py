@@ -418,6 +418,7 @@ class printcore():
             self._listen_until_online()
         while self._listen_can_continue():
             line = self._readline()
+            # print("LINE:"+line+"AND TEST:"+str("H:" and "T:" in line))
             if line is None:
                 logging.debug('_readline() is None, exiting _listen()')
                 break
