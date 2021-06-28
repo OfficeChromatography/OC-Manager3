@@ -136,10 +136,11 @@ class DevelopmentAppPlay(View):
 class DevelopmentWaitingTime(View):
 
     def get(self, request, id):
-        query = WaitTime_Db.objects.filter(development=Development_Db.objects.get(pk=id)).values('waitTime',
+
+        query = WaitTime_Db.objects.filter(development=Development_Db.objects.get(method=id)).values('waitTime',
                                                                                                  'application')
         response = list(query)
-        if response == []:
+        if not response:
             return HttpResponseBadRequest({"data": "No Waiting times saved!"})
         else:
             return JsonResponse(response, safe=False)
@@ -148,7 +149,7 @@ class DevelopmentWaitingTime(View):
         data = json.loads(request.POST['data'])
         dev_id = data['development_id']
         try:
-            development_object = Development_Db.objects.get(pk=dev_id)
+            development_object = Development_Db.objects.get(method=dev_id)
             old_waitingtime = WaitTime_Db.objects.filter(development=development_object)
             if old_waitingtime:
                 old_waitingtime.delete()
