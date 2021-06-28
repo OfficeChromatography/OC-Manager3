@@ -6,8 +6,8 @@ chatSocket.onmessage = function(e) {
     $("#air_sensor_module").show()
     if(data.message!=undefined && data.message.temperature!="0.00" && data.message.humidity!="0.00"){
         console.log(data.message)
-        $("#air_temperature").text(data.message.temperature)
-        $("#air_humidity").text(data.message.humidity)
+        $("#air_temperature").text(data.message.temperature+"°C")
+        $("#air_humidity").text(data.message.humidity+"%")
     }
     else{
         $("#air_sensor_module").hide()
