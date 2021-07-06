@@ -116,7 +116,9 @@ class listOfSaved{
 
     $save(data){
         $.post( this.save_url, data)
-        .done(()=>this.loadList())
+        .done(()=>{
+            console.log("THIS IS:",this)
+            this.loadList()})
         .fail()
         .always();
     }
@@ -156,24 +158,21 @@ class listOfSaved{
     }
 
     $exportToCsv = function(){
-        let data = $('form').serializeArray();
-        let filename = $(".active").find(".saved_element").text();
-      
-        let csvContent = "data:text/csv;charset=utf-8,";
-      
-        data.forEach(function(dataPart) {
-            let row = [dataPart["name"], dataPart["value"]]
-            csvContent += row + "\r\n";
-        });
-      
-        let encodedUri = encodeURI(csvContent);
-        let link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", filename + ".csv");
-        document.body.appendChild(link); // Required for FF
-      
-        link.click();
-      }
+        // let data = $('form').serializeArray();
+        let methodID = $('[aria-selected="true"]').find("a").attr("value_saved")
+        $.get(window.location.origin+'/export/'+methodID+"/").done(function (data){
+            let filename = $(".active").find(".saved_element").text();
+            let csvContent = "data:text/csv;charset=utf-8,"+data;
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", filename + ".csv");
+            document.body.appendChild(link); // Required for FF
+            link.click();
+        })
+
+
+    };
 }
 
 

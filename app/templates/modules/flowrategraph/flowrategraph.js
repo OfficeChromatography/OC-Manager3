@@ -89,6 +89,5 @@ $(document).ready(function (){
 
 $("#flowrate_stepcontrol").on("change", function (){
     let steps=parseInt($(this).val())
-    console.log("VALOR DE STEPS", steps)
     flowGraph = new flowRateGraph(steps)
 })

@@ -15,7 +15,6 @@ connectionCheckSocket.onclose = function(e) {
 };
 
 function footerState(data){
-    console.log(data)
     foot = $('#footer')
     footText = $('#footerText')
     if (data.connected==true){
