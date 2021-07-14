@@ -2,22 +2,24 @@ from connection.forms import OC_LAB
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from .forms import *
 from .models import *
-import os
+
+from detection.models import *
+
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 from django.views.generic import FormView, View
 from django.http import JsonResponse
+from django.forms.models import model_to_dict
 
-from sampleapp.models import SampleApplication_Db
-from development.models import Development_Db
-from derivatization.models import Derivatization_Db
-from detection.models import Images_Db
+from sampleapp.models import *
+from development.models import *
+from derivatization.models import *
+from detection.models import *
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -104,9 +106,7 @@ class SyringeLoad(View):
 
         if 'MOVEMOTOR' in request.POST:
             zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']), False)
-            print(zMov)
-            mm_movement = round(37 - zMov, 2)
-            print(mm_movement)
+            mm_movement = round(41 - zMov, 2)
             OC_LAB.send(f"G1Z{mm_movement}F3000")
             return JsonResponse("Volume save", safe=False)
 
@@ -405,9 +405,6 @@ class Fan(View):
             form)
 
 
-
-
-
 class AirSensorList(APIView):
     parser_classes = [JSONParser]
 
@@ -436,7 +433,7 @@ class AirSensorDetail(APIView):
     def get(self, request, pk, format=None):
         measure = self.get_object(pk)
         serializer = AirSensorSerializer(measure)
-        return Response(serializer.data,  status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         measure = self.get_object(pk)
@@ -445,3 +442,132 @@ class AirSensorDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.http import HttpResponse
+import csv
+
+
+class Export(View):
+
+    def append_method_to_csv(self, writer, method):
+        header = self.header(method.keys())
+        writer.writerow(header)
+        writer.writerow(method.values())
+
+    def get(self, request, id):
+        c = ExportToCsv(id)
+        return c.response
+
+class ExportToCsv:
+
+    def __init__(self, id):
+        self.method = Method_Db.objects.get(pk=id)
+        self.response = HttpResponse(content_type='text/csv')
+        self.response['Content-Disposition'] = "attachment; filename=" + f"{self.method.filename}.csv"
+        self.writer = csv.writer(self.response)
+
+        try:
+            self.sample_application = {"data": {},
+                                       "object": SampleApplication_Db.objects.get(method=self.method)}
+            self.sample_app_2_csv()
+        except:
+            pass
+
+        try:
+            self.development = {"data": {},
+                                "object": Development_Db.objects.get(method=self.method)}
+            self.development_2_csv()
+        except:
+            pass
+
+        try:
+            self.derivatization = {"data": {},
+                                   "object": Derivatization_Db.objects.get(method=self.method)}
+            self.derivatization_2_csv()
+        except:
+            pass
+
+        try:
+            self.detection = {"data": {},
+                              "object": Images_Db.objects.filter(method=self.method)}
+
+        except:
+            pass
+        self.detection_2_csv()
+
+    def header(self, listOfNames):
+        return [str(i).upper() for i in listOfNames]
+
+    def space_methods(self):
+        self.space(5)
+
+    def space(self, n):
+        for i in range(0, n):
+            self.writer.writerow([])
+
+    def append_method_to_csv(self, method):
+        header = self.header(method.keys())
+        self.writer.writerow(header)
+        self.writer.writerow(method.values())
+
+    def object_to_dictionary(self, dict_data, obj, attrs):
+
+        if isinstance(obj, Images_Db):
+            for attr in attrs:
+                sub = getattr(obj, attr)
+                fields = getattr(getattr(sub, "_meta"), 'fields')
+                dict_data.update(model_to_dict(sub, fields=[field.name for field in fields]))
+        else:
+            for attr in attrs:
+                try:
+                    dict_data.update(model_to_dict(getattr(obj, attr).get(), exclude=["id", ]))
+                except:
+                    pass
+
+    def sample_app_2_csv(self):
+        self.object_to_dictionary(self.sample_application['data'],
+                                  self.sample_application['object'],
+                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties",
+                                   "movement_settings"])
+        self.writer.writerow(["SAMPLE APPLICATION", ])
+        bands_components = BandsComponents_Db.objects.filter(
+            sample_application=self.sample_application['object']).values()
+        self.append_method_to_csv(self.sample_application['data'])
+        self.writer.writerow(["BAND COMPONENTS", ])
+        for band_component in bands_components:
+            self.append_method_to_csv(band_component)
+        self.space_methods()
+
+    def development_2_csv(self):
+        self.object_to_dictionary(self.development['data'],
+                                  self.development['object'],
+                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties"])
+
+        self.writer.writerow(["DEVELOPMENT", ])
+        self.append_method_to_csv(self.development['data'])
+
+        flows = Flowrate_Db.objects.filter(development=self.development['object']).values('value')
+        self.writer.writerow(["FLOWRATES", ])
+        for flowrate_entry in flows:
+            self.append_method_to_csv(flowrate_entry)
+        self.space_methods()
+
+    def derivatization_2_csv(self):
+        self.object_to_dictionary(self.derivatization['data'],
+                                  self.derivatization['object'],
+                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties"])
+
+        self.writer.writerow(["DERIVATIZATION", ])
+        self.append_method_to_csv(self.derivatization['data'])
+        self.space_methods()
+
+    def detection_2_csv(self):
+
+        for image in self.detection["object"]:
+            self.object_to_dictionary(self.detection['data'],
+                                      image,
+                                      ["user_conf", "leds_conf", "camera_conf"])
+            self.writer.writerow(["IMAGE", "http://127.0.0.1:8000"+str(image.image.url)])
+            self.append_method_to_csv(self.detection['data'])
+            self.space(2)

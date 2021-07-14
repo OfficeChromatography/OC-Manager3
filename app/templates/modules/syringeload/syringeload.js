@@ -10,7 +10,6 @@ $.ajax({
   error: loadlistMethodError,
 })
 function loadlistMethodSuccess(data, textStatus, jqXHR){
-  console.log(data)
   $('#list_syringe_vol').empty()
   $.each(data, function(key, value) {
       $('#list_syringe_vol').append('<a class="list-group-item list-group-item-action py-1 volume-list" id='+value+' data-toggle="list" href="#list-home" role="tab" aria-controls="home">'+value+'</a>')

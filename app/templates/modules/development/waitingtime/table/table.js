@@ -37,7 +37,7 @@ class TableWaitingTime{
     loadFromServer() {
         let table = this
         if(this.development_id!=''){
-            let jqxhr = $.get( window.location.origin+'/development/waiting_time/'+this.development_id)
+            let jqxhr = $.get( window.location.origin+'/development/waiting_time/'+this.development_id+"/")
                 .done(function (data){
                     if(table.numberOfApplications==data.length){
                         data.forEach(function (item,index){
@@ -67,7 +67,6 @@ class TableWaitingTime{
         data.waitingTimes = table.getValues()
         if(this.development_id!=''){
             data.development_id = this.development_id
-            console.log("DATA TO BE SEND",data)
             let jqxhr = $.post( window.location.origin+'/development/waiting_time/', {'data': JSON.stringify(data)})
         }
     }
@@ -81,7 +80,6 @@ class TableWaitingTime{
             waitingTime['waitingTime'] = $(this).val();
             waitingTimes.push(waitingTime)
         })
-        console.log(waitingTimes)
         return waitingTimes
     }
 }
