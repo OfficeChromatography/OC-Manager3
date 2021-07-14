@@ -29,6 +29,7 @@ services:
       - '/dev:/dev'
     command: >
       sh -c "pip install numpy==1.20.3 &&
+      pip install djangorestframework &&
       python manage.py runserver 0.0.0.0:8000"
 
 

@@ -119,7 +119,9 @@ class DevelopmentDetail(View):
 
 class DevelopmentAppPlay(View):
     def post(self, request):
-        waiting_times = WaitTime_Db.objects.filter(development=request.POST.get('selected-element-id')).values('waitTime', 'application')
+        method_id = request.POST.get('selected-element-id')
+        development_object = Development_Db.objects.get(method=method_id)
+        waiting_times = WaitTime_Db.objects.filter(development=development_object).values('waitTime', 'application')
         flowrates = json.loads(request.POST.get('flowrate'))
         forms_data = data_validations(plate_properties=PlateProperties_Form(request.POST),
                                       pressure_settings=PressureSettings_Form(request.POST),
@@ -148,11 +150,15 @@ class DevelopmentWaitingTime(View):
     def post(self, request):
         data = json.loads(request.POST['data'])
         dev_id = data['development_id']
+      #  print(dev_id)
         try:
             development_object = Development_Db.objects.get(method=dev_id)
+            print("Development Object"+str(development_object))
             old_waitingtime = WaitTime_Db.objects.filter(development=development_object)
+#            print("oldWaitingTIME Object"+str(old_waitingtime))
             if old_waitingtime:
                 old_waitingtime.delete()
+ #               print("oldWaitingTIME Object"+str(old_waitingtime))
             for application in data.get('waitingTimes'):
                     obj = WaitTime_Db(development=development_object,
                                       waitTime=application.get('waitingTime'),
