@@ -5,7 +5,7 @@ The installation process is really simple. You just need to follow the next step
 ### 0. Install git
 Before we begin with the installation, we need to install git.
 ```bash
-sudo apt-get update && sudo apt-get upgrade
+sudo apt-get update && sudo apt-get -y upgrade
 sudo apt-get install git
 ```
 
