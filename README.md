@@ -19,7 +19,7 @@ cd ~/Desktop
 Finally, copy and paste the next command and press enter.
 
 ```bash
-git clone https://github.com/lucassing/OC-Lab-2.0.git
+git clone https://github.com/ocmanager/oc-manager-v3.git
 ```
 
 
