@@ -7,10 +7,9 @@ from django.core.files import File
 from .forms import *
 from .models import *
 
-from detection.models import *
 
-from finecontrol.calculations.volumeToZMovement import volumeToZMovement
-from finecontrol.gcode.GcodeGenerator import GcodeGenerator
+from .calculations.volumeToZMovement import volumeToZMovement
+from .gcode.GcodeGenerator import GcodeGenerator
 
 from django.views.generic import FormView, View
 from django.http import JsonResponse
@@ -18,15 +17,13 @@ from django.forms.models import model_to_dict
 
 from sampleapp.models import *
 from development.models import *
-from derivatization.models import *
-from detection.models import *
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http import Http404
-from .serializers import AirSensorSerializer
+from .serializers import *
 
 CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
                             'stop_frequency': 500,
