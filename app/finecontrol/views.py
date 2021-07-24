@@ -7,7 +7,6 @@ from django.core.files import File
 from .forms import *
 from .models import *
 
-
 from .calculations.volumeToZMovement import volumeToZMovement
 from .gcode.GcodeGenerator import GcodeGenerator
 
@@ -24,6 +23,7 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http import Http404
 from .serializers import *
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
 CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
                             'stop_frequency': 500,
@@ -32,25 +32,23 @@ CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
 form = {}
 
 
-class MethodList(FormView):
+class MethodList(ListCreateAPIView):
+    serializer_class = MethodSerializer
 
-    def get(self, request):
-        """Returns a list with all the Methods saved in DB"""
-        method = Method_Db.objects.filter(auth_id=request.user).order_by('-id')
-        data_saved = []
-        for i in method:
-            icons = [1, 1, 1, 1]
-            if not SampleApplication_Db.objects.filter(method=i):
-                icons[0] = 0.3
-            if not Development_Db.objects.filter(method=i):
-                icons[1] = 0.3
-            if not Derivatization_Db.objects.filter(method=i):
-                icons[2] = 0.3
-            if not Images_Db.objects.filter(method=i):
-                icons[3] = 0.3
-            data_saved.append([i.filename, i.id, icons])
-        return JsonResponse(data_saved, safe=False)
+    def get_queryset(self):
+        return Method_Db.objects.filter(auth=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(auth=self.request.user)
+
+
+class MethodDetail(RetrieveUpdateDestroyAPIView):
+    serializer_class = MethodSerializer
+    lookup_url_kwarg = 'id'
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Method_Db.objects.filter(auth=self.request.user)
 
 class OcLabControl(View):
     def post(self, request):
@@ -456,6 +454,7 @@ class Export(View):
         c = ExportToCsv(id)
         return c.response
 
+
 class ExportToCsv:
 
     def __init__(self, id):
@@ -565,6 +564,6 @@ class ExportToCsv:
             self.object_to_dictionary(self.detection['data'],
                                       image,
                                       ["user_conf", "leds_conf", "camera_conf"])
-            self.writer.writerow(["IMAGE", "http://127.0.0.1:8000"+str(image.image.url)])
+            self.writer.writerow(["IMAGE", "http://127.0.0.1:8000" + str(image.image.url)])
             self.append_method_to_csv(self.detection['data'])
             self.space(2)

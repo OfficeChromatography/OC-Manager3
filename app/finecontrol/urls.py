@@ -12,6 +12,10 @@ urlpatterns = [
     path('fan/', Fan.as_view(), name='fan'),
     path('oclab/control/', OcLabControl.as_view(), name='oclabcontrol'),
 
+    path('method/', MethodList.as_view(), name='method_list'),
+    path('method/remove/<int:id>/', MethodDetail.as_view(), name='method_remove'),
+    path('method/detail/<int:id>/', MethodDetail.as_view(), name='method_detail'),
+    path('method/modify/<int:id>/', MethodDetail.as_view(), name='method_update'),
 
     path('export/<int:id>/', Export.as_view(), name='export')
 ]
