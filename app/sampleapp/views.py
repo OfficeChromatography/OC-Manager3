@@ -28,9 +28,14 @@ class SampleView(FormView):
         """Manage the HTML view in SampleApp"""
         return render(request,'sample.html',{})
 
-class SampleAppView(ListCreateAPIView):
+class SampleAppListCreate(ListCreateAPIView):
     serializer_class = SampleAppSerializer
     queryset = SampleApplication_Db.objects.all()
+
+class SampleAppDetail(RetrieveUpdateDestroyAPIView):
+    serializer_class = SampleAppSerializer
+    queryset = SampleApplication_Db.objects.all()
+    lookup_url_kwarg = 'id'
 
 
 # class SampleList(FormView):

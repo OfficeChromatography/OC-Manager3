@@ -14,5 +14,6 @@ urlpatterns = [
     path('sample/start/', SampleAppPlay.as_view(), name='sampleplay'),
     path('samplecalc/', CalcVol.as_view(), name='samplecalc'),
 
-    path('sample/api/', SampleAppView.as_view(), name='sampleApp')
+    path('sample/api/', SampleAppListCreate.as_view(), name='sampleApp'),
+    path('sample/detail/<int:id>', SampleAppDetail.as_view(), name='sampleApp'),
 ]
