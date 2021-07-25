@@ -8,12 +8,12 @@ class Development_Db(core_models.Application_Db):
         pass
 
 
-class PlateProperties_Db(core_models.PlateProperties_Db):
-    development = models.ForeignKey(Development_Db,
-                                    related_name='plate_properties',
-                                    null=True,
-                                    on_delete=models.CASCADE,
-                                    blank=True)
+# class PlateProperties_Db(core_models.PlateProperties_Db):
+#     development = models.ForeignKey(Development_Db,
+#                                     related_name='plate_properties',
+#                                     null=True,
+#                                     on_delete=models.CASCADE,
+#                                     blank=True)
 
 
 class ZeroPosition_Db(core_models.ZeroPosition_Db):

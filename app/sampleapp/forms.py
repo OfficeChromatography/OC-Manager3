@@ -3,51 +3,32 @@ from django import forms
 from .models import *
 
 
-class SampleApplication_Form(forms.ModelForm):
-    class Meta:
-        model = SampleApplication_Db
-        fields = ['filename','method']
 
-class PlateProperties_Form(forms.ModelForm):
-    class Meta:
-        model = PlateProperties_Db
-        fields = ['size_x','size_y','offset_left','offset_right','offset_top','offset_bottom']
+# class MovementSettings_Form(forms.ModelForm):
+#     class Meta:
+#         model = MovementSettings_Db
+#         fields = ['motor_speed','delta_x','delta_y']
+#
+#         def clean_motor_speed(self):
+#             motor_speed = self.motor_speed
+#             return int(motor_speed)
 
-
-class BandSettings_Form(forms.ModelForm):
-    class Meta:
-        model = BandSettings_Db
-        fields = ['main_property','value','height','gap','waitTime']
-
-        def clean_main_property(self):
-            return int(self.main_property)
-
-
-class MovementSettings_Form(forms.ModelForm):
-    class Meta:
-        model = MovementSettings_Db
-        fields = ['motor_speed','delta_x','delta_y']
-
-        def clean_motor_speed(self):
-            motor_speed = self.motor_speed
-            return int(motor_speed)
-
-class PressureSettings_Form(forms.ModelForm):
-    class Meta:
-        model = PressureSettings_Db
-        fields = ['pressure','frequency', 'temperature','nozzlediameter', "rinsingPeriod"]
-
-    def clean_temperature(self):
-        temperature = self.cleaned_data["temperature"]
-        if not temperature:
-            return 0
-        return temperature
-
-    def clean_rinsingPeriod(self):
-        rinsingPeriod = self.cleaned_data["rinsingPeriod"]
-        if not rinsingPeriod:
-            return 999999
-        return rinsingPeriod
+# class PressureSettings_Form(forms.ModelForm):
+#     class Meta:
+#         model = PressureSettings_Db
+#         fields = ['pressure','frequency', 'temperature','nozzlediameter', "rinsingPeriod"]
+#
+#     def clean_temperature(self):
+#         temperature = self.cleaned_data["temperature"]
+#         if not temperature:
+#             return 0
+#         return temperature
+#
+#     def clean_rinsingPeriod(self):
+#         rinsingPeriod = self.cleaned_data["rinsingPeriod"]
+#         if not rinsingPeriod:
+#             return 999999
+#         return rinsingPeriod
 
 class BandsComponents_Form(forms.ModelForm):
     class Meta:
@@ -102,9 +83,3 @@ class BandsComponents_Form(forms.ModelForm):
                         "Specify Density and Viscosity!"
                     )
         return self.cleaned_data
-
-class ZeroPosition_Form(forms.ModelForm):
-
-    class Meta:
-        model = ZeroPosition_Db
-        fields = ['zero_x','zero_y']

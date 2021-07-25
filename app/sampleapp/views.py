@@ -15,12 +15,22 @@ from .models import *
 from connection.forms import OC_LAB
 from finecontrol.calculations.sampleAppCalc import *
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import JSONParser
+from django.http import Http404
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from .serializers import *
 
 class SampleView(FormView):
     def get(self, request):
         """Manage the HTML view in SampleApp"""
         return render(request,'sample.html',{})
 
+class SampleAppView(ListCreateAPIView):
+    serializer_class = SampleAppSerializer
+    queryset = SampleApplication_Db.objects.all()
 
 
 # class SampleList(FormView):

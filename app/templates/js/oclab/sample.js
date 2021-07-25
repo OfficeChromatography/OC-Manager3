@@ -237,7 +237,6 @@ var calcVol = function calcVol(){
     table.setTableCalculationValues(data.results)
   }
   function calcMethodError(jqXHR, textStatus, errorThrown){
-      alert("Error calculating estimated volumes")
     }
 }
 

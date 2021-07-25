@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import CleaningProcess_Db, ZeroPosition, Method_Db
+from .models import CleaningProcess_Db, Method_Db
 from django import forms
 from django.http import JsonResponse
 
@@ -66,11 +66,6 @@ class CleaningProcessForm(forms.ModelForm):
     def clean_pressure(self):
         return int(self.cleaned_data['pressure'])
 
-class ZeroPosition_Form(forms.ModelForm):
-
-    class Meta:
-        model = ZeroPosition
-        fields = ['zero_x','zero_y']
 
 class Method_Form(forms.ModelForm):
 

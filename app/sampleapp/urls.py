@@ -13,4 +13,6 @@ urlpatterns = [
 
     path('sample/start/', SampleAppPlay.as_view(), name='sampleplay'),
     path('samplecalc/', CalcVol.as_view(), name='samplecalc'),
+
+    path('sample/api/', SampleAppView.as_view(), name='sampleApp')
 ]
