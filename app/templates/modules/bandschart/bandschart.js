@@ -61,8 +61,8 @@ plotPreview.eliminateAllPoints = function (){
     while(plotPreview.data.datasets.pop()!=undefined){}
 }
 
-plotPreview.changeGraphSize = function (){
-    plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($("#id_size_x").val());
-    plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($("#id_size_y").val());
+plotPreview.changeGraphSize = function (x,y){
+    plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat(x);
+    plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat(y);
     plotPreview.update();
 }

@@ -31,7 +31,7 @@ $('#disconnectBttn').on('click',function(e){
 })
 
 
-let getListElements = async () => {
+let loadListEvent = async () => {
   return getMethods()
 }
 
@@ -64,7 +64,7 @@ let deleteEvent = async (derivatization_id)=> {
 
 
 let list_of_saved = new listOfSaved(
-    getListElements,
+    loadListEvent,
     createEvent,
     updateEvent,
     loadEvent,

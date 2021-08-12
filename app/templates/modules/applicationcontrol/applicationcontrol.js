@@ -1,9 +1,12 @@
 class ApplicationControl{
-    constructor(control_url, play_url,getData){
+    constructor(startEvent, stopEvent, pauseEvent, resumeEvent){
         this.state = "stopped" // started, stopped, paused
-        this.control_url = control_url
-        this.play_url = play_url
-        this.getData = getData
+
+        this.startEvent = startEvent
+        this.stopEvent = stopEvent
+        this.pauseEvent = pauseEvent
+        this.resumeEvent = resumeEvent
+
         this.$click_start_button_handler()
         this.$click_stop_button_handler()
         this.$click_pause_button_handler()
@@ -30,51 +33,52 @@ class ApplicationControl{
     }
 
     $click_stop_button_handler(){
-        application_control = this
+        let application_control = this
         $("#stop_bttn").on("click",function(){
             application_control.$stop()
         })
     }
 
     $click_pause_button_handler(){
-        application_control = this
+        let application_control = this
         $("#pause_bttn").on("click",function(){
             if(application_control.state == "started") application_control.$pause();
         })
     }
 
-    $resume(){
-        $.post(application_control.control_url,{RESUME:''}).done(function(){
-            application_control.state = "started"
-            application_control.$change_state()
+    async $resume(){
+        let res = await this.resumeEvent()
+        if (res.ok){
+            this.state = "started"
+            this.$change_state()
             $("#start_bttn").text("Start")
-            }
-        )
+        }
     }
 
-    $start(){
-        $.post(application_control.play_url,application_control.getData()).done(function(){
-                    application_control.state = "started"
-                    application_control.$change_state()
-                    $(this).text("Start")
-                    }
-        )
+    async $start(){
+        let res = await this.startEvent()
+        if (res.ok){
+            this.state = "started"
+            this.$change_state()
+            $("#start_bttn").text("Start")
+        }
     }
 
-    $stop(){
-        $.post(application_control.control_url,{STOP:''}).done(function(){
-                application_control.state = "stopped"
-                $("#start_bttn").text("Start")
-                application_control.$change_state()
-                }
-        )
+    async $stop(){
+        let res = await this.stopEvent()
+        if (res.ok){
+            this.state = "stopped"
+            $("#start_bttn").text("Start")
+            this.$change_state()
+        }
     }
 
-    $pause(){
-        $("#start_bttn").text("Resume")
-        $.post(application_control.control_url,{PAUSE:''}).done(function(){
-            application_control.state = "paused"
-            application_control.$change_state()
-        })
+    async $pause(){
+        let res = await this.pauseEvent()
+        if (res.ok){
+            this.state = "paused"
+            $("#start_bttn").text("Resume")
+            this.$change_state()
+        }
     }
 }

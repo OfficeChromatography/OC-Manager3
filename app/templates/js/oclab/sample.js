@@ -1,53 +1,135 @@
-window.table = new Table(0, calcVol);
+window.table = new Table(0);
 
-var getData = function(){
-    data = $("form:not(.band-component)").serialize()+'&table='+JSON.stringify(table.getTableValues())
+//
+
+//
+// $(document).ready(function() {
+//     createBandsTable()
+//     calcVol()
+//     list_of_saved.loadList()
+// });
+//
+
+
+
+let loadListEvent = async () => {
+    let method = localStorage.getItem("method")
+    if(method){
+        return await getSampleApps(method)
+    }else{
+        alert("Please Select a Method!")
+    }
+}
+
+let getDataFromForm = (class_id) => {
+    let obj = {}
+    $(`.${class_id}`).each(function( index ) {
+        obj[$( this ).attr('name')] = $( this ).val()
+    })
+    return obj
+}
+
+let setDataInForm = (obj, class_id) => {
+    $(`.${class_id}`).each(function( index ) {
+        let property = $(this).attr('name')
+        $(this).val(obj[property])
+    })
+    $(".change-graph-size-parameter").trigger("change")
+    // table.loadTable(data.bands_components)
+}
+
+function formData(filename){
+    return {
+        filename: filename,
+        method: localStorage.getItem("method"),
+        application_settings: getDataFromForm('application_settings'),
+        band_settings: getDataFromForm("band_settings"),
+        step_settings: getDataFromForm("step_settings"),
+        zero_position: getDataFromForm("zero_position"),
+        plate_size: getDataFromForm("plate_size"),
+        offset: getDataFromForm("offset"),
+        band_components: table.getTableValues(),
+    }
+}
+
+let createEvent = async (filename) => {
+    let data = formData(filename)
+    let res = await createSampleApp(data)
+}
+
+let updateEvent = async (id, filename) => {
+    let data = formData(filename)
+    let res = await updateSampleApp(id, data)
+}
+
+let loadEvent = async (sample_id) => {
+    let data = await getSampleApp(sample_id)
+    localStorage.setItem("sample_id", data.id)
+    for (const [key, value] of Object.entries(data)) {
+        setDataInForm(value,key)
+    }
     return data
 }
 
-var setData = function (data){
-  $.each(data,function (key,value,array){
-    $('input[name='+key+']').val(value)
-    if(key == "main_property"){
-        $('select[name='+key+']').val(value)
-    }
-  })
-  $(".change-graph-size-parameter").trigger("change")
-  table.loadTable(data.bands_components)
+let deleteEvent = async (id) => {
+    let res =  await deleteSampleApp(id)
+    return res
 }
 
-var list_of_saved = new listOfSaved("http://127.0.0.1:8000/sample/save/",
-    "http://127.0.0.1:8000/sample/list",
-    "http://127.0.0.1:8000/sample/load",
-    getData,
-    setData,
-    "http://127.0.0.1:8000/sample/delete",
-    )
+let list_of_saved = new listOfSaved( loadListEvent,
+    createEvent,
+    updateEvent,
+    loadEvent,
+    deleteEvent
+)
 
-var application_control = new ApplicationControl('http://127.0.0.1:8000/oclab/control/',
-                                                'http://127.0.0.1:8000/sample/start/',
-                                                getData)
+let startEvent = async () => {
+    return await startSampleApp(formData())
+}
+
+let stopEvent = async () => {
+    return await controlMachineApp({'method':'STOP'})
+}
+
+let resumeEvent = async () => {
+    return await controlMachineApp({'method':'RESUME'})
+}
+
+let pauseEvent = async () => {
+    return await controlMachineApp({'method':'PAUSE'})
+}
+
+
+let application_control = new ApplicationControl(
+    startEvent,
+    stopEvent,
+    pauseEvent,
+    resumeEvent)
 
 $(document).ready(function() {
+    list_of_saved.loadList()
     createBandsTable()
     calcVol()
-    list_of_saved.loadList()
 });
 
+
+
 $(".change-graph-size-parameter").on("change", function(){
-    changeGraphSize()
+    plotPreview.changeGraphSize($('#id_size_x').val(),$('#id_size_y').val())
     mainCalculations()
-    calcVol()
+    // calcVol()
 })
+
 
 $(".change-bands-table").on("change", function(){
     createBandsTable()
-    calcVol()
+    // calcVol()
 })
 
 $(".change-volume-parameter").on("change", function(){
-    calcVol()
+    // calcVol()
 });
+//
 
 $("#id_main_property").on("change",function(){
         switch ($("#id_main_property").val()) {
@@ -73,40 +155,45 @@ $("#id_main_property").on("change",function(){
         $('.change-graph-size-parameter').trigger("change")
     });
 
-function createBandsTable(){
-    gap_size = parseFloat($("#id_gap").val());
-    band_size = parseFloat($("#id_value").val());
-    property = $("#id_main_property").val();
-    number_bands = parseFloat($("#id_value").val());
 
-    working_area = nBandsWorkingArea()
-    if (property=='2'){number_bands = Math.trunc(working_area[0]/(band_size+gap_size))}
-    newComponentsTable(number_bands);
+function createBandsTable(){
+    let data = formData().band_settings
+
+    let gap_size = parseFloat(data.gap);
+    let value = parseFloat(data.value);
+    let property = data.main_property;
+
+    let working_area = nBandsWorkingArea()
+    if (property=='2'){value = Math.trunc(working_area[0]/(value+gap_size))}
+    newComponentsTable(value);
 }
+
 // MAIN
 function mainCalculations(){
-    let plate_x_size = parseFloat($("#id_size_x").val());
-    let plate_y_size = parseFloat($("#id_size_y").val());
+    let data = formData()
 
-    let offset_left_size = parseFloat($("#id_offset_left").val());
-    let offset_right_size = parseFloat($("#id_offset_right").val());
-    let offset_top_size = parseFloat($("#id_offset_top").val());
-    let offset_bottom_size = parseFloat($("#id_offset_bottom").val());
+    let plate_x_size = parseFloat(data.plate_size.x);
+    let plate_y_size = parseFloat(data.plate_size.y);
 
-    let gap_size = parseFloat($("#id_gap").val());
-    let number_bands = parseFloat($("#id_value").val());
-    let band_size = parseFloat($("#id_value").val());
+    let offset_left_size = parseFloat(data.offset.left);
+    let offset_right_size = parseFloat(data.offset.right);
+    let offset_top_size = parseFloat(data.offset.top);
+    let offset_bottom_size = parseFloat(data.offset.bottom);
 
-    let band_height = parseFloat($("#id_height").val());
-    let property = $("#id_main_property").val();
+    let gap_size = parseFloat(data.band_settings.gap);
+    let number_bands = parseFloat(data.band_settings.value);
+    let band_size = parseFloat(data.band_settings.value);
+
+    let band_height = parseFloat(data.band_settings.height);
+    let property = data.band_settings.main_property;
 
   // Check if theres missing parameters
-  missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(gap_size)||isNaN(band_height))
+  let missing_parameter = (isNaN(plate_x_size)||isNaN(plate_y_size)||isNaN(offset_left_size)||isNaN(offset_right_size)||isNaN(offset_top_size)||isNaN(offset_bottom_size)||isNaN(gap_size)||isNaN(band_height))
 
   if(areErrors('#id_parameter_error',missing_parameter)){return}
 
   // Calculate the Working Area [x,y]
-  working_area = nBandsWorkingArea()
+  let working_area = nBandsWorkingArea()
 
   // Check if its not posible to calculate the wa
   if(areErrors('#id_offsets_error',isNaN(working_area[0]) && isNaN(working_area[1]))){return}
@@ -118,7 +205,7 @@ function mainCalculations(){
     // N Bands
     case '1':
     //Gap process
-      sum_gaps_size = totalGapLength(number_bands, gap_size)
+      let sum_gaps_size = totalGapLength(number_bands, gap_size)
       if(areErrors('#id_gap_error',isNaN(sum_gaps_size) || sum_gaps_size>= working_area[0])){return}
 
     //Bands Sizes
@@ -133,8 +220,8 @@ function mainCalculations(){
   }
 
   plotPreview.eliminateAllPoints()
-  for(i=0;i<number_bands;i++){
-    newdata = []
+  for(let i=0;i<number_bands;i++){
+    let newdata = []
     if(i==0){
       newdata[0]={y:offset_bottom_size,x:offset_left_size}
       newdata[1]={y:offset_bottom_size+band_height,x:offset_left_size}
@@ -195,6 +282,7 @@ function totalGapLength(number_bands, gap_size){
   }
 }
 
+
 //  Calculate the sum of bands lenght
 function totalBandsLength(working_area,sum_gaps_size,number_bands){
   bands_size = (working_area[0]-sum_gaps_size)/number_bands
@@ -207,40 +295,29 @@ function totalBandsLength(working_area,sum_gaps_size,number_bands){
 }
 
 
-
 // Create a new Table with a given number of rows
 function newComponentsTable(number_row){
     table.destructor()
     table = new Table(number_row, calcVol);
 }
 
-// Change the Graph sizes with the size x and y field values.
-function changeGraphSize(){
-  plotPreview.config.options.scales.xAxes[0].ticks.max = parseFloat($("#id_size_x").val());
-  plotPreview.config.options.scales.yAxes[0].ticks.max = parseFloat($("#id_size_y").val());
-  plotPreview.update();
-}
 
+let calcVol = async function calcVol(){
 
-
-var calcVol = function calcVol(){
-  $formData = $('#plateform').serialize()+'&'+$('#movementform').serialize()+'&table='+JSON.stringify(table.getTableValues())
-  $endpoint = window.location.origin+'/samplecalc/'
-  $.ajax({
-  method: 'POST',
-  url:    $endpoint,
-  data:   $formData,
-  success: calcMethodSuccess,
-  error: calcMethodError,
-  })
-  function calcMethodSuccess(data, textStatus, jqXHR){
-    table.setTableCalculationValues(data.results)
-  }
-  function calcMethodError(jqXHR, textStatus, errorThrown){
+    let data = {
+        filename: $('#filename').val(),
+        method: localStorage.getItem("method"),
+        sample_application: localStorage.getItem("sample_id"),
+        application_settings: getDataFromForm('application_settings'),
+        band_settings: getDataFromForm("band_settings"),
+        step_settings: getDataFromForm("step_settings"),
+        zero_position: getDataFromForm("zero_position"),
+        plate_size: getDataFromForm("plate_size"),
+        offset: getDataFromForm("offset"),
+        table: table.getTableValues()
     }
+    return await tableDataRequest(data)
 }
-
-
 
 
 

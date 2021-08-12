@@ -18,7 +18,6 @@ class ApplicationSettings_Db(models.Model):
     delay = models.DecimalField(null=True, decimal_places=2, max_digits=5)
     rinsing_period = models.DecimalField(null=True, decimal_places=0, max_digits=6)
 
-
 class StepSettings_Db(models.Model):
     x = models.DecimalField(null=True, decimal_places=2, max_digits=5)
     y = models.DecimalField(null=True, decimal_places=2, max_digits=5)
@@ -60,6 +59,7 @@ class BandsComponents_Db(models.Model):
     sample_application = models.ForeignKey(SampleApplication_Db,
                                            related_name='band_components',
                                            null=True,
+                                           primary_key=False,
                                            on_delete=models.CASCADE,
                                            blank=True)
     band_number = models.DecimalField(decimal_places=0, max_digits=3, null=True, blank=True)

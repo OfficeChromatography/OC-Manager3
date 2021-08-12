@@ -1,5 +1,6 @@
 class listOfSaved{
     constructor(loadListEvent, createEvent, updateEvent,loadEvent, deleteEvent){
+
         this.loadListEvent = loadListEvent;
         this.createEvent = createEvent;
         this.loadEvent = loadEvent;

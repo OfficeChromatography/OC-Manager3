@@ -83,6 +83,7 @@ class Table {
 
         constructor(calculationMethod){
             this.row = $(".band-row").first().clone().show().appendTo("#tbody-band");
+            this.id_band_component = ""
             this.solventOptions = OPTIONS;
             this.#setSolventOptions();
             this.calculationMethod = calculationMethod
@@ -126,14 +127,6 @@ class Table {
             let value = this.row.find('.solvent_select').val()
             return this.#sanityUndefined(value)
         }
-
-        // setDescription(value){
-        //     this.row.find('.description-column').text(value)
-        // }
-        // getDescription(){
-        //     let value = this.row.find('.description-column').text()
-        //     return this.#sanityUndefined(value)
-        // }
 
         setProduct(value){
             this.row.find('.product').val(value)
@@ -200,7 +193,6 @@ class Table {
         }
 
 
-
         #setSolventOptions(){
             /**
              * adds the solvents options to a cell
@@ -235,6 +227,8 @@ class Table {
 
         getRowData(){
             let data = {
+                "id": this.id_band_component,
+                "sample_application": localStorage.getItem('sample_id'),
                 "band_number": this.getBandNumber(),
                 // "description": this.getDescription(),
                 "product_name": this.getProduct(),
@@ -282,10 +276,10 @@ $('.product').change(function(){
 })
 
 
-var productName = "Product Name"
-var company = "Company"
-var region = "Region"
-var year = "Year"
+let productName = "Product Name"
+let company = "Company"
+let region = "Region"
+let year = "Year"
 
 $(document).on('click', '.copybttn', function () {
     console.log('test')

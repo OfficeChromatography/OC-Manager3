@@ -14,16 +14,20 @@ class MethodSerializer(serializers.ModelSerializer):
 class ZeroPositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ZeroPosition_Db
-        fields = '__all__'
+        exclude = ('id',)
 
 
 class PlateSizesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlateSizeSettings_Db
-        fields = '__all__'
+        exclude = ('id',)
 
 
 class OffsetSerializer(serializers.ModelSerializer):
     class Meta:
         model = OffsetSettings_Db
-        fields = '__all__'
+        exclude = ('id',)
+
+
+class OcLabControlSerializer(serializers.Serializer):
+    method = serializers.CharField(required=True, allow_blank=False, max_length=100)

@@ -4,16 +4,19 @@ from finecontrol.views import MethodList
 
 urlpatterns = [
     path('sample/', SampleView.as_view(), name='sample'),
-    path('sample/list/', MethodList.as_view(), name='samplelist'),
-
-
-    path('sample/load/<int:id>/', SampleDetails.as_view(), name='sampleload'),
-    path('sample/save/', SampleDetails.as_view(), name='samplesave'),
-    path('sample/delete/<int:id>/', SampleDelete.as_view(), name='sampledelete'),
 
     path('sample/start/', SampleAppPlay.as_view(), name='sampleplay'),
-    path('samplecalc/', CalcVol.as_view(), name='samplecalc'),
+    path('sample/calcvol/', CalcVol.as_view(), name='samplecalc'),
 
-    path('sample/api/', SampleAppListCreate.as_view(), name='sampleApp'),
-    path('sample/detail/<int:id>', SampleAppDetail.as_view(), name='sampleApp'),
+    path('sample/band_components/<int:sample_id>/',
+         BandComponentsListCreate.as_view(), name='bandComponentsList'),
+
+    path('sample/list/<int:method_id>/', SampleAppListCreate.as_view(), name='sampleAppList'),
+    path('sample/create/', SampleAppListCreate.as_view(), name='sampleAppCreate'),
+    path('sample/detail/<int:id>/', SampleAppRetrieveUpdateDestroy.as_view(), name='sampleAppDetail'),
+    path('sample/remove/<int:id>/', SampleAppRetrieveUpdateDestroy.as_view(), name='sampleAppRemove'),
+    path('sample/modify/<int:id>/', SampleAppRetrieveUpdateDestroy.as_view(), name='sampleAppModify'),
+
+
+
 ]

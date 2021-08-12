@@ -3,11 +3,11 @@
 {% load static %}
 <head>
 
-  {% include 'modules/basics/head.html' %}
+  {% include 'head.html' %}
 
   <!-- Chart.js-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js" charset="utf-8"></script>
-
+  <script src="{% static 'services/sampleapp.js' %}" charset="utf-8"></script>
 
 </head>
 <body id="page-top" onload="mainCalculations()">
