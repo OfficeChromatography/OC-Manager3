@@ -25,12 +25,8 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('finecontrol.urls')),
     path('', include('connection.urls')),
-    path('', include('detection.urls')),
     path('', include('sampleapp.urls')),
     path('', include('development.urls')),
-    path('', include('derivatization.urls')),
-    path('', include('evaluation.urls')),
-    path('', include('analysis.urls')),
 ]
 
 if settings.DEBUG:

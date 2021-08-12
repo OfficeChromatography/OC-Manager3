@@ -51,7 +51,7 @@ class listOfSaved{
         // Creates the new element in list
         let flex_container = $("<div class=\"d-flex py-0 flex-row justify-content-between align-items-center\"></div>")
         let element = $("<a class=\"saved_element py-2\" style=\"width:100%\">"+ text +"</a>")
-        let icons = $("<i class=\"fas fa-eye-dropper\" style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:5px;opacity:"+iconOpacity[1]+";\"></i><i class=\"fas fa-spray-can\" style=\"padding-right:5px;opacity:"+iconOpacity[2]+";\"></i><i class=\"fas fa-microscope\" style=\"padding-right:20px;opacity:"+iconOpacity[3]+";\"></i>")
+        let icons = $("<i class=\"fas fa-eye-dropper\"style=\"padding-right:5px;opacity:"+iconOpacity[0]+";\"></i><i class=\"fas fa-shower\" style=\"padding-right:20px;opacity:"+iconOpacity[1]+";\"></i>")
         let trash_can = $("<i class=\"fas fa-trash saved_element_trash_can\"></i>")
 
         flex_container.addClass('list-group-item list-group-item-action')
@@ -170,8 +170,6 @@ class listOfSaved{
             document.body.appendChild(link); // Required for FF
             link.click();
         })
-
-
     };
 }
 

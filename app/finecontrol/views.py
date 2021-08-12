@@ -7,7 +7,8 @@ from django.core.files import File
 from .forms import *
 from .models import *
 
-from detection.models import *
+from django.http import HttpResponse
+import csv
 
 from finecontrol.calculations.volumeToZMovement import volumeToZMovement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
@@ -18,8 +19,6 @@ from django.forms.models import model_to_dict
 
 from sampleapp.models import *
 from development.models import *
-from derivatization.models import *
-from detection.models import *
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -28,10 +27,8 @@ from rest_framework.parsers import JSONParser
 from django.http import Http404
 from .serializers import AirSensorSerializer
 
-CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
-                            'stop_frequency': 500,
-                            'steps': 50,
-                            'pressure': 20}
+CLEANINGPROCESS_INITIALS = {'start_frequency': 100, 'stop_frequency': 500,
+                            'steps': 50, 'pressure': 20}
 form = {}
 
 
@@ -47,10 +44,7 @@ class MethodList(FormView):
                 icons[0] = 0.3
             if not Development_Db.objects.filter(method=i):
                 icons[1] = 0.3
-            if not Derivatization_Db.objects.filter(method=i):
-                icons[2] = 0.3
-            if not Images_Db.objects.filter(method=i):
-                icons[3] = 0.3
+                icons[1] = 0.3
             data_saved.append([i.filename, i.id, icons])
         return JsonResponse(data_saved, safe=False)
 
@@ -68,20 +62,24 @@ class OcLabControl(View):
             return JsonResponse({'message': 'OcLab Resumed!'})
         if 'SEND' in request.POST:
             OC_LAB.send(request.POST['message'])
-            return JsonResponse({'message': f'OcLab {request.POST["message"]} send !'})
+            return JsonResponse(
+                {'message': f'OcLab {request.POST["message"]} send !'})
         if 'SEND_NOW' in request.POST:
             OC_LAB.send_now(request.POST['message'])
-            return JsonResponse({'message': f'OcLab {request.POST["message"]} fast send !'})
+            return JsonResponse(
+                {'message': f'OcLab {request.POST["message"]} fast send !'})
         if 'RESET' in request.POST:
             OC_LAB.reset()
-            return JsonResponse({'message': f'OcLab {request.POST["message"]} reset !'})
+            return JsonResponse(
+                {'message': f'OcLab {request.POST["message"]} reset !'})
 
 
 class SyringeLoad(View):
     # def post:
     def get(self, request):
         if "LISTLOAD" in request.GET:
-            syringe_load_db = SyringeLoad_Db.objects.filter(author=request.user).order_by('volume')
+            syringe_load_db = SyringeLoad_Db.objects.filter(
+                author=request.user).order_by('volume')
             volumes = [i.volume for i in syringe_load_db]
             return JsonResponse(volumes, safe=False)
 
@@ -89,25 +87,29 @@ class SyringeLoad(View):
         # Creates a new vol in the database
         if 'SAVEMOVEMOTOR' in request.POST:
             try:
-                SyringeLoad_Db.objects.filter(volume=request.POST['SAVEMOVEMOTOR']).filter(author=request.user)[0]
+                SyringeLoad_Db.objects.filter(
+                    volume=request.POST['SAVEMOVEMOTOR']).filter(
+                    author=request.user)[0]
                 return JsonResponse("Volume already exist!", safe=False)
             except IndexError:
-                syringe_load = SyringeLoad_Db.objects.create(volume=request.POST['SAVEMOVEMOTOR'],
-                                                             author=request.user)
+                syringe_load = SyringeLoad_Db.objects.create(
+                    volume=request.POST['SAVEMOVEMOTOR'], author=request.user)
                 syringe_load.save()
                 return JsonResponse("Volume saved!", safe=False)
 
         if 'DELETE' in request.POST:
             try:
-                SyringeLoad_Db.objects.filter(volume=request.POST['DELETE']).filter(author=request.user)[0].delete()
+                SyringeLoad_Db.objects.filter(
+                    volume=request.POST['DELETE']).filter(author=request.user)[
+                    0].delete()
                 return JsonResponse("Volume Deleted!", safe=False)
             except IndexError:
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
             zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']), False)
-            mm_movement = round(41 - zMov, 2)
-            OC_LAB.send(f"G1Z{mm_movement}F3000")
+            mm_movement = round(39 - zMov, 2)
+            OC_LAB.send(f"G0Z{mm_movement}")
             return JsonResponse("Volume save", safe=False)
 
 
@@ -160,34 +162,24 @@ clean = Cleaning()
 class MotorControl(View):
     # Manage the GET request
     def get(self, request):
-        return render(
-            request,
-            "./motorcontrol.html",
-            form)
+        return render(request, "./motorcontrol.html", form)
 
 
 class Clean(View):
-    CLEANINGPROCESS_INITIALS = {'start_frequency': 100,
-                                'stop_frequency': 500,
-                                'steps': 50,
-                                'pressure': 15}
+    CLEANINGPROCESS_INITIALS = {'start_frequency': 100, 'stop_frequency': 500,
+                                'steps': 50, 'pressure': 15}
 
     def get(self, request):
         OC_LAB.send('G28XY')
-        form['CleaningProcessForm'] = CleaningProcessForm(initial=CLEANINGPROCESS_INITIALS)
-        return render(
-            request,
-            "./cleanprocess.html",
-            form)
+        form['CleaningProcessForm'] = CleaningProcessForm(
+            initial=CLEANINGPROCESS_INITIALS)
+        return render(request, "./cleanprocess.html", form)
 
     def post(self, request):
         if 'cycles' in request.POST:
             for i in range(0, int(request.POST['cycles'])):
                 OC_LAB.send('M42 P63 T')
-        return render(
-            request,
-            "./cleanprocess.html",
-            {**form})
+        return render(request, "./cleanprocess.html", {**form})
 
 
 clean = Cleaning();
@@ -196,8 +188,9 @@ clean = Cleaning();
 class StaticPurge(View):
     def post(self, request):
         if request.POST.get('rinse_volume'):
-            gcode = clean.static_cleaning(float(request.POST.get('rinse_volume')),
-                                          float(request.POST.get('rinse_speed')))
+            gcode = clean.static_cleaning(
+                float(request.POST.get('rinse_volume')),
+                float(request.POST.get('rinse_speed')))
             OC_LAB.print_from_list(gcode)
         return JsonResponse({'message': 'ok'})
 
@@ -219,7 +212,8 @@ class CleanControl(View):
 
                 OC_LAB.print_from_list(gcode)
 
-                data = {'message': f'Cleaning process in progress, please wait! \n'}
+                data = {
+                    'message': f'Cleaning process in progress, please wait! \n'}
                 data.update({'duration': clean.duration})
             else:
                 data = {'message': 'ERROR'}
@@ -236,11 +230,10 @@ class CleanControl(View):
     def get(self, request):
         # Check the status
         if 'checkstatus' in request.GET:
-            data = {'busy': 'true',
-                    'message': '',
-                    }
+            data = {'busy': 'true', 'message': '', }
             if OC_LAB.printing:
-                data['message'] = f'Cleaning process in progress, please wait! \n'
+                data[
+                    'message'] = f'Cleaning process in progress, please wait! \n'
                 return JsonResponse(data)
             else:
                 data['busy'] = 'false'
@@ -251,32 +244,31 @@ class CleanControl(View):
 class GcodeEditor(View):
 
     def get(self, request):
-        form['list_load'] = GcodeFile.objects.filter(uploader=request.user).order_by('-id')
+        form['list_load'] = GcodeFile.objects.filter(
+            uploader=request.user).order_by('-id')
 
         # LIST LOADING
         if 'LISTLOAD' in request.GET:
-            gcodefiles = GcodeFile.objects.filter(uploader=request.user).order_by('-id')
+            gcodefiles = GcodeFile.objects.filter(
+                uploader=request.user).order_by('-id')
             names = [i.filename for i in gcodefiles]
             return JsonResponse(names, safe=False)
 
         # FILE LOADING
         if 'LOADFILE' in request.GET:
             filename = request.GET.get('filename')
-            gcodefile = GcodeFile.objects.filter(uploader=request.user, filename=filename)
+            gcodefile = GcodeFile.objects.filter(uploader=request.user,
+                                                 filename=filename)
 
             # Open the file
             with open(str(gcodefile[0].gcode), 'r') as f:
                 text = f.read()
 
-            response = {'text': text,
-                        'filename': gcodefile[0].filename,
+            response = {'text': text, 'filename': gcodefile[0].filename,
                         'success': 'File opened!'}
             return JsonResponse(response)
 
-        return render(
-            request,
-            "./gcodeeditor.html",
-            form)
+        return render(request, "./gcodeeditor.html", form)
 
     def post(self, request):
         # print(request.POST)
@@ -284,8 +276,10 @@ class GcodeEditor(View):
             if request.FILES['file']:
                 uploaded_file = request.FILES['file']
 
-                if GcodeFile.objects.filter(filename=uploaded_file, uploader=request.user):
-                    return JsonResponse({'danger': 'Filename already exist, change it!'})
+                if GcodeFile.objects.filter(filename=uploaded_file,
+                                            uploader=request.user):
+                    return JsonResponse(
+                        {'danger': 'Filename already exist, change it!'})
 
                 if 'gcode' in uploaded_file.content_type:
                     fs = FileSystemStorage('media/gfiles/')
@@ -310,7 +304,8 @@ class GcodeEditor(View):
             filename = request.POST.get('name')
             text = request.POST.get('text')
             fs = FileSystemStorage('media/gfiles/')
-            gcodefile = GcodeFile.objects.filter(uploader=request.user, filename=filename)
+            gcodefile = GcodeFile.objects.filter(uploader=request.user,
+                                                 filename=filename)
 
             # if the file exist then edit
             if gcodefile:
@@ -343,7 +338,8 @@ class GcodeEditor(View):
                 return JsonResponse({'warning': 'Choose a file!'})
 
             try:
-                file = GcodeFile.objects.get(filename=filename, uploader=request.user)
+                file = GcodeFile.objects.get(filename=filename,
+                                             uploader=request.user)
                 file.delete()
             except:
                 return JsonResponse({'warning': 'Something went wrong!'})
@@ -354,9 +350,11 @@ class GcodeEditor(View):
         if 'START' in request.POST:
             filename = request.POST.get('name')
             if not filename:
-                return JsonResponse({'warning': 'First save the file and Open it!'})
+                return JsonResponse(
+                    {'warning': 'First save the file and Open it!'})
             try:
-                file = GcodeFile.objects.get(filename=filename, uploader=request.user)
+                file = GcodeFile.objects.get(filename=filename,
+                                             uploader=request.user)
                 if file:
                     with open(f'{file.gcode}', 'r') as f:
                         OC_LAB.print_from_file(f)
@@ -373,10 +371,7 @@ class GcodeEditor(View):
 class Temperature(View):
     # Manage the GET request
     def get(self, request):
-        return render(
-            request,
-            "./temperature.html",
-            form)
+        return render(request, "./temperature.html", form)
 
 
 class TempControl(View):
@@ -399,10 +394,7 @@ class TempControl(View):
 class Fan(View):
     # Manage the GET request
     def get(self, request):
-        return render(
-            request,
-            "./fancontrol.html",
-            form)
+        return render(request, "./fancontrol.html", form)
 
 
 class AirSensorList(APIView):
@@ -444,10 +436,6 @@ class AirSensorDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-from django.http import HttpResponse
-import csv
-
-
 class Export(View):
 
     def append_method_to_csv(self, writer, method):
@@ -459,42 +447,31 @@ class Export(View):
         c = ExportToCsv(id)
         return c.response
 
+
 class ExportToCsv:
 
     def __init__(self, id):
         self.method = Method_Db.objects.get(pk=id)
         self.response = HttpResponse(content_type='text/csv')
-        self.response['Content-Disposition'] = "attachment; filename=" + f"{self.method.filename}.csv"
+        self.response[
+            'Content-Disposition'] = "attachment; filename=" + f"{self.method.filename}.csv"
         self.writer = csv.writer(self.response)
 
         try:
             self.sample_application = {"data": {},
-                                       "object": SampleApplication_Db.objects.get(method=self.method)}
+                                       "object": SampleApplication_Db.objects.get(
+                                           method=self.method)}
             self.sample_app_2_csv()
         except:
             pass
 
         try:
             self.development = {"data": {},
-                                "object": Development_Db.objects.get(method=self.method)}
+                                "object": Development_Db.objects.get(
+                                    method=self.method)}
             self.development_2_csv()
         except:
             pass
-
-        try:
-            self.derivatization = {"data": {},
-                                   "object": Derivatization_Db.objects.get(method=self.method)}
-            self.derivatization_2_csv()
-        except:
-            pass
-
-        try:
-            self.detection = {"data": {},
-                              "object": Images_Db.objects.filter(method=self.method)}
-
-        except:
-            pass
-        self.detection_2_csv()
 
     def header(self, listOfNames):
         return [str(i).upper() for i in listOfNames]
@@ -517,18 +494,21 @@ class ExportToCsv:
             for attr in attrs:
                 sub = getattr(obj, attr)
                 fields = getattr(getattr(sub, "_meta"), 'fields')
-                dict_data.update(model_to_dict(sub, fields=[field.name for field in fields]))
+                dict_data.update(
+                    model_to_dict(sub, fields=[field.name for field in fields]))
         else:
             for attr in attrs:
                 try:
-                    dict_data.update(model_to_dict(getattr(obj, attr).get(), exclude=["id", ]))
+                    dict_data.update(model_to_dict(getattr(obj, attr).get(),
+                                                   exclude=["id", ]))
                 except:
                     pass
 
     def sample_app_2_csv(self):
         self.object_to_dictionary(self.sample_application['data'],
                                   self.sample_application['object'],
-                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties",
+                                  ["pressure_settings", "plate_properties",
+                                   "band_settings", "zero_properties",
                                    "movement_settings"])
         self.writer.writerow(["SAMPLE APPLICATION", ])
         bands_components = BandsComponents_Db.objects.filter(
@@ -542,32 +522,15 @@ class ExportToCsv:
     def development_2_csv(self):
         self.object_to_dictionary(self.development['data'],
                                   self.development['object'],
-                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties"])
+                                  ["pressure_settings", "plate_properties",
+                                   "band_settings", "zero_properties"])
 
         self.writer.writerow(["DEVELOPMENT", ])
         self.append_method_to_csv(self.development['data'])
 
-        flows = Flowrate_Db.objects.filter(development=self.development['object']).values('value')
+        flows = Flowrate_Db.objects.filter(
+            development=self.development['object']).values('value')
         self.writer.writerow(["FLOWRATES", ])
         for flowrate_entry in flows:
             self.append_method_to_csv(flowrate_entry)
         self.space_methods()
-
-    def derivatization_2_csv(self):
-        self.object_to_dictionary(self.derivatization['data'],
-                                  self.derivatization['object'],
-                                  ["pressure_settings", "plate_properties", "band_settings", "zero_properties"])
-
-        self.writer.writerow(["DERIVATIZATION", ])
-        self.append_method_to_csv(self.derivatization['data'])
-        self.space_methods()
-
-    def detection_2_csv(self):
-
-        for image in self.detection["object"]:
-            self.object_to_dictionary(self.detection['data'],
-                                      image,
-                                      ["user_conf", "leds_conf", "camera_conf"])
-            self.writer.writerow(["IMAGE", "http://127.0.0.1:8000"+str(image.image.url)])
-            self.append_method_to_csv(self.detection['data'])
-            self.space(2)
