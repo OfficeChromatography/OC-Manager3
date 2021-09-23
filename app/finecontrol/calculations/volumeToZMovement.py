@@ -19,9 +19,9 @@ def volumeToZMovement(volume, ul):
 
 def zMovementToVolume(zMovement, ul):
     if ul:
-        return round(float(zMovement) * SYRINGE_VOLUME * 1000 / 40, 2)
+        return round(float(zMovement) * SYRINGE_VOLUME * 1000 / SYRINGE_LENGTH, 2)
     else:
-        return round(float(zMovement) * SYRINGE_VOLUME / 40, 2)
+        return round(float(zMovement) * SYRINGE_VOLUME / SYRINGE_LENGTH, 2)
 
 
 '''40 mm = 3ml'''
