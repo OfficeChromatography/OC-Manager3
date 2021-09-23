@@ -1,3 +1,9 @@
+import os
+
+SYRINGE_VOLUME = int(os.environ.get('SYRINGE_VOLUME'))
+SYRINGE_LENGTH = int(os.environ.get('SYRINGE_LENGTH'))
+
+
 def volumeToZMovement(volume, ul):
     '''
     if ul -> true:
@@ -6,16 +12,16 @@ def volumeToZMovement(volume, ul):
     volume in ml -> zMovement in (mm)
     '''
     if ul:
-        return round(40*float(volume)/3000,2)
+        return round(SYRINGE_LENGTH * float(volume) / SYRINGE_VOLUME * 1000, 2)
     else:
-        return round(40*float(volume)/3,2)
-    
+        return round(SYRINGE_LENGTH * float(volume) / SYRINGE_VOLUME, 2)
+
 
 def zMovementToVolume(zMovement, ul):
-
     if ul:
-        return round(float(zMovement)*3000/40,2)
+        return round(float(zMovement) * SYRINGE_VOLUME * 1000 / 40, 2)
     else:
-        return round(float(zMovement)*3/40,2)
+        return round(float(zMovement) * SYRINGE_VOLUME / 40, 2)
+
 
 '''40 mm = 3ml'''
