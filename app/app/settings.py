@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'printrun',
     'channels',
-    # 'detection',
+    'detection',
     'sampleapp',
     'development',
     # 'derivatization',
