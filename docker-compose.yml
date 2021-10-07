@@ -24,6 +24,7 @@ services:
     privileged: true
     volumes:
       - ./app:/app # Map ./app directory en docker app folder
+      - /dev:/dev # Magic for USB connection to work
     cap_add:
       - SYS_ADMIN
     devices:
