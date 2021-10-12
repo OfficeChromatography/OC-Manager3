@@ -21,7 +21,7 @@ cd ~/Desktop
 Finally, copy and paste the next command and press enter.
 
 ```bash
-git clone https://github.com/ocmanager/oc-manager-v3.git
+git clone https://github.com/OfficeChromatography/OCLab3-Software.git
 ```
 
 ### 2. Execute 'install.py'
@@ -34,7 +34,7 @@ cd /path/to/your/OC-files
 ```
 Then execute,
 ```bash
-python install.py
+python3 install.py
 ```
 
 this will install:
@@ -53,4 +53,4 @@ python3 run.py
 ```
 # FIRMWARE
 Firmware installation 
-[OcLab3Firmware](https://github.com/ocmanager/OC-Lab-Firmware)
+[OcLab3Firmware](https://github.com/OfficeChromatography/OCLab3-Hardware)
