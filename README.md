@@ -53,4 +53,4 @@ python3 run.py
 ```
 # FIRMWARE
 Firmware installation 
-[OcLab3Firmware](https://github.com/ocmanager/OC-Lab-Firmware)
+[OcLab3Firmware](https://github.com/OfficeChromatography/OCLab3-Hardware)
