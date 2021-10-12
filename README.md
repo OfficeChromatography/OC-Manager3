@@ -34,7 +34,7 @@ cd /path/to/your/OC-files
 ```
 Then execute,
 ```bash
-python install.py
+python3 install.py
 ```
 
 this will install:
