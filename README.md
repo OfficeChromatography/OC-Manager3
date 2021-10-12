@@ -1,6 +1,8 @@
 # OC-Manager 3.0
 ## Install
-The installation process is really simple. You just need to follow the next steps.
+The installation process is really simple. 
+
+OC-Manager 3.0 works fine on a 'Raspberry Pi 4' with 4Gb ram memory and Ubuntu 20.04 installed on it.  
 
 ### 0. Install git
 Before we begin with the installation, we need to install git.
@@ -21,7 +23,6 @@ Finally, copy and paste the next command and press enter.
 ```bash
 git clone https://github.com/ocmanager/oc-manager-v3.git
 ```
-
 
 ### 2. Execute 'install.py'
 The next step is to execute a bash script which contains, the necessary softwares to run the OC-Manager. If you close the Terminal open it again (remember, `Ctrl+t`). Now go to the folder that contains the OC-Lab files, it is
