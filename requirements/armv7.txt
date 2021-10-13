@@ -1,0 +1,7 @@
+https://www.piwheels.org/simple/opencv-python/opencv_python-4.5.1.48-cp37-cp37m-linux_armv7l.whl#sha256=10972196848a28d1b89584784475c51eae3f160491750adc53165916767b29cd
+https://www.piwheels.org/simple/pillow/Pillow-8.2.0-cp37-cp37m-linux_armv7l.whl#sha256=3da86987a323708512d4d35939b29854286ad88940ee10f2eac48bfec9dba678
+https://www.piwheels.org/simple/matplotlib/matplotlib-3.4.2-cp37-cp37m-linux_armv7l.whl#sha256=e8f67562159a86f308eafda665927379d9edad0d5a8ef52b1c4f02b4b29f10dd
+https://www.piwheels.org/simple/scipy/scipy-1.6.3-cp37-cp37m-linux_armv7l.whl#sha256=208fe23655561a95ede6bb3bb15342882f6a8f3867bf5564cafbdbcc401b1a5d
+https://www.piwheels.org/simple/pandas/pandas-1.2.4-cp37-cp37m-linux_armv7l.whl#sha256=10727ff01992b38e06436e06bd4d263acd054cf40e59bfbcaf05d58b98234041
+https://www.piwheels.org/simple/scikit-learn/scikit_learn-0.24.0-cp37-cp37m-linux_armv7l.whl#sha256=a83fcd9d59c42a2f66b307e3b0b0f08aa8e6e45be33da055697ea499f0e4f7c2
+https://www.piwheels.org/simple/numpy/numpy-1.20.3-cp37-cp37m-linux_armv7l.whl#sha256=d840d80623c96696fab0d15489f49425bec1c0f47f3bf0b3362ce0c75dbad993
