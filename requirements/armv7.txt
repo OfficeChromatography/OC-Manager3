@@ -5,3 +5,4 @@ https://www.piwheels.org/simple/scipy/scipy-1.6.3-cp37-cp37m-linux_armv7l.whl#sh
 https://www.piwheels.org/simple/pandas/pandas-1.2.4-cp37-cp37m-linux_armv7l.whl#sha256=10727ff01992b38e06436e06bd4d263acd054cf40e59bfbcaf05d58b98234041
 https://www.piwheels.org/simple/scikit-learn/scikit_learn-0.24.0-cp37-cp37m-linux_armv7l.whl#sha256=a83fcd9d59c42a2f66b307e3b0b0f08aa8e6e45be33da055697ea499f0e4f7c2
 https://www.piwheels.org/simple/numpy/numpy-1.20.3-cp37-cp37m-linux_armv7l.whl#sha256=d840d80623c96696fab0d15489f49425bec1c0f47f3bf0b3362ce0c75dbad993
+https://www.piwheels.org/simple/seaborn/seaborn-0.11.1-py3-none-any.whl#sha256=4e1cce9489449a1c6ff3c567f2113cdb41122f727e27a984950d004a88ef3c5c

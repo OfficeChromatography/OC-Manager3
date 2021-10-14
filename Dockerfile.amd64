@@ -6,7 +6,7 @@ COPY requirements/amd64.txt /requirements.txt
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN apt install build-essential libssl-dev libffi-dev rustc -y
 
-RUN pip install -r /requirements.txt
+RUN cat /requirements.txt | xargs pip install
 RUN mkdir /app
 WORKDIR /app
 # Copy the app folder from system to docker

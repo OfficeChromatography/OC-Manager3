@@ -4,4 +4,3 @@ pyserial==3.5
 channels==2.3.1
 channels-redis==2.4.1
 pytest==6.2.4
-seaborn==0.11.1
