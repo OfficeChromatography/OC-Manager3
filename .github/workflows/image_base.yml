@@ -19,7 +19,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: build the base image
         run: |
-          docker buildx build -f Dockerfile \
-            --tag ocmanager/ocmanager:base \
-            --push \
-            --platform linux/amd64, linux/arm64,linux/arm/v7 .
+          docker buildx build --file Dockerfile \
+          --tag ocmanager/ocmanager:base \
+          --push \
+          --platform linux/amd64,linux/arm64,linux/arm/v7 .
