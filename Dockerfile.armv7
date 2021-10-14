@@ -4,10 +4,6 @@ COPY requirements/armv7.txt /requirements.txt
 
 RUN pip install --upgrade pip
 
-# Installing Rust for compiling cryptography in ARMv7
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-RUN apt install build-essential libssl-dev libffi-dev rustc -y
-
 RUN cat /requirements.txt | xargs pip install
 RUN mkdir /app
 WORKDIR /app

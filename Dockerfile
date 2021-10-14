@@ -11,6 +11,10 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install python3-opencv -y
 RUN apt-get install -y v4l-utils
 
+# Installing Rust for compiling cryptography in ARMv7
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN apt install build-essential libssl-dev libffi-dev rustc -y
+
 #Libraries for scipy
 RUN apt-get install gfortran libopenblas-dev liblapack-dev -y
 RUN apt-get install curl -y
