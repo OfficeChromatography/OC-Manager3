@@ -1,6 +1,4 @@
 django==3.2.5
 flake8==3.9.2
 pyserial==3.5
-channels==2.3.1
-channels-redis==2.4.1
 pytest==6.2.4

@@ -1,3 +1,6 @@
+https://www.piwheels.org/simple/cryptography/cryptography-3.4.8-cp37-cp37m-linux_armv7l.whl#sha256=7e69404bc78400852fab78c91595a26a025d01aef1f31b470f3a9f007c178f8d
+https://www.piwheels.org/simple/channels/channels-2.3.1-py2.py3-none-any.whl#sha256=70c988074c03b500c96a46123bb5e37a9444930d0be988d488d1e786dfe08631
+https://www.piwheels.org/simple/channels-redis/channels_redis-2.4.1-py2.py3-none-any.whl#sha256=de3ecced30b43df61bc944b84d45ebbaf008fdf1a4154fc8ee7c9c6e78f00a4c
 https://www.piwheels.org/simple/opencv-python/opencv_python-4.5.1.48-cp37-cp37m-linux_armv7l.whl#sha256=10972196848a28d1b89584784475c51eae3f160491750adc53165916767b29cd
 https://www.piwheels.org/simple/pillow/Pillow-8.2.0-cp37-cp37m-linux_armv7l.whl#sha256=3da86987a323708512d4d35939b29854286ad88940ee10f2eac48bfec9dba678
 https://www.piwheels.org/simple/matplotlib/matplotlib-3.4.2-cp37-cp37m-linux_armv7l.whl#sha256=e8f67562159a86f308eafda665927379d9edad0d5a8ef52b1c4f02b4b29f10dd
