@@ -4,34 +4,62 @@ on:
   workflow_dispatch
 
 jobs:
-  build:
+  build_base:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
         uses: actions/checkout@v2
-      - name: install buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: build the base image
         run: |
-          docker buildx build \
-            --push \
-            --tag ocmanager/ocmanager:base \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 .
-      - name: build the image for amd64
-        run: |
-          docker buildx build -f Dockerfile.amd64 \
+          docker buildx build --file Dockerfile \
+          --tag ocmanager/ocmanager:base \
           --push \
-          --tag ocmanager/ocmanager:amd64 \
-          --platform linux/amd64 .
+          --platform linux/amd64,linux/arm64,linux/arm/v7 .
+
+  build_armv7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: build the image for arm/v7
         run: |
-          docker buildx build -f Dockerfile.armv7 \
+          docker buildx build --file Dockerfile.armv7 \
           --push \
           --tag ocmanager/ocmanager:armv7 \
           --platform linux/arm/v7 .
 
+  build_amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: build the image for amd64
+        run: |
+          docker buildx build --file Dockerfile.amd64 \
+          --push \
+          --tag ocmanager/ocmanager:amd64 \
+          --platform linux/amd64 .
