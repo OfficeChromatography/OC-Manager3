@@ -18,6 +18,8 @@ RUN apt-get install curl -y
 RUN export PYTHONPATH='/usr/lib/python3/dist-packages'
 ENV PYTHONPATH='/usr/lib/python3/dist-packages'
 
+COPY requirements/base.txt /base_requirements.txt
+RUN pip install -r /base_requirements.txt
 #RUN pip install numpy==1.20.3
 #RUN pip install djangorestframework==3.12.4
 
