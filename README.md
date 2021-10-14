@@ -51,6 +51,19 @@ Navigate to the path where OC-Manager was installed and execute ./run.py file.
 ```
 python3 run.py 
 ```
+#### With Linux-PC
+If you want to run OC-Manager with a PC running a Linux instance, you can download the docker for it by changing the docker-compose.yml file.
+Instead of 
+
+```dockerfile
+    image: ocmanager/ocmanager:armv7
+```
+use: 
+```dockerfile
+    image: ocmanager/ocmanager:amd64
+```
+OC-Manager supports at the moment only linux/amd64, linux/arm/v7 architecutes.
+
 # FIRMWARE
 Firmware installation 
 [OcLab3Firmware](https://github.com/OfficeChromatography/OCLab3-Hardware)
