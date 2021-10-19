@@ -83,3 +83,19 @@ OC-Manager supports at the moment only linux/amd64, linux/arm/v7 and linux/arm64
 # FIRMWARE
 Firmware installation 
 [OcLab3Firmware](https://github.com/OfficeChromatography/OCLab3-Hardware)
+
+# Useful guides
+
+[Docker Commands](https://towardsdatascience.com/15-docker-commands-you-should-know-970ea5203421)
+
+[Remove Migrations](https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migrations.html)
+
+All commands must be executed inside the docker-composee. To enter to the docker-compose running instance:
+In a running container:
+```sh
+sudo docker-compose exec -ti app bash
+```
+To initialize and enter the terminal
+```sh
+sudo docker-compose run -ti app bash
+```
