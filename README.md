@@ -62,7 +62,7 @@ For a 32bits OS:
 ##### [Activate the PiCamera in Raspbian distributions](https://thepihut.com/blogs/raspberry-pi-tutorials/16021420-how-to-install-use-the-raspberry-pi-camera)
 
 #### With Linux-PC (No Pi-Camera, instead uses the pc-webcam)
-If you want to run OC-Manager with a PC running a Linux instance, you can download the docker for it by changing the docker-compose.yml file.
+If you want to run OC-Manager with a PC running a Linux instance, you can download the docker image for it by changing the docker-compose.yml file.
 Instead of 
 
 ```dockerfile
