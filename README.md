@@ -46,12 +46,22 @@ Now OC-Manager it's installed in your device.
 
 ### 3.Execute OC-Manager
 
-In case of using OC-LAB, before you execute the OC-Manager, be sure that it is connected to your device (PC, MAC, raspi, etc.)
-Navigate to the path where OC-Manager was installed and execute ./run.py file.
+#### With Raspberry Pi
+Depending on the OS change on the dockerfile:
+
+For a 64bits OS:
+```dockerfile
+    image: ocmanager/ocmanager:arm64
 ```
-python3 run.py 
+For a 32bits OS: 
+```dockerfile
+    image: ocmanager/ocmanager:armv7
 ```
-#### With Linux-PC
+
+##### [Activate the PiCamera in Ubuntu distributions](https://ubuntu.com/blog/how-to-stream-video-with-raspberry-pi-hq-camera-on-ubuntu-core)
+##### [Activate the PiCamera in Raspbian distributions](https://thepihut.com/blogs/raspberry-pi-tutorials/16021420-how-to-install-use-the-raspberry-pi-camera)
+
+#### With Linux-PC (No Pi-Camera, instead uses the pc-webcam)
 If you want to run OC-Manager with a PC running a Linux instance, you can download the docker for it by changing the docker-compose.yml file.
 Instead of 
 
@@ -61,8 +71,14 @@ Instead of
 use: 
 ```dockerfile
     image: ocmanager/ocmanager:amd64
+``` 
+
+Navigate to the path where OC-Manager was installed and execute ./run.py file.
 ```
-OC-Manager supports at the moment only linux/amd64, linux/arm/v7 architecutes.
+python3 run.py 
+```
+
+OC-Manager supports at the moment only linux/amd64, linux/arm/v7 and linux/arm64 architecutes.
 
 # FIRMWARE
 Firmware installation 
