@@ -50,25 +50,25 @@ Now OC-Manager it's installed in your device.
 Depending on the OS change on the dockerfile:
 
 For a 64bits OS:
+
 ```dockerfile
     image: ocmanager/ocmanager:arm64
 ```
+
 For a 32bits OS: 
+
 ```dockerfile
     image: ocmanager/ocmanager:armv7
 ```
+
+To activate the camera, follow the corresponding instruction: 
 
 ##### [Activate the PiCamera in Ubuntu distributions](https://ubuntu.com/blog/how-to-stream-video-with-raspberry-pi-hq-camera-on-ubuntu-core)
 ##### [Activate the PiCamera in Raspbian distributions](https://thepihut.com/blogs/raspberry-pi-tutorials/16021420-how-to-install-use-the-raspberry-pi-camera)
 
 #### With Linux-PC (No Pi-Camera, instead uses the pc-webcam)
 If you want to run OC-Manager with a PC running a Linux instance, you can download the docker image for it by changing the docker-compose.yml file.
-Instead of 
 
-```dockerfile
-    image: ocmanager/ocmanager:armv7
-```
-use: 
 ```dockerfile
     image: ocmanager/ocmanager:amd64
 ``` 
