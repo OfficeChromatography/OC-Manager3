@@ -93,6 +93,7 @@ Firmware installation
 [Remove Migrations](https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migrations.html)
 
 All commands must be executed inside the docker-composee. To enter to the docker-compose running instance:
+
 In a running container:
 ```sh
 sudo docker-compose exec -ti app bash
