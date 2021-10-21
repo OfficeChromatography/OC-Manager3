@@ -44,7 +44,7 @@ docker-compose
 ```
 Now OC-Manager it's installed in your device.
 
-### 3.Execute OC-Manager
+### 3.Before the first execution 
 
 #### With Raspberry Pi
 Depending on the OS change on the dockerfile:
@@ -72,6 +72,8 @@ use:
 ```dockerfile
     image: ocmanager/ocmanager:amd64
 ``` 
+
+### 4.OC Manager execution 
 
 Navigate to the path where OC-Manager was installed and execute ./run.py file.
 ```
