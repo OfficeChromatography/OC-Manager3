@@ -47,7 +47,7 @@ Now OC-Manager it's installed in your device.
 ### 3.Before the first execution 
 
 #### With Raspberry Pi
-Depending on the OS change on the dockerfile:
+Depending on the OS change on the docker_compose.yml file:
 
 For a 64bits OS:
 
