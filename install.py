@@ -36,7 +36,6 @@ class InstallationProcess:
             
             "install_docker_compose": ["sudo", "pip3", "install", "docker-compose"],
             "install_libraries": ["sudo", "apt-get", "install", "-y", "libffi-dev", "libssl-dev"],
-            "pulling OC_manager_v3": ["sudo", "docker", "pull", "ocmanager/ocmanager"],
             "creating media folder": ["mkdir", "app/media"],
         }
 
