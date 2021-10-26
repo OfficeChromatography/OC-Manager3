@@ -79,7 +79,6 @@ def GcodeGenDevelopment(startPoint, length, zMovement, applications, width, spee
     generate.set_absolute()    
     #Homming
     generate.homming("XY")
-    print(generate.list_of_gcodes)
     return generate.list_of_gcodes
 
 

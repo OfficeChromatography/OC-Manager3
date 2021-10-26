@@ -150,15 +150,11 @@ class DevelopmentWaitingTime(View):
     def post(self, request):
         data = json.loads(request.POST['data'])
         dev_id = data['development_id']
-      #  print(dev_id)
         try:
             development_object = Development_Db.objects.get(method=dev_id)
-            print("Development Object"+str(development_object))
             old_waitingtime = WaitTime_Db.objects.filter(development=development_object)
-#            print("oldWaitingTIME Object"+str(old_waitingtime))
             if old_waitingtime:
                 old_waitingtime.delete()
- #               print("oldWaitingTIME Object"+str(old_waitingtime))
             for application in data.get('waitingTimes'):
                     obj = WaitTime_Db(development=development_object,
                                       waitTime=application.get('waitingTime'),

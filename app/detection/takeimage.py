@@ -1,5 +1,6 @@
 from app.settings import STATIC_ROOT, MEDIA_ROOT
-from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, LedsControlsForm
+from .forms import ShootConfigurationForm, CameraControlsForm, UserControlsForm, AligmentConfigurationForm, \
+    LedsControlsForm
 from .models import Images_Db
 
 from finecontrol.forms import Method_Form
@@ -18,6 +19,7 @@ import cv2
 import numpy as np
 
 from .Camera import *
+
 
 def basic_conf():
     basic_conf = {'brightness': 50,
@@ -55,12 +57,10 @@ def basic_conf():
                   }
     return basic_conf
 
+
 def get_metadata(image_in_Db):
-    #     path = os.path.join('./', str(image_in_Db.photo))
-    #     print(path)
     img = Image.open("./media/images/best1.jpeg")
     exifdata = img.getexif()
-    print(exifdata)
     dic = {}
     img_data = ""
     for tag_id in exifdata:
@@ -72,7 +72,6 @@ def get_metadata(image_in_Db):
             data = data.decode()
         img_data += f"{tag}: {data}\n"
         dic[tag] = str(data)
-    print(filter_data(dic))
     return filter_data(dic)
 
 
@@ -89,7 +88,6 @@ def filter_data(data):
 class PhotoShootManager:
 
     def __init__(self, request):
-        print(request)
         self.camera = Camera()
         self.nm_255 = UvLed(5)
         self.nm_365 = UvLed(4)
@@ -100,10 +98,9 @@ class PhotoShootManager:
         self.user_config_form = UserControlsForm(request.POST or None)
         self.format_config_form = ShootConfigurationForm(request.POST or None)
         self.led_config_form = LedsControlsForm(request.POST or None)
-        #self.method_form = Method_Form(request.POST or None)
+        # self.method_form = Method_Form(request.POST or None)
 
         self.id = request.POST.get("id")
-        print(request.POST)
         self.path_photo = None
 
     def are_shoot_options_correct(self):
@@ -159,8 +156,8 @@ class PhotoShootManager:
             image.leds_conf = self.led_config_form.save()
             image.camera_conf = self.camera_config_form.save()
             image.method = Method_Db.objects.get(pk=self.id)
-            
-            #print(self.camera_config_form,self.method_form)
+
+            # print(self.camera_config_form,self.method_form)
             image.save()
             return image
 
@@ -177,10 +174,11 @@ class FixDistortionImage:
         self.path_photo = path
         self.img = cv2.imread(self.path_photo)
 
-        self.correction_mtx = np.array([[1967.921637060819, 0.0, 980.07213571975], [0.0, 1964.823317953312, 741.073015742526], [0.0, 0.0, 1.0]])
+        self.correction_mtx = np.array(
+            [[1967.921637060819, 0.0, 980.07213571975], [0.0, 1964.823317953312, 741.073015742526], [0.0, 0.0, 1.0]])
 
-        self.correction_dist = np.array([[-0.4778321949564693, 0.2886513041769561, 0.0016895448886501186, 0.0047619737564622905, -0.12895314122999252]])
-
+        self.correction_dist = np.array([[-0.4778321949564693, 0.2886513041769561, 0.0016895448886501186,
+                                          0.0047619737564622905, -0.12895314122999252]])
 
         self.rotation_angle = 0.5
 
@@ -198,10 +196,10 @@ class FixDistortionImage:
                                                           (w, h))
         # undistort
         dst = cv2.undistort(self.img,
-                                 self.correction_mtx,
-                                 self.correction_dist,
-                                 None,
-                                 newcameramtx)
+                            self.correction_mtx,
+                            self.correction_dist,
+                            None,
+                            newcameramtx)
         # crop the image
         x, y, w, h = roi
         dst = dst[y:y + h, x:x + w]

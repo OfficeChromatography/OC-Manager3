@@ -197,7 +197,6 @@ class Hdr_View(View):
 class Detection_Homming(View):
     def post(self, request):
         if request.POST.get('setzero'):
-            print(request.POST)
             zeros_values = list(request.POST['setzero'].split(","))
             zero_on_DB = Detection_ZeroPosition( uploader = request.user,
                                      zero_x = float(zeros_values[0]),
@@ -214,12 +213,10 @@ class Detection_Homming(View):
 class DeleteImage(View):
     def delete(self, request, id):
         if not Images_Db.objects.get(pk=id):
-            print('error')
             return JsonResponse({'warning': 'Something went wrong!'})
         else:
             image = Images_Db.objects.get(pk=id)
             path = os.path.join(MEDIA_ROOT, str(image.image))
-            print(path)
             if os.path.exists(path):
                 os.remove(path)
                 image.delete()

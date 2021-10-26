@@ -152,7 +152,6 @@ class Cleaning(object):
         generate.close_valve()
         generate.set_absolute()
 
-        print(generate.list_of_gcodes)
         return generate.list_of_gcodes
 
 
@@ -217,7 +216,6 @@ class CleanControl(View):
                 data.update({'duration': clean.duration})
             else:
                 data = {'message': 'ERROR'}
-                print(clean_param.errors)
             return JsonResponse(data)
 
         if 'STOP' in request.POST:
@@ -271,7 +269,6 @@ class GcodeEditor(View):
         return render(request, "./gcodeeditor.html", form)
 
     def post(self, request):
-        # print(request.POST)
         if 'UPLOAD' in request.POST:
             if request.FILES['file']:
                 uploaded_file = request.FILES['file']
@@ -293,7 +290,6 @@ class GcodeEditor(View):
                     gcode.save()
                     return JsonResponse({'success': 'File Saved!'})
                 else:
-                    print('entro al else')
                     return JsonResponse({'danger': 'Invalid File'})
             else:
                 return JsonResponse({'danger': 'Please select a File'})
