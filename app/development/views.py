@@ -6,9 +6,11 @@ from .models import *
 from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 import json
+
 from finecontrol.calculations.DevCalc import calculateDevelopment
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
+
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -18,6 +20,7 @@ class DevelopmentDelete(View):
         apps = Development_Db.objects.filter(method=Method_Db.objects.get(pk=id))
         apps.delete()
         return JsonResponse({})
+
 
 class DevelopmentView(FormView):
     def get(self, request):
@@ -140,7 +143,7 @@ class DevelopmentWaitingTime(View):
     def get(self, request, id):
 
         query = WaitTime_Db.objects.filter(development=Development_Db.objects.get(method=id)).values('waitTime',
-                                                                                                 'application')
+                                                                                                     'application')
         response = list(query)
         if not response:
             return HttpResponseBadRequest({"data": "No Waiting times saved!"})
@@ -156,10 +159,10 @@ class DevelopmentWaitingTime(View):
             if old_waitingtime:
                 old_waitingtime.delete()
             for application in data.get('waitingTimes'):
-                    obj = WaitTime_Db(development=development_object,
-                                      waitTime=application.get('waitingTime'),
-                                      application=application.get('application'))
-                    obj.save()
+                obj = WaitTime_Db(development=development_object,
+                                  waitTime=application.get('waitingTime'),
+                                  application=application.get('application'))
+                obj.save()
             return JsonResponse({"data": f"Data Saved in development_object {dev_id}"})
         except ObjectDoesNotExist:
             return HttpResponseBadRequest({"data": "Development id not Found"})
