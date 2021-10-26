@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 from connection.forms import OC_LAB
 import json
 
-from finecontrol.calculations.DevCalc import calculateDevelopment
+from finecontrol.calculations.development import calculateDevelopment
 from finecontrol.forms import data_validations, data_validations_and_save, Method_Form
 from finecontrol.models import Method_Db
 
