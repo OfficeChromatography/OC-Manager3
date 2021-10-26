@@ -12,7 +12,7 @@ def volumeToZMovement(volume, ul):
     volume in ml -> zMovement in (mm)
     '''
     if ul:
-        return round(SYRINGE_LENGTH * float(volume) / SYRINGE_VOLUME * 1000, 2)
+        return round(SYRINGE_LENGTH * float(volume) / (SYRINGE_VOLUME * 1000), 2)
     else:
         return round(SYRINGE_LENGTH * float(volume) / SYRINGE_VOLUME, 2)
 
