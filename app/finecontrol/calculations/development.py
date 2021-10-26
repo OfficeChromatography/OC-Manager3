@@ -4,7 +4,7 @@ from scipy.interpolate import CubicSpline
 from types import SimpleNamespace
 
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
-from finecontrol.calculations.volumeToZMovement import volumeToZMovement
+from finecontrol.calculations.volumeToZMovement import volume_to_z_movement
 
 
 def cubicSpline(data):
@@ -38,7 +38,7 @@ def calculateDevelopment(data):
     start_point = [round(float(data.offset_left) + float(data.zero_x), 3),
                    round(float(data.offset_bottom) + float(data.zero_y), 3)]
 
-    z_movement = volumeToZMovement(data.volume, True)
+    z_movement = volume_to_z_movement(data.volume, True)
 
     speed_spline_list = cubicSpline(data.flowrate)
     speed_factors = speedWeighting(speed_spline_list)

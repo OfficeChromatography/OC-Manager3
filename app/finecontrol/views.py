@@ -10,7 +10,7 @@ from .models import *
 from django.http import HttpResponse
 import csv
 
-from finecontrol.calculations.volumeToZMovement import volumeToZMovement
+from finecontrol.calculations.volumeToZMovement import volume_to_z_movement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
 from django.views.generic import FormView, View
@@ -107,7 +107,7 @@ class SyringeLoad(View):
                 return JsonResponse("Volume doesn't exist!", safe=False)
 
         if 'MOVEMOTOR' in request.POST:
-            zMov = volumeToZMovement(float(request.POST['MOVEMOTOR']), False)
+            zMov = volume_to_z_movement(float(request.POST['MOVEMOTOR']), False)
             mm_movement = round(39 - zMov, 2)
             OC_LAB.send(f"G0Z{mm_movement}")
             return JsonResponse("Volume save", safe=False)
@@ -138,7 +138,7 @@ class Cleaning(object):
         # Gcode to move the Pump for a specific volume from 0-position
         # zMovement = round(volume * 58 / 1000, 2)
         generate = GcodeGenerator(True)
-        zMovement = volumeToZMovement(volume, True)
+        zMovement = volume_to_z_movement(volume, True)
         # zIncrement = int(round(zMovement,1)/0.2)
         speed = round(speed * 60, 2)
         generate.homming("XY")
