@@ -55,12 +55,6 @@ For a 64bits OS:
     image: ocmanager/ocmanager:arm64
 ```
 
-For a 32bits OS: 
-
-```dockerfile
-    image: ocmanager/ocmanager:armv7
-```
-
 To activate the camera, follow the corresponding instruction: 
 
 ##### [Activate the PiCamera in Ubuntu distributions](https://ubuntu.com/blog/how-to-stream-video-with-raspberry-pi-hq-camera-on-ubuntu-core)
