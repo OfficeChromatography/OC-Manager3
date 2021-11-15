@@ -6,6 +6,7 @@ class listOfSaved{
         this.saveEvent = saveEvent;
         this.loadEvent = loadEvent;
         this.delete_app_url = delete_app_url;
+        this.delete_method_url = 'http://127.0.0.1:8000/method/delete/';
 
         this.$click_new_button_handler()
         this.$click_save_button_handler()
@@ -79,7 +80,7 @@ class listOfSaved{
         $(".saved_element_trash_can").on("dblclick click mouseover mouseout", (e) => {
             switch (e.type){
                 case "dblclick":
-                    this.$delete_element($(e.currentTarget).siblings('a'))
+                    this.$delete_method_element($(e.currentTarget).siblings('a'))
                     break;
                 case "click":
                     this.$delete_element_completely($(e.currentTarget).siblings('a'))
@@ -123,9 +124,9 @@ class listOfSaved{
         .always();
     }
 
-    $delete_element(object){
+    $delete_method_element(object){
         $.ajax({
-            url: this.get_url+"/"+object.attr("value_saved"),
+            url: this.delete_method_url+object.attr("value_saved"),
             type: 'DELETE',
         })
             .done(()=>this.loadList())

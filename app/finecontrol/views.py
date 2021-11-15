@@ -13,7 +13,7 @@ import csv
 from finecontrol.calculations.volumeToZMovement import volume_to_z_movement
 from finecontrol.gcode.GcodeGenerator import GcodeGenerator
 
-from django.views.generic import FormView, View
+from django.views.generic import FormView, View, DeleteView
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 
@@ -47,6 +47,13 @@ class MethodList(FormView):
                 icons[1] = 0.3
             data_saved.append([i.filename, i.id, icons])
         return JsonResponse(data_saved, safe=False)
+
+
+class MethodDelete(DeleteView):
+
+    def delete(self, request, *args, **kwargs):
+        Method_Db.objects.filter(auth_id=request.user).get(id=kwargs.get('id')).delete()
+        return JsonResponse({}, safe=False)
 
 
 class OcLabControl(View):

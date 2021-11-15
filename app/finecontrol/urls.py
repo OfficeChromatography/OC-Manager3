@@ -15,5 +15,6 @@ urlpatterns = [
     path('oclab/airsensor/', AirSensorList.as_view(), name='airsensor'),
     path('oclab/airsensor/<int:pk>/', AirSensorDetail.as_view(), name='airsensordetail'),
 
+    path('method/delete/<int:id>/', MethodDelete.as_view(), name='methoddelete'),
     path('export/<int:id>/', Export.as_view(), name='export')
 ]
