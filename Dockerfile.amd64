@@ -1,0 +1,13 @@
+FROM ocmanager/ocmanager:base
+
+COPY requirements/amd64.txt /requirements.txt
+
+RUN cat /requirements.txt | xargs pip install
+RUN mkdir /app
+WORKDIR /app
+# Copy the app folder from system to docker
+COPY ./app /app
+
+
+
+

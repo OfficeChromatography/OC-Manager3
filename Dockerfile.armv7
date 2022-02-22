@@ -1,0 +1,25 @@
+FROM ocmanager/ocmanager:base
+
+# Installing Rust for compiling cryptography in ARMv7
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN apt-get install libatlas-base-dev -y
+RUN apt install build-essential libssl-dev libffi-dev rustc -y
+
+
+COPY requirements/armv7.txt /requirements.txt
+
+RUN pip install --upgrade pip
+
+RUN cat /requirements.txt | xargs pip install
+RUN mkdir /app
+WORKDIR /app
+# Copy the app folder from system to docker
+COPY ./app /app
+
+RUN export PYTHONPATH='/usr/lib/python3/dist-packages'
+ENV PYTHONPATH='/usr/lib/python3/dist-packages'
+
+# -D is only to run the apps without root premision
+# RUN adduser user
+# RUN adduser -D user
+# USER user
