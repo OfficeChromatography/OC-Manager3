@@ -201,7 +201,11 @@ class FixDistortionImage:
                             None,
                             newcameramtx)
         # crop the image
-        x, y, w, h = roi
+        #x, y, w, h = roi
+        y=190
+        h=1100
+        x=400
+        w=1100
         dst = dst[y:y + h, x:x + w]
         self.path_photo = f'{os.path.splitext(self.path_photo)[0]}_corrected{os.path.splitext(self.path_photo)[1]}'
 
