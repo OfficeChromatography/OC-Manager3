@@ -15,10 +15,6 @@ RUN apt-get install -y v4l-utils
 RUN apt-get install gfortran libopenblas-dev liblapack-dev -y
 RUN apt-get install curl -y
 
-#Programs for bioluminescent images
-RUN apt-get install thonny -y
-RUN apt-get install wmctrl -y
-
 RUN export PYTHONPATH='/usr/lib/python3/dist-packages'
 ENV PYTHONPATH='/usr/lib/python3/dist-packages'
 
