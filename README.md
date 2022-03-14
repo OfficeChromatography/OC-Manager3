@@ -76,6 +76,12 @@ python3 run.py
 
 OC-Manager supports at the moment only linux/amd64, linux/arm/v7 and linux/arm64 architecutes.
 
+OC-Manager3 was intensively tested with Chromium as browser. Therefore, it is recommended to install this browser:
+
+```
+sudo apt install chromium-browser
+```
+
 # FIRMWARE
 Firmware installation 
 [OcLab3Firmware](https://github.com/OfficeChromatography/OCLab3-Hardware)
@@ -86,7 +92,7 @@ Firmware installation
 
 [Remove Migrations](https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migrations.html)
 
-All commands must be executed inside the docker-composee. To enter to the docker-compose running instance:
+All commands must be executed inside the docker-compose. To enter to the docker-compose running instance:
 
 In a running container:
 ```sh
