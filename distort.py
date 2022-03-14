@@ -47,7 +47,7 @@ class FixDistortionImage:
         self.correction_dist = np.array([[-0.4778321949564693, 0.2886513041769561, 0.0016895448886501186,
                                           0.0047619737564622905, -0.12895314122999252]])
 
-        self.rotation_angle = 0.5
+        self.rotation_angle = 0
 
         # Undistort the image
         self.undistort()
@@ -71,8 +71,8 @@ class FixDistortionImage:
         #x, y, w, h = roi
         y=190
         h=1100
-        x=400
-        w=1100
+        x=425
+        w=1125
         dst = dst[y:y + h, x:x + w]
 
         self.path_photo = f'{self.output_path}/{self.path_photo.stem}_corrected{self.path_photo.suffix}'
