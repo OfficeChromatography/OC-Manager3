@@ -3,7 +3,10 @@ from app.settings import STATIC_ROOT, MEDIA_ROOT
 import subprocess
 import re
 import glob
+import pytz         #Import Timezone Library
 from connection.forms import OC_LAB
+
+tz = pytz.timezone('Europe/Berlin') #Setting Timezone for Berlin
 
 
 class Camera:
@@ -35,7 +38,7 @@ class Camera:
         return None
 
     def create_time_stamp(self):
-        return datetime.now().strftime("%Y.%m.%d-%H.%M.%S")
+        return datetime.now(tz).strftime("%Y.%m.%d-%H.%M.%S")
 
     def set_camera_property(self, property, value):
         # Sets the property value
