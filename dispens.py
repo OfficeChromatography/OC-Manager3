@@ -16,10 +16,10 @@ def command(ser, command):
 
 ser = serial.Serial('/dev/ttyACM0', 115200)
 time.sleep(2)
-command(ser, "G1Y101F2000\r\n")
+command(ser, "G1Y110F2000\r\n")
 input("Press Enter to continue...")
-command(ser, "G0Y93F400\r\n") 
-time.sleep(0.5)  # stop time at Y93 = lower edge of the plate
-command(ser, "G1Y0F600\r\n")    #F value = speed for application (mm/min)
+command(ser, "G0Y101F400\r\n") 
+time.sleep(0.5)  # stop time at Y101 = lower edge of the plate
+command(ser, "G1Y10F600\r\n")    #F value = speed for application (mm/min)
 time.sleep(2)
 ser.close()
