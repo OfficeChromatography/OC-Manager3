@@ -219,4 +219,6 @@ class PrintingProcess:
     def _final_steps_after_print(self):
         self._gcode_generator.hold_bed_temperature(0)
         self._gcode_generator.report_bed_temperature(0)
-        self._gcode_generator.homming("XY")
+        #self._gcode_generator.homming("XY")
+        self._gcode_generator.homming("Y") #first Y
+        self._gcode_generator.homming("X") #then X

@@ -2,7 +2,13 @@
 ## Install
 The installation process is really simple. 
 
-OC-Manager 3.0 works fine on a 'Raspberry Pi 4' with 4Gb ram memory and [Ubuntu 20.04](https://ubuntu-mate.org/raspberry-pi/download/) installed on it.  
+OC-Manager 3.0 works fine on a 'Raspberry Pi 4' with 4Gb ram memory and [Ubuntu 20.04](https://releases.ubuntu-mate.org/20.04/arm64/) installed on it.  
+During and after the development phase, we used Ubuntu 20.04 LTS, for which security 
+updates are available until April 2025. The long-term service (LTS) can be extended by 
+5 years after registering at [Ubuntu](https://ubuntu.com/security/esm) and is free 
+for personal use on three machines.
+
+Newer releases of Ubuntu unfortunately do not support the raspistill command to capture plate images.
 
 ### 0. Install git
 Before we begin with the installation, we need to install git.

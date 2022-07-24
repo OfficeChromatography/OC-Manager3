@@ -138,7 +138,7 @@ class GcodeGenerator:
 
     def rinsing(self):
         self.homming("X")
-        self.pressurize("40")
+        self.pressurize("10")
         self.open_valve_frequency("2")
 
     def set_new_zero_position(self, x, y,speed):

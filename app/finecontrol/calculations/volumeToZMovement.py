@@ -1,7 +1,7 @@
 import os
 
-SYRINGE_VOLUME = int(os.environ.get('SYRINGE_VOLUME'))
-SYRINGE_LENGTH = int(os.environ.get('SYRINGE_LENGTH'))
+SYRINGE_VOLUME = float(os.environ.get('SYRINGE_VOLUME'))
+SYRINGE_LENGTH = float(os.environ.get('SYRINGE_LENGTH'))
 
 
 def volume_to_z_movement(volume, ul):
