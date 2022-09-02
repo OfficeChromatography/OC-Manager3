@@ -2,7 +2,7 @@
 ## Install
 The installation process is really simple. 
 
-OC-Manager 3.0 works fine on a 'Raspberry Pi 4' with 4Gb ram memory and [Ubuntu 20.04](https://releases.ubuntu-mate.org/20.04/arm64/) installed on it.  
+OC-Manager 3.0 works fine on a 'Raspberry Pi 4' with 4Gb RAM memory and [Ubuntu 20.04](https://releases.ubuntu-mate.org/20.04/arm64/) installed on it.  
 During and after the development phase, we used Ubuntu 20.04 LTS, for which security 
 updates are available until April 2025. The long-term service (LTS) can be extended by 
 5 years after registering at [Ubuntu](https://ubuntu.com/security/esm) and is free 
@@ -27,7 +27,7 @@ cd ~/Desktop
 Finally, copy and paste the next command and press enter.
 
 ```bash
-git clone https://github.com/OfficeChromatography/OCLab3-Software.git
+git clone https://github.com/OfficeChromatography/OC-Manager3.git
 ```
 
 ### 2. Execute 'install.py'
