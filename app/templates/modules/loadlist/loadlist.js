@@ -157,21 +157,18 @@ class listOfSaved{
             this.$exportToCsv();
         })
     }
-
     $exportToCsv = function(){
-        // let data = $('form').serializeArray();
-        let methodID = $('[aria-selected="true"]').find("a").attr("value_saved")
-        $.get(window.location.origin+'/export/'+methodID+"/").done(function (data){
-            let filename = $(".active").find(".saved_element").text();
-            let csvContent = "data:text/csv;charset=utf-8,"+data;
-            var encodedUri = encodeURI(csvContent);
-            var link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", filename + ".csv");
-            document.body.appendChild(link); // Required for FF
-            link.click();
-        })
+        let data = this.saveEvent()
+        let sentencias = data.replaceAll('&','\n');
+        sentencias = sentencias.replaceAll('=',',');
+        sentencias = sentencias.substring(0, sentencias.length - 199);
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(sentencias);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'output.csv';
+        hiddenElement.click();
     };
+    
 }
 
 
